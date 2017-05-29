@@ -1,5 +1,5 @@
 //RIGHT NOW:
-//
+//Implement fill_rec_buffer, test that it works
 
 /* File: main.js
  * -----------------------
@@ -7,8 +7,6 @@
  * Grainulator, but right now it just contains trivial test stuffs
  * 
  * To implement next: records a sample to a buffer, plays it backs
- * 
- * 
  * 
  * 
  */
@@ -34,18 +32,25 @@ GButton.prototype.change_active = function() {
 
 /* ##### End GButton ##### */
 
+/* ##### Begin Constants/ Globals ##### */
 //create context
 var context = new (window.AudioContext || window.webkitAudioContext)();
 //declare the nodes
-var gate;
+var mic_analyzer;
+var mic_source;
+//declare the buttons
 var rec_button;
 var play_button;
-var mic_source;
+var rec_buffer;
+
+const NUM_CHANS = 2;
+const BUFFER_DUR = 3;
+
+/* ##### End Constants/ Globals ##### */
 
 function init(){
 	init_buttons();
 	init_audio_nodes();
-
 }
 
 /* grabs the record and play/stop buttons from html, assigns them
@@ -63,6 +68,9 @@ function init_button_listener(btn) {
 	btn.button.addEventListener('click', function(){btn.click_func(btn); });
 }
 
+/* I eventually want to implement recording to behave like this stub,
+ * where you can record for an arbitrary amount of time, but for now
+ * buffer lendth is set at BUFFER_DUR seconds
 function handle_rec_press(btn) {
 	if (btn.is_active) {
 		console.log("end record")
@@ -70,17 +78,53 @@ function handle_rec_press(btn) {
 		console.log("begin record")
 	}
 	btn.change_active()
+} */
+
+function fill_rec_buffer(buffer) {
+	// create buffer inSamp tracker variable
+	// while not at end of buffer
+		// create intermediate array (min(fft.Size, number of samples left to fill, buffer.length - inSamp))
+		// fill the intermediate arr
+		// for each channel
+			// put intermediate arr into channel buffer at inSamp index
 }
 
-function handle_play_stop_press(btn) {
-	if (btn.is_active) {
-		console.log("end play")
-	} else {
-		console.log("begin play")
-	}
-	btn.change_active()
+function handle_rec_press(btn) {
+	if (!btn.is_active) {
+		//switch on
+		btn.change_active();
 
-	gate.gain.value = (gate.gain.value + 1) % 2;
+		// record over the buffer
+		fill_rec_buffer(rec_buffer);
+
+		//Old code
+		/*var dataArray = new Float32Array(rec_buffer.length);
+		mic_analyzer.getFloatTimeDomainData(dataArray)
+		for(var c = 0; c < NUM_CHANS; c++){
+			rec_buffer.copyToChannel(dataArray, c)
+		}*/
+
+		//switch off
+		btn.change_active();
+	}
+}
+
+// this helper function comes from https://goo.gl/VaV8kX
+function playSound(buffer) {
+  	var source = context.createBufferSource();
+  	source.buffer = buffer;
+  	source.connect(context.destination);
+  	source.start(0);
+}
+
+/* plays what's in the buffer */
+function handle_play_stop_press(btn) {
+	if (!btn.is_active) {
+		btn.change_active()
+		console.log("begin play")
+		playSound(rec_buffer);
+		btn.change_active()
+	}
 }
 
 // Some of this is based on http://tinyurl.com/m7txdkv, mainly the
@@ -89,23 +133,26 @@ function init_audio_stream() {
 	if (navigator.mediaDevices) {
 		console.log('getUserMedia supported.');
 		// this syntax comes from https://goo.gl/etOCTm
-		navigator.mediaDevices.getUserMedia({audio: true, video: true}).then(function(stream) {
+		navigator.mediaDevices.getUserMedia({audio: true}).then(function(stream) {
   			mic_source = context.createMediaStreamSource(stream);
-  			mic_source.connect(gate);
+  			mic_source.connect(mic_analyzer);
 		}).catch(function(err) {
   			console.log("Encountered the getUserMedia error: " + err);
 		});
-	} else {	
+	} else {
 	   	console.log('getUserMedia not supported on your browser!');
 	}
 }
 
+function init_audio_buffer() {
+	rate = context.sampleRate;
+	rec_buffer = context.createBuffer(NUM_CHANS, BUFFER_DUR * rate, rate);
+}
+
 function init_audio_nodes() {
 	//create the audio nodes
+	mic_analyzer = context.createAnalyser();
 	init_audio_stream();
 	//then connect to recording buffer? we'll just output it straight for now
-	gate = context.createGain();
-	gate.gain.value = 0;
-	gate.connect(context.destination);
-
+	init_audio_buffer();
 }
