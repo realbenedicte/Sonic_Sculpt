@@ -31,20 +31,21 @@ function GButton(html_label, click_func, is_active) {
 GButton.prototype.change_active = function() {
 						this.is_active = (this.is_active + 1) % 2;
 					};
-					
+
 /* ##### End GButton ##### */
 
 //create context
 var context = new (window.AudioContext || window.webkitAudioContext)();
 //declare the nodes
-var osc;
 var gate;
 var rec_button;
 var play_button;
+var mic_source;
 
 function init(){
 	init_buttons();
-	//init_audio_nodes();
+	init_audio_nodes();
+
 }
 
 /* grabs the record and play/stop buttons from html, assigns them
@@ -78,22 +79,33 @@ function handle_play_stop_press(btn) {
 		console.log("begin play")
 	}
 	btn.change_active()
+
+	gate.gain.value = (gate.gain.value + 1) % 2;
+}
+
+// Some of this is based on http://tinyurl.com/m7txdkv, mainly the
+// mediaDevices stuff
+function init_audio_stream() {
+	if (navigator.mediaDevices) {
+		console.log('getUserMedia supported.');
+		// this syntax comes from https://goo.gl/etOCTm
+		navigator.mediaDevices.getUserMedia({audio: true, video: true}).then(function(stream) {
+  			mic_source = context.createMediaStreamSource(stream);
+  			mic_source.connect(gate);
+		}).catch(function(err) {
+  			console.log("Encountered the getUserMedia error: " + err);
+		});
+	} else {	
+	   	console.log('getUserMedia not supported on your browser!');
+	}
 }
 
 function init_audio_nodes() {
 	//create the audio nodes
-	osc = context.createOscillator();
+	init_audio_stream();
+	//then connect to recording buffer? we'll just output it straight for now
 	gate = context.createGain();
-
-	//specs for the oscillator
-	osc.type = "sine";
-	osc.start();
-
-	//specs for the gain gate node
 	gate.gain.value = 0;
-
-	//connect nodes to dest;
-	osc.connect(gate);
 	gate.connect(context.destination);
 
 }
