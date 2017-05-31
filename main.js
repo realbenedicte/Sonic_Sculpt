@@ -1,5 +1,10 @@
 //RIGHT NOW:
-//Implement fill_rec_buffer, test that it works
+
+// Going to implement without a play buffer, get it saving the file for playback w/out it 
+// going into the buffer (just a raw file), and then figure out the playBuffer sitch in a 
+// sec #### CHECK OUT reader.readAsArrayBuffer(blob) ####
+
+// 
 
 /* File: main.js
  * -----------------------
@@ -8,7 +13,13 @@
  * 
  * To implement next: records a sample to a buffer, plays it backs
  * 
- * 
+ * Important Sources:
+ * - https://goo.gl/NIerhh
+ * - https://goo.gl/nZF0x5
+ * - https://goo.gl/bcIYL7
+ * - https://goo.gl/VaV8kX
+ * - https://goo.gl/86PNFT
+ * - https://goo.gl/RVYeG5 - ObjectURL manpage
  */
 
 
@@ -36,12 +47,15 @@ GButton.prototype.change_active = function() {
 //create context
 var context = new (window.AudioContext || window.webkitAudioContext)();
 //declare the nodes
-var mic_analyzer;
-var mic_source;
+var mic_recorder;
 //declare the buttons
 var rec_button;
 var play_button;
 var rec_buffer;
+//declare other
+var rec_chunks = [];
+var rec_url;
+
 
 const NUM_CHANS = 2;
 const BUFFER_DUR = 3;
@@ -68,45 +82,35 @@ function init_button_listener(btn) {
 	btn.button.addEventListener('click', function(){btn.click_func(btn); });
 }
 
+function save_rec_blob() {
+	var rec_blob = new Blob(rec_chunks, { 'type' : 'audio/ogg; codecs=opus' });
+	rec_chunks = [];
+	rec_url	= window.URL.createObjectURL(rec_blob);
+}
+
 /* I eventually want to implement recording to behave like this stub,
  * where you can record for an arbitrary amount of time, but for now
  * buffer lendth is set at BUFFER_DUR seconds
+ */
 function handle_rec_press(btn) {
 	if (btn.is_active) {
-		console.log("end record")
+		end_record(btn);
 	} else {
-		console.log("begin record")
+		begin_record(btn);
 	}
-	btn.change_active()
-} */
-
-function fill_rec_buffer(buffer) {
-	// create buffer inSamp tracker variable
-	// while not at end of buffer
-		// create intermediate array (min(fft.Size, number of samples left to fill, buffer.length - inSamp))
-		// fill the intermediate arr
-		// for each channel
-			// put intermediate arr into channel buffer at inSamp index
 }
 
-function handle_rec_press(btn) {
-	if (!btn.is_active) {
-		//switch on
-		btn.change_active();
+function end_record(btn) {
+	mic_recorder.stop();
+	console.log("ending record");
+	btn.change_active();
+}
 
-		// record over the buffer
-		fill_rec_buffer(rec_buffer);
-
-		//Old code
-		/*var dataArray = new Float32Array(rec_buffer.length);
-		mic_analyzer.getFloatTimeDomainData(dataArray)
-		for(var c = 0; c < NUM_CHANS; c++){
-			rec_buffer.copyToChannel(dataArray, c)
-		}*/
-
-		//switch off
-		btn.change_active();
-	}
+function begin_record(btn) {
+	//switch on
+	mic_recorder.start();
+	console.log(mic_recorder.state);
+	btn.change_active();
 }
 
 // this helper function comes from https://goo.gl/VaV8kX
@@ -127,6 +131,18 @@ function handle_play_stop_press(btn) {
 	}
 }
 
+
+//Initializes the MediaRecorder mic_recorder object
+function init_mic_recorder(stream) {
+	mic_recorder = new MediaRecorder(stream);
+  	mic_recorder.ondataavailable = function(e) {
+  		rec_chunks.push(e.data);
+  	};
+  	mic_recorder.onstop = function(e) {
+  		save_rec_blob();
+  	};
+}
+
 // Some of this is based on http://tinyurl.com/m7txdkv, mainly the
 // mediaDevices stuff
 function init_audio_stream() {
@@ -134,8 +150,7 @@ function init_audio_stream() {
 		console.log('getUserMedia supported.');
 		// this syntax comes from https://goo.gl/etOCTm
 		navigator.mediaDevices.getUserMedia({audio: true}).then(function(stream) {
-  			mic_source = context.createMediaStreamSource(stream);
-  			mic_source.connect(mic_analyzer);
+  			init_mic_recorder(stream);
 		}).catch(function(err) {
   			console.log("Encountered the getUserMedia error: " + err);
 		});
@@ -151,8 +166,7 @@ function init_audio_buffer() {
 
 function init_audio_nodes() {
 	//create the audio nodes
-	mic_analyzer = context.createAnalyser();
 	init_audio_stream();
 	//then connect to recording buffer? we'll just output it straight for now
-	init_audio_buffer();
+	//init_audio_buffer();
 }
