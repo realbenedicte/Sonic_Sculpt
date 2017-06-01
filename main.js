@@ -1,8 +1,6 @@
 //RIGHT NOW:
-
-// Going to implement without a play buffer, get it saving the file for playback w/out it 
-// going into the buffer (just a raw file), and then figure out the playBuffer sitch in a 
-// sec
+// going to implement a delete-previous-recording feature, to be space
+// efficient
 
 //ON THE LIST:
 /* - CHECK OUT reader.readAsArrayBuffer(blob)
@@ -15,9 +13,8 @@
 /* File: main.js
  * -----------------------
  * This is going to contain the javascript-working-gubbins for the Grains4u
- * Grainulator, but right now it just contains trivial test stuffs
- * 
- * To implement next: records a sample to a buffer, plays it backs
+ * Grainulator, but right now it is only a stub page that records an audio
+ * sample and plays it back
  * 
  * Important Sources:
  * - https://goo.gl/NIerhh
@@ -33,13 +30,15 @@
 /* Object: GButton
  * -----------------------
  * This is a button object. It represents a button the screen, and houses
- * some important info on that button. I'll write it, and then I'll know
- * more about what that info is
+ * some important info on that button. Specifically, it contains the HTML
+ * id string for the button, the actual HTML element itself (button), the
+ * function that is to be called when it is clicked, and a 1-or-0 value that
+ * reflects if the button is currently "active" or not. 
  */
 
-function GButton(html_label, click_func, is_active) {
-	this.html_label = html_label;
-	this.button = document.getElementById(html_label);
+function GButton(html_id, click_func, is_active) {
+	this.html_id = html_id;
+	this.button = document.getElementById(html_id);
 	this.click_func = click_func;
 	this.is_active = is_active;
 }
@@ -62,13 +61,15 @@ var full_audio;
 
 
 const NUM_CHANS = 2;
-const BUFFER_DUR = 3;
+//const BUFFER_DUR = 3;
 
 /* ##### End Constants/ Globals ##### */
 
 /* Function: init
  * --------------
- * 
+ * This is the master initialization function for the script. It
+ * first initializes the buttons, then initializes the rest of the
+ * audio node business. It is called when the HTML page loads.
  */
 function init(){
 	init_buttons();
@@ -77,8 +78,9 @@ function init(){
 
 /* Function: init_buttons
  * ----------------------
- * grabs the record and play/stop buttons from html, assigns them
- * things to do when pressed
+ * This function creates new GButton objects for the record and play
+ * buttons in the HTML document, then intializes click event listeners
+ * for both of these buttons.
  */
 function init_buttons() {
 	rec_button = new GButton("rec_stop", handle_rec_press,  0);
@@ -90,30 +92,20 @@ function init_buttons() {
 
 /* Function: init_button_listener
  * ------------------------------
- * 
+ * This initializes a new Event Listener, listening for clicks on 
+ * whichever button is passed into it. When the button is clicked,
+ * the button's "click_func" function fires.
  */
 function init_button_listener(btn) {
 	btn.button.addEventListener('click', function(){btn.click_func(btn); });
 }
 
-/* Function: save_rec_blob
- * -----------------------
- * 
- */
-function save_rec_blob() {
-	var rec_blob = new Blob(rec_chunks, { 'type' : 'audio/ogg; codecs=opus' });
-	rec_chunks = [];
-	rec_url	= window.URL.createObjectURL(rec_blob);
-	if(full_audio) {
-		full_audio.src = rec_url;
-	} else {
-		full_audio = new Audio(rec_url);	
-	}
-}
-
-/* Function: end_record
+/* Function: handle_rec_press
  * --------------------
- * 
+ * This function handles the pressing of the record button.
+ * if the recording is currently happening, it is ended. If it
+ * is not, then playback of the sound is stopped (if it is going),
+ * and the recording is begun.
  */
 function handle_rec_press() {
 	if (rec_button.is_active) {
@@ -130,63 +122,91 @@ function handle_rec_press() {
 
 /* Function: end_record
  * ----------------------
- * 
+ * This ends the recording process, and changes the activity boolean of
+ * the record button to reflect this.
  */
 function end_record() {
 	mic_recorder.stop();
-	console.log("ending record");
 	rec_button.is_active = 0;
 }
 
 /* Function: begin_record
  * ----------------------
- * 
+ * This begins the recording process, and changes the activity boolean of
+ * the record button to reflect this.
  */
 function begin_record() {
 	mic_recorder.start();
-	console.log(mic_recorder.state);
 	rec_button.is_active = 1;
 }
 
 /* Function: play_full_audio
  * -------------------------
- * 
+ * This plays the audio recording from the beginning, and changes the activity
+ * boolean of the play button to reflect this.
  */
 function play_full_audio() {
+	full_audio.currentTime = 0.0;
 	full_audio.play();
 	play_button.is_active = 1;
 }
 
 /* Function: stop_full_audio
  * -------------------------
- * 
+ * This stops the currently playing audio recording, and resets
+ * the activity boolean on the play button.
  */
 function stop_full_audio() {
 	full_audio.pause();
-	full_audio.currentTime = 0.0;
 	play_button.is_active = 0;
 }
 
 /* Function: handle_play_stop_press
  * --------------------------------
- * plays what's in the buffer
+ * This function handles behavior when the "Play/Pause" button is
+ * pressed. If the recording is not currently being played, and
+ * the button is pressed, then the recording is played. If the recording
+ * is being played at the time the button is pressed, then the recording
+ * is stopped. If no audio has been recorded, that is caught
  */
 function handle_play_stop_press() {
-	if (play_button.is_active && !full_audio.ended) {
-		stop_full_audio();
-	} else {
-		if(full_audio) {
-			if (full_audio.ended){ full_audio.currentTime = 0.0; }
-			play_full_audio();	
+	if(full_audio) {
+		if (play_button.is_active && !full_audio.ended) {
+			stop_full_audio();
 		} else {
-			console.log("No audio recorded!");
+			play_full_audio();	
 		}
+	} else {
+			console.log("No audio recorded!");
+	}
+}
+
+/* Function: save_rec_blob
+ * -----------------------
+ * This function fires every time the mic_recorder object finishes
+ * recording. It first creates a new audio blob, then gets an object
+ * url for this blob. It then passes this object url to the Audio 
+ * contructor to make a new HTMLAudioElement object. If this object
+ * has already been initialized, then the source value of the Audio
+ * element is replaced.
+ */
+function save_rec_blob() {
+	var rec_blob = new Blob(rec_chunks, { 'type' : 'audio/ogg; codecs=opus' });
+	rec_chunks = [];
+	rec_url	= window.URL.createObjectURL(rec_blob);
+	if(full_audio) {
+		full_audio.src = rec_url;
+	} else {
+		full_audio = new Audio(rec_url);	
 	}
 }
 
 /* Function: init_mic_recorder
  * ---------------------------
- * Initializes the MediaRecorder mic_recorder object
+ * Initializes the MediaRecorder mic_recorder object. Links it to the
+ * audio stream, and declares callback functions for when data is
+ * available from the MediaRecorder API, and what to do when the 
+ * MediaRecorder object is done recording.
  */
 function init_mic_recorder(stream) {
 	mic_recorder = new MediaRecorder(stream);
@@ -201,8 +221,13 @@ function init_mic_recorder(stream) {
 
 /* Function: init_audio_stream
  * ---------------------------
- * Some of this is based on http://tinyurl.com/m7txdkv, mainly the
- * mediaDevices stuff
+ * This initializes all variables and AudioNodes related to capturing
+ * the audio stream. It first checks to see if grabbing the audio stream
+ * is possible. If so, it passes the stream to init_mic_recorder, so that
+ * it can be linked to the MediaRecorder. It catches any errors/ MediaStream
+ * incompatibilities with the browser.
+ * 
+ * Code Sources: https://goo.gl/etOCTm, https://goo.gl/5X2Fzt
  */
 function init_audio_stream() {
 	if (navigator.mediaDevices) {
@@ -220,6 +245,9 @@ function init_audio_stream() {
 
 /* Function: init_audio_nodes
  * ---------------------------
+ * This function initializes the AudioNodes used in the app. It first
+ * initializes all those related to the audio stream (ie: mic_recorder),
+ * then those related to the audio buffer.
  */
 function init_audio_nodes() {
 	init_audio_stream();
