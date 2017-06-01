@@ -4,7 +4,7 @@
 // going into the buffer (just a raw file), and then figure out the playBuffer sitch in a 
 // sec #### CHECK OUT reader.readAsArrayBuffer(blob) ####
 
-// 
+// httpd.conf permission = 644
 
 /* File: main.js
  * -----------------------
@@ -20,6 +20,7 @@
  * - https://goo.gl/VaV8kX
  * - https://goo.gl/86PNFT
  * - https://goo.gl/RVYeG5 - ObjectURL manpage
+ * - https://goo.gl/tNB9Bf - setting up localhost
  */
 
 
