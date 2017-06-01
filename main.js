@@ -1,13 +1,8 @@
 //RIGHT NOW:
-// going to implement a delete-previous-recording feature, to be space
-// efficient
+// Plays one grain
 
 //ON THE LIST:
-/* - CHECK OUT reader.readAsArrayBuffer(blob)
- * - delete previous recording when recording a new one (line 106)
- * - responsive play/pause button, isn't clickable if no recording yet
- *
- *
+/* - responsive play/pause button, isn't clickable if no recording yet
  */
 
 /* File: main.js
@@ -43,6 +38,37 @@ function GButton(html_id, click_func, is_active) {
 	this.is_active = is_active;
 }
 
+/* Object: Grain
+ * -----------------------
+ * This is a grain object. It contains all of the information and functionality
+ * of a grain. Some important things it contains: grain length, grain start time,
+ * grain playback rate, (some other stuff I don't know I need yet). It also prototypes
+ * the functionality of playing the grain. Lemme write it and then get back to this...
+ * 
+ */
+
+function Grain(start_time, samp_length, play_rate) {
+	this.start_time = start_time;
+	this.samp_length = g_length;
+	this.play_rate = play_rate;
+	// other stuff?
+}
+
+Grain.prototype.play = function () {
+		console.log("playing grain");
+		//write this?
+	}
+
+Grain.prototype.stop = function () {
+		console.log("stoping grain");
+		//write this?
+	}
+
+Grain.prototype.strike = function () {
+		console.log("striking grain");
+		//write this?
+	}
+
 /* ##### End GButton ##### */
 
 /* ##### Begin Constants/ Globals ##### */
@@ -50,6 +76,7 @@ function GButton(html_id, click_func, is_active) {
 var context = new (window.AudioContext || window.webkitAudioContext)();
 //declare the nodes
 var mic_recorder;
+var full_array_buffer;
 //declare the buttons
 var rec_button;
 var play_button;
@@ -57,8 +84,12 @@ var rec_buffer;
 //declare other
 var rec_chunks = [];
 var rec_url;
+var rec_blob;
 var full_audio;
+var curr_buffer;
 
+//for debugging
+var verbose = 0;
 
 const NUM_CHANS = 2;
 //const BUFFER_DUR = 3;
@@ -111,11 +142,11 @@ function handle_rec_press() {
 	if (rec_button.is_active) {
 		end_record();
 	} else {
-		//delete last recording
 		if(play_button.is_active) {
 			stop_full_audio();
 			play_button.is_active = 0;
 		}
+		delete_rec_blob();
 		begin_record();
 	}
 }
@@ -127,6 +158,7 @@ function handle_rec_press() {
  */
 function end_record() {
 	mic_recorder.stop();
+	if(verbose) { console.log("recording stopped"); }
 	rec_button.is_active = 0;
 }
 
@@ -137,6 +169,7 @@ function end_record() {
  */
 function begin_record() {
 	mic_recorder.start();
+	if(verbose) { console.log("recording started"); }
 	rec_button.is_active = 1;
 }
 
@@ -146,8 +179,10 @@ function begin_record() {
  * boolean of the play button to reflect this.
  */
 function play_full_audio() {
-	full_audio.currentTime = 0.0;
-	full_audio.play();
+	var buf = get_audio_buffer_source(full_array_buffer, context.destination);
+	curr_buffer = buf;
+	buf.start(0);
+	if(verbose) { console.log("file playing"); }
 	play_button.is_active = 1;
 }
 
@@ -157,7 +192,8 @@ function play_full_audio() {
  * the activity boolean on the play button.
  */
 function stop_full_audio() {
-	full_audio.pause();
+	curr_buffer.stop(0);
+	if(verbose) { console.log("file stopped"); }
 	play_button.is_active = 0;
 }
 
@@ -181,6 +217,15 @@ function handle_play_stop_press() {
 	}
 }
 
+/* Function: delete_rec_blob
+ * -----------------------
+ * This revokes the url of the previously-used audio recording, in
+ * preparation of a new one about to be created.
+ */
+function delete_rec_blob(){
+	window.URL.revokeObjectURL(rec_url);
+}
+
 /* Function: save_rec_blob
  * -----------------------
  * This function fires every time the mic_recorder object finishes
@@ -191,7 +236,7 @@ function handle_play_stop_press() {
  * element is replaced.
  */
 function save_rec_blob() {
-	var rec_blob = new Blob(rec_chunks, { 'type' : 'audio/ogg; codecs=opus' });
+	rec_blob = new Blob(rec_chunks, { 'type' : 'audio/ogg; codecs=opus' });
 	rec_chunks = [];
 	rec_url	= window.URL.createObjectURL(rec_blob);
 	if(full_audio) {
@@ -199,6 +244,42 @@ function save_rec_blob() {
 	} else {
 		full_audio = new Audio(rec_url);	
 	}
+}
+
+/* Function: get_audio_buffer_source
+ * -----------------------------------
+ * This function creates and returns an AudioBufferSource object, which
+ * contains the data from the ArrayBuffer arr_buf passed into it.
+ * It uses the AudioContext's decodeAudioData function to create 
+ * an AudioBuffer object that can be used as the data buffer for the
+ * AudioBufferSource object being created. The AudioBufferSource then
+ * connected to the inputs of the out_node AudioNode, and returned.
+ */
+function get_audio_buffer_source(arr_buf, out_node){
+	var audio_buf = context.createBufferSource();
+	context.decodeAudioData(arr_buf).then(function(data) {
+		audio_buf.buffer = data;
+        audio_buf.connect(out_node);
+	}).catch(function(err) {
+		console.log("Encountered the decodeAudioData error: " + err);
+	});
+	return audio_buf;
+}
+
+/* Function: create_audio_array_buffer
+ * -----------------------------------
+ * This function uses a FileReader instance to feed the raw data from
+ * the full recording blob into an ArrayBuffer object, which we can
+ * use later to create playable AudioBuffer objects.
+ */
+function create_audio_array_buffer() {
+	var reader = new FileReader();
+	reader.onloadstart = function() {if(verbose) { console.log("beginning buffer load"); }}
+	reader.onloadend = function() {
+		full_array_buffer = reader.result;
+		if(verbose) { console.log("finished buffer load"); } 
+	} 
+	reader.readAsArrayBuffer(rec_blob)
 }
 
 /* Function: init_mic_recorder
@@ -209,12 +290,13 @@ function save_rec_blob() {
  * MediaRecorder object is done recording.
  */
 function init_mic_recorder(stream) {
-	mic_recorder = new MediaRecorder(stream);
+	mic_recorder = new MediaRecorder(stream, {audioBitsPerSecond : 64000});
   	mic_recorder.ondataavailable = function(e) {
   		rec_chunks.push(e.data);
   	};
   	mic_recorder.onstop = function(e) {
   		save_rec_blob();
+  		create_audio_array_buffer();
   	};
 }
 
@@ -232,7 +314,6 @@ function init_mic_recorder(stream) {
 function init_audio_stream() {
 	if (navigator.mediaDevices) {
 		console.log('getUserMedia supported.');
-		// this syntax comes from https://goo.gl/etOCTm
 		navigator.mediaDevices.getUserMedia({audio: true}).then(function(stream) {
   			init_mic_recorder(stream);
 		}).catch(function(err) {
@@ -251,5 +332,4 @@ function init_audio_stream() {
  */
 function init_audio_nodes() {
 	init_audio_stream();
-	//init_audio_buffer();
 }
