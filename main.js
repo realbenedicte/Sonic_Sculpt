@@ -2,9 +2,15 @@
 
 // Going to implement without a play buffer, get it saving the file for playback w/out it 
 // going into the buffer (just a raw file), and then figure out the playBuffer sitch in a 
-// sec #### CHECK OUT reader.readAsArrayBuffer(blob) ####
+// sec
 
-// httpd.conf permission = 644
+//ON THE LIST:
+/* - CHECK OUT reader.readAsArrayBuffer(blob)
+ * - delete previous recording when recording a new one (line 106)
+ * - responsive play/pause button, isn't clickable if no recording yet
+ *
+ *
+ */
 
 /* File: main.js
  * -----------------------
@@ -38,10 +44,6 @@ function GButton(html_label, click_func, is_active) {
 	this.is_active = is_active;
 }
 
-GButton.prototype.change_active = function() {
-						this.is_active = (this.is_active + 1) % 2;
-					};
-
 /* ##### End GButton ##### */
 
 /* ##### Begin Constants/ Globals ##### */
@@ -56,6 +58,7 @@ var rec_buffer;
 //declare other
 var rec_chunks = [];
 var rec_url;
+var full_audio;
 
 
 const NUM_CHANS = 2;
@@ -87,31 +90,37 @@ function save_rec_blob() {
 	var rec_blob = new Blob(rec_chunks, { 'type' : 'audio/ogg; codecs=opus' });
 	rec_chunks = [];
 	rec_url	= window.URL.createObjectURL(rec_blob);
-}
-
-/* I eventually want to implement recording to behave like this stub,
- * where you can record for an arbitrary amount of time, but for now
- * buffer lendth is set at BUFFER_DUR seconds
- */
-function handle_rec_press(btn) {
-	if (btn.is_active) {
-		end_record(btn);
+	if(full_audio) {
+		full_audio.src = rec_url;
 	} else {
-		begin_record(btn);
+		full_audio = new Audio(rec_url);	
 	}
 }
 
-function end_record(btn) {
-	mic_recorder.stop();
-	console.log("ending record");
-	btn.change_active();
+function handle_rec_press() {
+	if (rec_button.is_active) {
+		end_record();
+	} else {
+		//delete last recording
+		if(play_button.is_active) {
+			stop_full_audio();
+			play_button.is_active = 0;
+		}
+		begin_record();
+	}
 }
 
-function begin_record(btn) {
+function end_record() {
+	mic_recorder.stop();
+	console.log("ending record");
+	rec_button.is_active = 0;
+}
+
+function begin_record() {
 	//switch on
 	mic_recorder.start();
 	console.log(mic_recorder.state);
-	btn.change_active();
+	rec_button.is_active = 1;
 }
 
 // this helper function comes from https://goo.gl/VaV8kX
@@ -122,13 +131,30 @@ function playSound(buffer) {
   	source.start(0);
 }
 
+function play_full_audio() {
+	full_audio.play();
+	play_button.is_active = 1;
+}
+
+function stop_full_audio() {
+	full_audio.pause();
+	full_audio.currentTime = 0.0;
+	play_button.is_active = 0;
+}
+
 /* plays what's in the buffer */
-function handle_play_stop_press(btn) {
-	if (!btn.is_active) {
-		btn.change_active()
-		console.log("begin play")
-		playSound(rec_buffer);
-		btn.change_active()
+function handle_play_stop_press() {
+	
+	//deal with making activity marker accurate
+	if (play_button.is_active && !full_audio.ended) {
+		stop_full_audio();
+	} else {
+		if(full_audio) {
+			if (full_audio.ended){ full_audio.currentTime = 0.0; }
+			play_full_audio();	
+		} else {
+			console.log("No audio recorded!");
+		}
 	}
 }
 
