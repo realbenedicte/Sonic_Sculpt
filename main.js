@@ -66,12 +66,18 @@ const BUFFER_DUR = 3;
 
 /* ##### End Constants/ Globals ##### */
 
+/* Function: init
+ * --------------
+ * 
+ */
 function init(){
 	init_buttons();
 	init_audio_nodes();
 }
 
-/* grabs the record and play/stop buttons from html, assigns them
+/* Function: init_buttons
+ * ----------------------
+ * grabs the record and play/stop buttons from html, assigns them
  * things to do when pressed
  */
 function init_buttons() {
@@ -82,10 +88,18 @@ function init_buttons() {
 	init_button_listener(play_button);
 }
 
+/* Function: init_button_listener
+ * ------------------------------
+ * 
+ */
 function init_button_listener(btn) {
 	btn.button.addEventListener('click', function(){btn.click_func(btn); });
 }
 
+/* Function: save_rec_blob
+ * -----------------------
+ * 
+ */
 function save_rec_blob() {
 	var rec_blob = new Blob(rec_chunks, { 'type' : 'audio/ogg; codecs=opus' });
 	rec_chunks = [];
@@ -97,6 +111,10 @@ function save_rec_blob() {
 	}
 }
 
+/* Function: end_record
+ * --------------------
+ * 
+ */
 function handle_rec_press() {
 	if (rec_button.is_active) {
 		end_record();
@@ -110,42 +128,50 @@ function handle_rec_press() {
 	}
 }
 
+/* Function: end_record
+ * ----------------------
+ * 
+ */
 function end_record() {
 	mic_recorder.stop();
 	console.log("ending record");
 	rec_button.is_active = 0;
 }
 
+/* Function: begin_record
+ * ----------------------
+ * 
+ */
 function begin_record() {
-	//switch on
 	mic_recorder.start();
 	console.log(mic_recorder.state);
 	rec_button.is_active = 1;
 }
 
-// this helper function comes from https://goo.gl/VaV8kX
-function playSound(buffer) {
-  	var source = context.createBufferSource();
-  	source.buffer = buffer;
-  	source.connect(context.destination);
-  	source.start(0);
-}
-
+/* Function: play_full_audio
+ * -------------------------
+ * 
+ */
 function play_full_audio() {
 	full_audio.play();
 	play_button.is_active = 1;
 }
 
+/* Function: stop_full_audio
+ * -------------------------
+ * 
+ */
 function stop_full_audio() {
 	full_audio.pause();
 	full_audio.currentTime = 0.0;
 	play_button.is_active = 0;
 }
 
-/* plays what's in the buffer */
+/* Function: handle_play_stop_press
+ * --------------------------------
+ * plays what's in the buffer
+ */
 function handle_play_stop_press() {
-	
-	//deal with making activity marker accurate
 	if (play_button.is_active && !full_audio.ended) {
 		stop_full_audio();
 	} else {
@@ -158,8 +184,10 @@ function handle_play_stop_press() {
 	}
 }
 
-
-//Initializes the MediaRecorder mic_recorder object
+/* Function: init_mic_recorder
+ * ---------------------------
+ * Initializes the MediaRecorder mic_recorder object
+ */
 function init_mic_recorder(stream) {
 	mic_recorder = new MediaRecorder(stream);
   	mic_recorder.ondataavailable = function(e) {
@@ -170,8 +198,12 @@ function init_mic_recorder(stream) {
   	};
 }
 
-// Some of this is based on http://tinyurl.com/m7txdkv, mainly the
-// mediaDevices stuff
+
+/* Function: init_audio_stream
+ * ---------------------------
+ * Some of this is based on http://tinyurl.com/m7txdkv, mainly the
+ * mediaDevices stuff
+ */
 function init_audio_stream() {
 	if (navigator.mediaDevices) {
 		console.log('getUserMedia supported.');
@@ -186,14 +218,10 @@ function init_audio_stream() {
 	}
 }
 
-function init_audio_buffer() {
-	rate = context.sampleRate;
-	rec_buffer = context.createBuffer(NUM_CHANS, BUFFER_DUR * rate, rate);
-}
-
+/* Function: init_audio_nodes
+ * ---------------------------
+ */
 function init_audio_nodes() {
-	//create the audio nodes
 	init_audio_stream();
-	//then connect to recording buffer? we'll just output it straight for now
 	//init_audio_buffer();
 }
