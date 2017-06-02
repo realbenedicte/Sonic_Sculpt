@@ -88,8 +88,8 @@ var rec_blob;
 var full_audio;
 
 //declare full-buffer-related vars
-var curr_buffer;
-var curr_buffer_src;
+var full_buffer;
+var full_buffer_src;
 
 //declare grain-related vars
 var grains;
@@ -188,8 +188,8 @@ function begin_record() {
  * boolean of the play button to reflect this.
  */
 function play_full_audio() {
-	curr_buffer_src = get_audio_buffer_source(full_array_buffer, context.destination);
-	curr_buffer_src.start(0);
+	full_buffer_src = get_audio_buffer_source(context.destination);
+	full_buffer_src.start(0);
 	if(verbose) { console.log("file playing"); }
 	play_button.is_active = 1;
 }
@@ -200,7 +200,7 @@ function play_full_audio() {
  * the activity boolean on the play button.
  */
 function stop_full_audio() {
-	curr_buffer_src.stop(0);
+	full_buffer_src.stop(0);
 	if(verbose) { console.log("file stopped"); }
 	play_button.is_active = 0;
 }
@@ -254,25 +254,31 @@ function save_rec_blob() {
 	}
 }
 
+
 /* Function: get_audio_buffer_source
  * -----------------------------------
- * This function creates and returns an AudioBufferSource object, which
- * contains the data from the ArrayBuffer arr_buf passed into it.
- * It uses the AudioContext's decodeAudioData function to create 
- * an AudioBuffer object that can be used as the data buffer for the
- * AudioBufferSource object being created. The AudioBufferSource then
- * connected to the inputs of the out_node AudioNode, and returned.
+ * This function creates and returns an AudioBufferSource object that 
+ * can play the current full buffer.
  */
-function get_audio_buffer_source(arr_buf, out_node){
+function get_audio_buffer_source(out_node){
 	var buf_src = context.createBufferSource();
-	context.decodeAudioData(arr_buf).then(function(data) {
-		curr_buffer = data;
-		buf_src.buffer = curr_buffer;
-        buf_src.connect(out_node);
+	buf_src.buffer = full_buffer;
+    buf_src.connect(out_node);
+	return buf_src;
+}
+
+/* Function: store_full_buffer
+ * -----------------------------------
+ * This function stores the AudioBuffer object containing the data for 
+ * the current audio recording. It it passed an ArrayBuffer object, and
+ * processes it with the decodeAudioData function of the AudioContext.
+ */
+function store_full_buffer(buf_arr){
+	context.decodeAudioData(buf_arr).then(function(data) {
+		full_buffer = data;
 	}).catch(function(err) {
 		console.log("Encountered the decodeAudioData error: " + err);
 	});
-	return buf_src;
 }
 
 /* Function: create_audio_array_buffer
@@ -285,7 +291,7 @@ function create_audio_array_buffer() {
 	var reader = new FileReader();
 	reader.onloadstart = function() {if(verbose) { console.log("beginning buffer load"); }}
 	reader.onloadend = function() {
-		full_array_buffer = reader.result;
+		full_buffer = store_full_buffer(reader.result);
 		if(verbose) { console.log("finished buffer load"); } 
 	} 
 	reader.readAsArrayBuffer(rec_blob)
