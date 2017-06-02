@@ -1,8 +1,9 @@
 //RIGHT NOW:
-// Plays one grain
+// Plays one grain (default values)
 
 //ON THE LIST:
-/* - responsive play/pause button, isn't clickable if no recording yet
+/* - continuous grain value change (ie: slider controls)
+ * - responsive play/pause button, isn't clickable if no recording yet
  */
 
 /* File: main.js
@@ -47,10 +48,10 @@ function GButton(html_id, click_func, is_active) {
  * 
  */
 
-function Grain(info_arr) {
-	this.start_time = info_arr[0];
-	this.samp_length = info_arr[1];
-	this.play_rate = info_arr[2];
+function Grain(info_dict) {
+	this.g_start = info_dict["g_start"];
+	this.g_length = info_dict["g_length"];
+	this.g_rate = info_dict["g_rate"];
 	// other stuff?
 }
 
@@ -99,8 +100,7 @@ var verbose = 1;
 
 const NUM_CHANS = 2;
 const NUM_GRAINS = 1;
-const G_START_DEF = 0.5;
-const G_LENGTH_DEF = 0;
+const G_DEF_DICT = { "g_start":0.5, "g_length":100, "g_rate": 1};
 
 /* ##### End Constants/ Globals ##### */
 
@@ -112,8 +112,9 @@ const G_LENGTH_DEF = 0;
  */
 function init(){
 	init_buttons();
+	g_fields_set_read_only(true);
 	init_audio_nodes();
-	//init_grains();
+	init_grains();
 }
 
 /* Function: init_buttons
@@ -125,9 +126,11 @@ function init(){
 function init_buttons() {
 	rec_button = new GButton("rec_stop", handle_rec_press,  0);
 	play_button = new GButton("play", handle_play_stop_press,  0);
+	submit_button = new GButton("g_submit", init_grains, 0);
 
 	init_button_listener(rec_button);
 	init_button_listener(play_button);
+	init_button_listener(submit_button);
 }
 
 /* Function: init_button_listener
@@ -160,6 +163,19 @@ function handle_rec_press() {
 	}
 }
 
+/* Function: g_fields_set_read_only
+ * ----------------------------
+ * 
+ */
+function g_fields_set_read_only(new_val) {
+	for(var i = 0; i < NUM_GRAINS; i++){
+		for(key in G_DEF_DICT){
+			id = key + "_" + i;
+			document.getElementById(id).readOnly = new_val;
+		}
+	}
+}
+
 /* Function: end_record
  * ----------------------
  * This ends the recording process, and changes the activity boolean of
@@ -167,6 +183,7 @@ function handle_rec_press() {
  */
 function end_record() {
 	mic_recorder.stop();
+	g_fields_set_read_only(false);
 	if(verbose) { console.log("recording stopped"); }
 	rec_button.is_active = 0;
 }
@@ -178,6 +195,7 @@ function end_record() {
  */
 function begin_record() {
 	mic_recorder.start();
+	g_fields_set_read_only(true);
 	if(verbose) { console.log("recording started"); }
 	rec_button.is_active = 1;
 }
@@ -349,11 +367,22 @@ function init_audio_nodes() {
 	init_audio_stream();
 }
 
+function get_grain_val(g_ind, val_id){
+	var val_field = document.getElementById(val_id + "_" + g_ind);
+	if(val_field.value == "") {
+		return G_DEF_DICT[val_id];
+	} else {
+		return parseFloat(val_field.value);
+	}
+}
+
 function get_grain_info(g_ind){
-	//get buttons
 	//init info array
-	//push
-	info = []
+	info = {} 
+	for (key in G_DEF_DICT) {
+		info[key] = get_grain_val(g_ind, key);
+	}
+	return info;
 }
 
 function init_grains() {
