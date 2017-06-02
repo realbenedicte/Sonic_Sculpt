@@ -30,3 +30,12 @@ table {
 h1 {
 	color: green;
 }
+
+fieldset {
+	margin: 1em;
+	border: solid black .1em;
+}
+
+input, label, legend {
+ 	margin: .7em;
+}

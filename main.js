@@ -47,10 +47,10 @@ function GButton(html_id, click_func, is_active) {
  * 
  */
 
-function Grain(start_time, samp_length, play_rate) {
-	this.start_time = start_time;
-	this.samp_length = g_length;
-	this.play_rate = play_rate;
+function Grain(info_arr) {
+	this.start_time = info_arr[0];
+	this.samp_length = info_arr[1];
+	this.play_rate = info_arr[2];
 	// other stuff?
 }
 
@@ -86,13 +86,21 @@ var rec_chunks = [];
 var rec_url;
 var rec_blob;
 var full_audio;
+
+//declare full-buffer-related vars
 var curr_buffer;
+var curr_buffer_src;
+
+//declare grain-related vars
+var grains;
 
 //for debugging
-var verbose = 0;
+var verbose = 1;
 
 const NUM_CHANS = 2;
-//const BUFFER_DUR = 3;
+const NUM_GRAINS = 1;
+const G_START_DEF = 0.5;
+const G_LENGTH_DEF = 0;
 
 /* ##### End Constants/ Globals ##### */
 
@@ -105,6 +113,7 @@ const NUM_CHANS = 2;
 function init(){
 	init_buttons();
 	init_audio_nodes();
+	//init_grains();
 }
 
 /* Function: init_buttons
@@ -179,9 +188,8 @@ function begin_record() {
  * boolean of the play button to reflect this.
  */
 function play_full_audio() {
-	var buf = get_audio_buffer_source(full_array_buffer, context.destination);
-	curr_buffer = buf;
-	buf.start(0);
+	curr_buffer_src = get_audio_buffer_source(full_array_buffer, context.destination);
+	curr_buffer_src.start(0);
 	if(verbose) { console.log("file playing"); }
 	play_button.is_active = 1;
 }
@@ -192,7 +200,7 @@ function play_full_audio() {
  * the activity boolean on the play button.
  */
 function stop_full_audio() {
-	curr_buffer.stop(0);
+	curr_buffer_src.stop(0);
 	if(verbose) { console.log("file stopped"); }
 	play_button.is_active = 0;
 }
@@ -256,14 +264,15 @@ function save_rec_blob() {
  * connected to the inputs of the out_node AudioNode, and returned.
  */
 function get_audio_buffer_source(arr_buf, out_node){
-	var audio_buf = context.createBufferSource();
+	var buf_src = context.createBufferSource();
 	context.decodeAudioData(arr_buf).then(function(data) {
-		audio_buf.buffer = data;
-        audio_buf.connect(out_node);
+		curr_buffer = data;
+		buf_src.buffer = curr_buffer;
+        buf_src.connect(out_node);
 	}).catch(function(err) {
 		console.log("Encountered the decodeAudioData error: " + err);
 	});
-	return audio_buf;
+	return buf_src;
 }
 
 /* Function: create_audio_array_buffer
@@ -332,4 +341,19 @@ function init_audio_stream() {
  */
 function init_audio_nodes() {
 	init_audio_stream();
+}
+
+function get_grain_info(g_ind){
+	//get buttons
+	//init info array
+	//push
+	info = []
+}
+
+function init_grains() {
+	grains = new Array();
+	for (var i = 0; i < NUM_GRAINS; i++){
+		var grain_info = get_grain_info(i);
+		grains.push(new Grain(grain_info));
+	}
 }
