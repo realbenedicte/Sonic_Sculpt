@@ -22,88 +22,6 @@
  * - https://goo.gl/tNB9Bf - setting up localhost
  */
 
-
-/* Object: GButton
- * -----------------------
- * This is a button object. It represents a button the screen, and houses
- * some important info on that button. Specifically, it contains the HTML
- * id string for the button, the actual HTML element itself (button), the
- * function that is to be called when it is clicked, and a 1-or-0 value that
- * reflects if the button is currently "active" or not. 
- */
-
-function GButton(html_id, click_func, is_active) {
-	this.html_id = html_id;
-	this.button = document.getElementById(html_id);
-	this.click_func = click_func;
-	this.is_active = is_active;
-}
-
-/* Object: Grain
- * -----------------------
- * This is a grain object. It contains all of the information and functionality
- * of a grain. Some important things it contains: grain length, grain start time,
- * grain playback rate, (some other stuff I don't know I need yet). It also prototypes
- * the functionality of playing the grain. Lemme write it and then get back to this...
- * 
- */
-
-function Grain(info_dict) {
-	this.g_start = info_dict["g_start"];
-	this.g_length = info_dict["g_length"];
-	this.g_rate = info_dict["g_rate"];
-	// other stuff?
-}
-
-Grain.prototype.play = function () {
-		console.log("playing grain");
-		//write this?
-	}
-
-Grain.prototype.stop = function () {
-		console.log("stoping grain");
-		//write this?
-	}
-
-Grain.prototype.strike = function () {
-		console.log("striking grain");
-		//write this?
-	}
-
-/* ##### End GButton ##### */
-
-/* ##### Begin Constants/ Globals ##### */
-//create context
-var context = new (window.AudioContext || window.webkitAudioContext)();
-//declare the nodes
-var mic_recorder;
-var full_array_buffer;
-//declare the buttons
-var rec_button;
-var play_button;
-var rec_buffer;
-//declare other
-var rec_chunks = [];
-var rec_url;
-var rec_blob;
-var full_audio;
-
-//declare full-buffer-related vars
-var full_buffer;
-var full_buffer_src;
-
-//declare grain-related vars
-var grains;
-
-//for debugging
-var verbose = 1;
-
-const NUM_CHANS = 2;
-const NUM_GRAINS = 1;
-const G_DEF_DICT = { "g_start":0.5, "g_length":100, "g_rate": 1};
-
-/* ##### End Constants/ Globals ##### */
-
 /* Function: init
  * --------------
  * This is the master initialization function for the script. It
@@ -374,6 +292,13 @@ function get_grain_val(g_ind, val_id){
 	} else {
 		return parseFloat(val_field.value);
 	}
+}
+
+function refresh_grain_buffer(g_ind){ 
+	grains[g_ind];
+	g.buffer = 
+	g.buffer_set = true;
+
 }
 
 function get_grain_info(g_ind){
