@@ -253,6 +253,17 @@ function init_audio_stream() {
 	}
 }
 
+// Construction Zone //// Construction Zone //// Construction Zone //
+// Construction Zone //// Construction Zone //// Construction Zone //
+// Construction Zone //// Construction Zone //// Construction Zone //
+
+function link_grains_to_uis() {
+	for(var i = 0; i < grains.length; i++){
+		grains[i].ui = grain_uis[i];
+		grain_uis[i].grain = grains[i];
+	}
+}
+
 /* Function: init_grains
  * ---------------------
  * This function initializes the Grain objects in the grain array, as well
@@ -262,15 +273,19 @@ function init_grains() {
 	grain_uis = new Array();
 	grains = new Array();
 	for (var i = 0; i < NUM_GRAINS; i++){
-		grain_uis.push(new GrainUI(i, "g_start_"+i, "g_length_"+i, "g_detune_"+i, "g_play_"+i));
-		grains.push(new Grain(i, grain_uis[i]));
-		grain_uis[i].init_buttons();
+		// init grains
+		grains.push(new Grain(i));
+		// init grain_uis
+		grain_uis.push(new GrainUI(i))
+		// link grains to ui's
+		link_grains_to_uis();
+
+
+		//grain_uis.push(new GrainUI(i, "g_start_"+i, "g_length_"+i, "g_detune_"+i, "g_play_"+i));
+		//grains.push(new Grain(i, grain_uis[i]));
+		//grain_uis[i].init_buttons();
 	}
 }
-
-// Construction Zone //// Construction Zone //// Construction Zone //
-// Construction Zone //// Construction Zone //// Construction Zone //
-// Construction Zone //// Construction Zone //// Construction Zone //
 
 // BONEYARD //// BONEYARD //// BONEYARD //// BONEYARD //
 // BONEYARD //// BONEYARD //// BONEYARD //// BONEYARD //

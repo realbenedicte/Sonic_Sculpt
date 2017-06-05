@@ -38,12 +38,11 @@ function Grain(g_ind, g_ui) {
 	}
 
 	this.g_ind = g_ind;
-	this.ui = g_ui
+	this.ui = null;
 	this.buffer = null;
 	this.buffer_src = null;
 	this.buffer_set = false;
 	this.grain_on = false;
-
 }
 
 Grain.prototype.refresh_buffer = function (buf) {
