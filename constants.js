@@ -27,3 +27,15 @@ var verbose = 1;
 const NUM_CHANS = 2;
 const NUM_GRAINS = 1;
 const G_DEF_DICT = { "start":0.5, "length":1000, "detune": 0};
+
+const START_MIN = 0;
+const START_MAX = 1;
+const START_STEP = 0.005;
+
+const LENGTH_MIN = 0;
+const LENGTH_MAX = 10000;
+const LENGTH_STEP = 1;
+
+const DETUNE_MIN = -1200;
+const DETUNE_MAX = 1200;
+const DETUNE_STEP = 1;

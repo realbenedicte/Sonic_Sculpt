@@ -48,11 +48,11 @@ function init(){
 function init_buttons() {
 	rec_button = new GButton("rec_stop", handle_rec_press,  0);
 	play_button = new GButton("play", handle_play_stop_press,  0);
-	submit_button = new GButton("g_submit", function(){grains[0].refresh_play();}, 0);
+	//submit_button = new GButton("g_submit", function(){grains[0].refresh_play();}, 0);
 
 	init_button_listener(rec_button);
 	init_button_listener(play_button);
-	init_button_listener(submit_button);
+	//init_button_listener(submit_button);
 }
 
 /* Function: init_button_listener
@@ -291,8 +291,9 @@ function init_grains() {
 	grain_uis = new Array();
 	grains = new Array();
 	for (var i = 0; i < NUM_GRAINS; i++){
-		grain_uis.push(new GrainUI("g_start_0", "g_length_0", "g_detune_0"));
-		grains.push(new Grain(grain_uis[i]));
+		grain_uis.push(new GrainUI(i, "g_start_0", "g_length_0", "g_detune_0"));
+		grains.push(new Grain(i, grain_uis[i]));
+		grain_uis[i].init_sliders();
 	}
 }
 

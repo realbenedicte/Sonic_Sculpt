@@ -9,14 +9,29 @@
  * IMP_NOTE: Check out getChannelData for applying the volume Envelope
  */
 
-function Grain(g_ui) {
+function Grain(g_ind, g_ui) {
 	// should have access to controls, so it can
 	// go get the values on its own
+	this.g_ind = g_ind;
 	this.ui = g_ui
-
 	this.buffer = null;
 	this.buffer_src = null;
 	this.buffer_set = false;
+
+	this.apply_vol_env = function() {
+		if(this.buffer) {
+			// get length of buffer
+			var half_len = this.buffer.length/2
+			// for i less than half buffer length
+			for (var i = 0; i < half_len; i++){
+				for(var c = 0; c < this.buffer.numberOfChannels; c++){
+					chan_buf = this.buffer.getChannelData(c);
+					chan_buf[i] *= i / (1.0 * half_len);
+					chan_buf[this.buffer.length-(i+1)] *= i / (1.0 * half_len);
+				}
+			}
+		}
+	}
 }
 
 Grain.prototype.refresh_buffer = function (buf) {
@@ -32,6 +47,7 @@ Grain.prototype.refresh_buffer = function (buf) {
 				grain.buffer = new_buffer;
 			}
 		});
+		this.apply_vol_env();
 		this.buffer_set = true;
 	}
 
@@ -42,7 +58,7 @@ Grain.prototype.play = function () {
 		
 		this.buffer_src.buffer = this.buffer;
 		this.buffer_src.loop = true;
-		this.buffer_src.detune = this.ui.get_detune();
+		this.buffer_src.detune.value = this.ui.get_detune();
 		this.buffer_src.connect(context.destination);
 
 		this.buffer_src.start();

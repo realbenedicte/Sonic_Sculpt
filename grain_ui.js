@@ -5,14 +5,34 @@
  * Again, lemme write it and get back to you...
  */
 
-function GrainUI(start_id, length_id, detune_id) {
+function GrainUI(g_ind, start_id, length_id, detune_id) {
+	this.g_ind = g_ind;
 	this.start_ctl = document.getElementById(start_id);
-	this.start_ctl.value = G_DEF_DICT["start"];
 	this.length_ctl = document.getElementById(length_id);
-	this.length_ctl.value = G_DEF_DICT["length"];
 	this.detune_ctl = document.getElementById(detune_id);
-	this.detune_ctl.value = G_DEF_DICT["detune"];
 }
+
+GrainUI.prototype.init_sliders = function(){
+		this.init_slider(this.start_ctl, START_MIN, START_MAX, START_STEP, G_DEF_DICT["start"]);
+		this.init_slider(this.length_ctl, LENGTH_MIN, LENGTH_MAX, LENGTH_STEP, G_DEF_DICT["length"]);
+		this.init_slider(this.detune_ctl, DETUNE_MIN, DETUNE_MAX, DETUNE_STEP, G_DEF_DICT["detune"]);
+	}
+
+GrainUI.prototype.trigger_grain_refresh = function() {
+		grains[this.g_ind].refresh_play();
+	}
+
+GrainUI.prototype.init_slider = function(sldr, min, max, step, initial){
+		sldr.min = min;
+		sldr.max = max;
+		sldr.step = step;
+		sldr.value = initial;
+
+		var _this = this;
+		sldr.addEventListener('change', function(){
+			grains[_this.g_ind].refresh_play();
+		});
+	}
 
 GrainUI.prototype.get_start = function () {
 		return parseFloat(this.start_ctl.value)
