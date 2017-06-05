@@ -46,7 +46,7 @@ function init(){
 function init_buttons() {
 	rec_button = new GButton("rec_stop", handle_rec_press,  0);
 	play_button = new GButton("play", handle_play_stop_press,  0);
-	submit_button = new GButton("g_submit", init_grains, 0);
+	submit_button = new GButton("g_submit", function(){handle_new_grain_vals(0);}, 0);
 
 	init_button_listener(rec_button);
 	init_button_listener(play_button);
@@ -229,7 +229,7 @@ function handle_store_full_buffer() {
 		arr_buf = reader.result;
 		context.decodeAudioData(arr_buf).then(function(data) {
 			full_buffer = data;
-			init_grain_buffers();
+			refresh_grain_buffers();
 		}).catch(function(err) {
 			console.log("Encountered the decodeAudioData error: " + err);
 		});
@@ -283,7 +283,13 @@ function init_audio_stream() {
 // Construction Zone //// Construction Zone //// Construction Zone //
 // Construction Zone //// Construction Zone //// Construction Zone //
 
-function init_grain_buffers(){
+function handle_new_grain_vals(g_ind){
+	grains[g_ind].stop();
+	grains[g_ind].refresh_buffer(full_buffer);
+	grains[g_ind].play();
+}
+
+function refresh_grain_buffers(){
 	for (var i = 0; i < NUM_GRAINS; i++){
 		grains[i].refresh_buffer(full_buffer);
 	} 
