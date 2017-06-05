@@ -36,7 +36,6 @@
  */
 function init(){
 	init_buttons();
-	g_fields_set_read_only(true);
 	init_audio_stream();
 	init_grains();
 }
@@ -100,21 +99,6 @@ function handle_rec_press() {
 		}
 		delete_rec_blob();
 		begin_record();
-	}
-}
-
-/* Function: g_fields_set_read_only
- * --------------------------------
- * This flips the readOnly boolean of the grain value inputs, and is 
- * used to prevent value changes before a recording has been made, and 
- * allow them afterwards.
- */
-function g_fields_set_read_only(new_val) {
-	for(var i = 0; i < NUM_GRAINS; i++){
-		for(key in G_DEF_DICT){
-			id = "g_" + key + "_" + i;
-			document.getElementById(id).readOnly = new_val;
-		}
 	}
 }
 
@@ -279,11 +263,6 @@ function init_grains() {
 		grain_uis.push(new GrainUI(i))
 		// link grains to ui's
 		link_grains_to_uis();
-
-
-		//grain_uis.push(new GrainUI(i, "g_start_"+i, "g_length_"+i, "g_detune_"+i, "g_play_"+i));
-		//grains.push(new Grain(i, grain_uis[i]));
-		//grain_uis[i].init_buttons();
 	}
 }
 
