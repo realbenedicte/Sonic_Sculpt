@@ -37,6 +37,7 @@ Grain.prototype.refresh_buffer = function (buf) {
 
 Grain.prototype.play = function () {
 		console.log("playing grain");
+		if(!this.buffer) this.refresh_buffer(full_buffer);
 		this.buffer_src = context.createBufferSource();
 		
 		this.buffer_src.buffer = this.buffer;
@@ -50,6 +51,13 @@ Grain.prototype.play = function () {
 Grain.prototype.stop = function () {
 		console.log("stoping grain");
 		this.buffer_src.stop();
+	}
+
+Grain.prototype.refresh_play = function () {
+		console.log("playing with new vals");
+		this.stop();
+		this.refresh_buffer(full_buffer);
+		this.play();
 	}
 
 Grain.prototype.strike = function () {

@@ -5,7 +5,9 @@
 /* - Implement 1 grain, no controls
  * - Implement 1 grain, sliding start control
  * - Implement 1 grain, sliding start and end controls
- * - Implement 1 grain, playback rate controls
+ * - Implement good grain sound (volume envelope, overlapping)
+ * 
+ * - Implement 1 grain, playback rate controls?
  */
 
 /* File: main.js
@@ -46,7 +48,7 @@ function init(){
 function init_buttons() {
 	rec_button = new GButton("rec_stop", handle_rec_press,  0);
 	play_button = new GButton("play", handle_play_stop_press,  0);
-	submit_button = new GButton("g_submit", function(){handle_new_grain_vals(0);}, 0);
+	submit_button = new GButton("g_submit", function(){grains[0].refresh_play();}, 0);
 
 	init_button_listener(rec_button);
 	init_button_listener(play_button);
@@ -84,8 +86,10 @@ function handle_rec_press() {
 }
 
 /* Function: g_fields_set_read_only
- * ----------------------------
- * 
+ * --------------------------------
+ * This flips the readOnly boolean of the grain value inputs, and is 
+ * used to prevent value changes before a recording has been made, and 
+ * allow them afterwards.
  */
 function g_fields_set_read_only(new_val) {
 	for(var i = 0; i < NUM_GRAINS; i++){
@@ -229,7 +233,6 @@ function handle_store_full_buffer() {
 		arr_buf = reader.result;
 		context.decodeAudioData(arr_buf).then(function(data) {
 			full_buffer = data;
-			refresh_grain_buffers();
 		}).catch(function(err) {
 			console.log("Encountered the decodeAudioData error: " + err);
 		});
@@ -279,22 +282,11 @@ function init_audio_stream() {
 	}
 }
 
-function handle_new_grain_vals(g_ind){
-	grains[g_ind].stop();
-	grains[g_ind].refresh_buffer(full_buffer);
-	grains[g_ind].play();
-}
-
-// Construction Zone //// Construction Zone //// Construction Zone //
-// Construction Zone //// Construction Zone //// Construction Zone //
-// Construction Zone //// Construction Zone //// Construction Zone //
-
-function refresh_grain_buffers(){
-	for (var i = 0; i < NUM_GRAINS; i++){
-		grains[i].refresh_buffer(full_buffer);
-	} 
-}
-
+/* Function: init_grains
+ * ---------------------
+ * This function initializes the Grain objects in the grain array, as well
+ * as the corresponding GrainUI objects for each grain.
+ */
 function init_grains() {
 	grain_uis = new Array();
 	grains = new Array();
@@ -304,31 +296,10 @@ function init_grains() {
 	}
 }
 
+// Construction Zone //// Construction Zone //// Construction Zone //
+// Construction Zone //// Construction Zone //// Construction Zone //
+// Construction Zone //// Construction Zone //// Construction Zone //
+
 // BONEYARD //// BONEYARD //// BONEYARD //// BONEYARD //
 // BONEYARD //// BONEYARD //// BONEYARD //// BONEYARD //
 // BONEYARD //// BONEYARD //// BONEYARD //// BONEYARD //
-
-/*
-
-function get_grain_info(g_ind){
-	info = {} 
-	for (key in G_DEF_DICT) {
-		info[key] = get_grain_val(g_ind, key);
-	}
-	return info;
-}
-
-function get_grain_val(g_ind, val_id){
-	var val_field = document.getElementById(val_id + "_" + g_ind);
-	if(val_field.value == "") {
-		return G_DEF_DICT[val_id];
-	} else {
-		return parseFloat(val_field.value);
-	}
-}
-
-//g_start comes in as 
-function get_safe_grain_end(g_start){
-	
-}
-*/
