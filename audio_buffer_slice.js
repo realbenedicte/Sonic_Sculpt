@@ -12,13 +12,14 @@
        source.connect(gainNode);
        gainNode.connect(audioContext.destination);
      }
+
+ * buffer = audio buffer to slice from, begin = begining point in
+ * seconds, end = ending point in seconds, callback = function to execute
+ * when slice is completed
  */
 
-function AudioBufferSlice(buffer, begin, end, callback) {
-  if (!(this instanceof AudioBufferSlice)) {
-    return new AudioBufferSlice(buffer, begin, end, callback);
-  }
-
+function AudioBufferSlice(buffer, begin, end, grain, callback) {
+  
   var error = null;
 
   var duration = buffer.duration;
@@ -29,10 +30,6 @@ function AudioBufferSlice(buffer, begin, end, callback) {
     callback = end;
     end = duration;
   }
-
-  // milliseconds to seconds
-  begin = begin/1000;
-  end = end/1000;
 
   if (begin < 0) {
     error = new RangeError('begin time must be greater than 0');
@@ -52,7 +49,7 @@ function AudioBufferSlice(buffer, begin, end, callback) {
   var newArrayBuffer;
 
   try {
-    newArrayBuffer = audioContext.createBuffer(channels, endOffset - startOffset, rate);
+    newArrayBuffer = context.createBuffer(channels, endOffset - startOffset, rate);
     var anotherArray = new Float32Array(frameCount);
     var offset = 0;
 
@@ -64,5 +61,5 @@ function AudioBufferSlice(buffer, begin, end, callback) {
     error = e;
   }
 
-  callback(error, newArrayBuffer);
+  callback(error, newArrayBuffer, grain);
 }

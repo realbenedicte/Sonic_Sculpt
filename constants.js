@@ -25,4 +25,4 @@ var verbose = 1;
 
 const NUM_CHANS = 2;
 const NUM_GRAINS = 1;
-const G_DEF_DICT = { "g_start":0.5, "g_length":100, "g_rate": 1};
+const G_DEF_DICT = { "start":0.5, "length":1000, "rate": 1};

@@ -2,8 +2,10 @@
 // Plays one grain (default values)
 
 //ON THE LIST:
-/* - continuous grain value change (ie: slider controls)
- * - responsive play/pause button, isn't clickable if no recording yet
+/* - Implement 1 grain, no controls
+ * - Implement 1 grain, sliding start control
+ * - Implement 1 grain, sliding start and end controls
+ * - Implement 1 grain, playback rate controls
  */
 
 /* File: main.js
@@ -31,7 +33,7 @@
 function init(){
 	init_buttons();
 	g_fields_set_read_only(true);
-	init_audio_nodes();
+	init_audio_stream();
 	init_grains();
 }
 
@@ -88,7 +90,7 @@ function handle_rec_press() {
 function g_fields_set_read_only(new_val) {
 	for(var i = 0; i < NUM_GRAINS; i++){
 		for(key in G_DEF_DICT){
-			id = key + "_" + i;
+			id = "g_" + key + "_" + i;
 			document.getElementById(id).readOnly = new_val;
 		}
 	}
@@ -101,9 +103,10 @@ function g_fields_set_read_only(new_val) {
  */
 function end_record() {
 	mic_recorder.stop();
-	g_fields_set_read_only(false);
+
 	if(verbose) { console.log("recording stopped"); }
 	rec_button.is_active = 0;
+	g_fields_set_read_only(false);
 }
 
 /* Function: begin_record
@@ -124,8 +127,10 @@ function begin_record() {
  * boolean of the play button to reflect this.
  */
 function play_full_audio() {
-	full_buffer_src = get_audio_buffer_source(context.destination);
-	full_buffer_src.start(0);
+	grains[0].play();
+
+	//full_buffer_src = get_audio_buffer_source(context.destination);
+	//full_buffer_src.start(0);
 	if(verbose) { console.log("file playing"); }
 	play_button.is_active = 1;
 }
@@ -136,7 +141,9 @@ function play_full_audio() {
  * the activity boolean on the play button.
  */
 function stop_full_audio() {
-	full_buffer_src.stop(0);
+	grains[0].stop();
+
+	//full_buffer_src.stop(0);
 	if(verbose) { console.log("file stopped"); }
 	play_button.is_active = 0;
 }
@@ -203,31 +210,29 @@ function get_audio_buffer_source(out_node){
 	return buf_src;
 }
 
-/* Function: store_full_buffer
+/* Function: handle_store_full_buffer
  * -----------------------------------
  * This function stores the AudioBuffer object containing the data for 
  * the current audio recording. It it passed an ArrayBuffer object, and
  * processes it with the decodeAudioData function of the AudioContext.
- */
-function store_full_buffer(buf_arr){
-	context.decodeAudioData(buf_arr).then(function(data) {
-		full_buffer = data;
-	}).catch(function(err) {
-		console.log("Encountered the decodeAudioData error: " + err);
-	});
-}
-
-/* Function: create_audio_array_buffer
- * -----------------------------------
+ * 
  * This function uses a FileReader instance to feed the raw data from
  * the full recording blob into an ArrayBuffer object, which we can
  * use later to create playable AudioBuffer objects.
+
+ * ALSO, it inits the grain buffers
  */
-function create_audio_array_buffer() {
+function handle_store_full_buffer() {
 	var reader = new FileReader();
 	reader.onloadstart = function() {if(verbose) { console.log("beginning buffer load"); }}
-	reader.onloadend = function() {
-		full_buffer = store_full_buffer(reader.result);
+	reader.onloadend = function() {	
+		arr_buf = reader.result;
+		context.decodeAudioData(arr_buf).then(function(data) {
+			full_buffer = data;
+			init_grain_buffers();
+		}).catch(function(err) {
+			console.log("Encountered the decodeAudioData error: " + err);
+		});
 		if(verbose) { console.log("finished buffer load"); } 
 	} 
 	reader.readAsArrayBuffer(rec_blob)
@@ -247,10 +252,9 @@ function init_mic_recorder(stream) {
   	};
   	mic_recorder.onstop = function(e) {
   		save_rec_blob();
-  		create_audio_array_buffer();
+  		handle_store_full_buffer();
   	};
 }
-
 
 /* Function: init_audio_stream
  * ---------------------------
@@ -275,14 +279,38 @@ function init_audio_stream() {
 	}
 }
 
-/* Function: init_audio_nodes
- * ---------------------------
- * This function initializes the AudioNodes used in the app. It first
- * initializes all those related to the audio stream (ie: mic_recorder),
- * then those related to the audio buffer.
- */
-function init_audio_nodes() {
-	init_audio_stream();
+// Construction Zone //// Construction Zone //// Construction Zone //
+// Construction Zone //// Construction Zone //// Construction Zone //
+// Construction Zone //// Construction Zone //// Construction Zone //
+
+function init_grain_buffers(){
+	for (var i = 0; i < NUM_GRAINS; i++){
+		grains[i].refresh_buffer(full_buffer);
+	} 
+}
+
+function init_grains() {
+	grains = new Array();
+	for (var i = 0; i < NUM_GRAINS; i++){
+		// TEMPORARY
+		//var grain_info = get_grain_info(i);
+		//grains.push(new Grain(grain_info));
+		grains.push(new Grain("g_start_0", "g_length_0", "g_rate_0"));
+	}
+}
+
+// BONEYARD //// BONEYARD //// BONEYARD //// BONEYARD //
+// BONEYARD //// BONEYARD //// BONEYARD //// BONEYARD //
+// BONEYARD //// BONEYARD //// BONEYARD //// BONEYARD //
+
+/*
+
+function get_grain_info(g_ind){
+	info = {} 
+	for (key in G_DEF_DICT) {
+		info[key] = get_grain_val(g_ind, key);
+	}
+	return info;
 }
 
 function get_grain_val(g_ind, val_id){
@@ -294,26 +322,8 @@ function get_grain_val(g_ind, val_id){
 	}
 }
 
-function refresh_grain_buffer(g_ind){ 
-	grains[g_ind];
-	g.buffer = 
-	g.buffer_set = true;
-
+//g_start comes in as 
+function get_safe_grain_end(g_start){
+	
 }
-
-function get_grain_info(g_ind){
-	//init info array
-	info = {} 
-	for (key in G_DEF_DICT) {
-		info[key] = get_grain_val(g_ind, key);
-	}
-	return info;
-}
-
-function init_grains() {
-	grains = new Array();
-	for (var i = 0; i < NUM_GRAINS; i++){
-		var grain_info = get_grain_info(i);
-		grains.push(new Grain(grain_info));
-	}
-}
+*/
