@@ -1,33 +1,32 @@
+/* RIGHT NOW:
+ * Implement a new play function that fires at twice the current speed, using
+ * the audio clock
+ */
+
 /* Object: Grain
  * -----------------------
  * This is a grain object. It contains all of the information and functionality
  * of a grain. Some important things it contains: grain length, grain start time,
  * grain playback rate, (some other stuff I don't know I need yet). It also prototypes
  * the functionality of playing the grain. Lemme write it and then back to this...
- * 
 
- * IMP_NOTE: Check out getChannelData for applying the volume Envelope
+ * For the Future:
+ * - different sound envelope shapes?
  */
 
 function Grain(g_ind, g_ui) {
-	// should have access to controls, so it can
-	// go get the values on its own
-	this.g_ind = g_ind;
-	this.ui = g_ui
-	this.buffer = null;
-	this.buffer_src = null;
-	this.buffer_set = false;
-	this.grain_on = false;
 
-	//NEXT IMP BUFFERS
-	//this.start_buffer = just the first half, faded up
-	//this.mod_buffer = second half layered on first, first onto second
+	this.fire = function() {
+		var g_src = context.createBufferSource();
+		g_src.buffer = this.buffer;
+		g_src.detune.value = this.ui.get_detune();
+		g_src.connect(context.destination);
+		g_src.start(0, 0, g_src.buffer.duration);
+	}
 
 	this.apply_vol_env = function() {
 		if(this.buffer) {
-			// get length of buffer
 			var half_len = this.buffer.length/2
-			// for i less than half buffer length
 			for (var i = 0; i < half_len; i++){
 				for(var c = 0; c < this.buffer.numberOfChannels; c++){
 					chan_buf = this.buffer.getChannelData(c);
@@ -38,9 +37,12 @@ function Grain(g_ind, g_ui) {
 		}
 	}
 
-	this.create_mod_buffer = function() {
-		//write this, merge with apply_vol_env
-	}
+	this.g_ind = g_ind;
+	this.ui = g_ui
+	this.buffer = null;
+	this.buffer_src = null;
+	this.buffer_set = false;
+	this.grain_on = false;
 
 }
 
@@ -64,6 +66,7 @@ Grain.prototype.refresh_buffer = function (buf) {
 Grain.prototype.play = function () {
 		if(verbose) console.log("playing grain");
 		if(!this.buffer) this.refresh_buffer(full_buffer);
+		
 		this.buffer_src = context.createBufferSource();
 		
 		this.buffer_src.buffer = this.buffer;

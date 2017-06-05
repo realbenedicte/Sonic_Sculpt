@@ -1,13 +1,9 @@
-//RIGHT NOW:
-// Plays one grain (default values)
+// RIGHT NOW:
+// - Implement front end, 1 grain
 
-//ON THE LIST:
-/* - Implement 1 grain, no controls
- * - Implement 1 grain, sliding start control
- * - Implement 1 grain, sliding start and end controls
+/* ON THE LIST:
+ * - Implement front end, all grains
  * - Implement good grain sound (volume envelope, overlapping)
- * 
- * - Implement 1 grain, playback rate controls?
  */
 
 /* File: main.js
@@ -24,6 +20,12 @@
  * - https://goo.gl/86PNFT
  * - https://goo.gl/RVYeG5 - ObjectURL manpage
  * - https://goo.gl/tNB9Bf - setting up localhost
+ * - https://goo.gl/t7ivz4 - working with clock timing
+ * - https://goo.gl/iMWzDQ - Music 220b granular lecture
+ * 
+ * For the Future:
+ * - Midi Control?
+ * - Save States/ recordings?
  */
 
 /* Function: init
@@ -47,10 +49,8 @@ function init(){
  */
 function init_buttons() {
 	rec_button = new GButton("rec_stop", handle_rec_press,  0);
-	//submit_button = new GButton("g_submit", function(){grains[0].refresh_play();}, 0);
 
 	init_button_listener(rec_button);
-	//init_button_listener(submit_button);
 }
 
 /* Function: init_button_listener

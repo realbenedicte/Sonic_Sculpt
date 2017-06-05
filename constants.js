@@ -22,7 +22,7 @@ var grains;
 var grain_uis;
 
 //for debugging
-var verbose = 0;
+var verbose = 1;
 
 const NUM_CHANS = 2;
 const NUM_GRAINS = 5;
