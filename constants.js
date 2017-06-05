@@ -19,10 +19,11 @@ var full_buffer_src;
 
 //declare grain-related vars
 var grains;
+var grain_uis;
 
 //for debugging
 var verbose = 1;
 
 const NUM_CHANS = 2;
 const NUM_GRAINS = 1;
-const G_DEF_DICT = { "start":0.5, "length":1000, "rate": 1};
+const G_DEF_DICT = { "start":0.5, "length":1000, "detune": 0};

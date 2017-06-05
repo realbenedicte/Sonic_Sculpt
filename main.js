@@ -279,15 +279,15 @@ function init_audio_stream() {
 	}
 }
 
-// Construction Zone //// Construction Zone //// Construction Zone //
-// Construction Zone //// Construction Zone //// Construction Zone //
-// Construction Zone //// Construction Zone //// Construction Zone //
-
 function handle_new_grain_vals(g_ind){
 	grains[g_ind].stop();
 	grains[g_ind].refresh_buffer(full_buffer);
 	grains[g_ind].play();
 }
+
+// Construction Zone //// Construction Zone //// Construction Zone //
+// Construction Zone //// Construction Zone //// Construction Zone //
+// Construction Zone //// Construction Zone //// Construction Zone //
 
 function refresh_grain_buffers(){
 	for (var i = 0; i < NUM_GRAINS; i++){
@@ -296,12 +296,11 @@ function refresh_grain_buffers(){
 }
 
 function init_grains() {
+	grain_uis = new Array();
 	grains = new Array();
 	for (var i = 0; i < NUM_GRAINS; i++){
-		// TEMPORARY
-		//var grain_info = get_grain_info(i);
-		//grains.push(new Grain(grain_info));
-		grains.push(new Grain("g_start_0", "g_length_0", "g_rate_0"));
+		grain_uis.push(new GrainUI("g_start_0", "g_length_0", "g_detune_0"));
+		grains.push(new Grain(grain_uis[i]));
 	}
 }
 
