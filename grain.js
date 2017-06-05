@@ -17,6 +17,11 @@ function Grain(g_ind, g_ui) {
 	this.buffer = null;
 	this.buffer_src = null;
 	this.buffer_set = false;
+	this.grain_on = false;
+
+	//NEXT IMP BUFFERS
+	//this.start_buffer = just the first half, faded up
+	//this.mod_buffer = second half layered on first, first onto second
 
 	this.apply_vol_env = function() {
 		if(this.buffer) {
@@ -32,10 +37,15 @@ function Grain(g_ind, g_ui) {
 			}
 		}
 	}
+
+	this.create_mod_buffer = function() {
+		//write this, merge with apply_vol_env
+	}
+
 }
 
 Grain.prototype.refresh_buffer = function (buf) {
-		console.log("refreshing grain buffer");
+		if(verbose) console.log("refreshing grain buffer");
 		//new_start in seconds
 		new_start = this.ui.get_start() * (buf.duration);
 		new_end = new_start + (this.ui.get_length()/ buf.sampleRate);
@@ -52,7 +62,7 @@ Grain.prototype.refresh_buffer = function (buf) {
 	}
 
 Grain.prototype.play = function () {
-		console.log("playing grain");
+		if(verbose) console.log("playing grain");
 		if(!this.buffer) this.refresh_buffer(full_buffer);
 		this.buffer_src = context.createBufferSource();
 		
@@ -62,22 +72,24 @@ Grain.prototype.play = function () {
 		this.buffer_src.connect(context.destination);
 
 		this.buffer_src.start();
+		this.grain_on = true;
 	}
 
 Grain.prototype.stop = function () {
-		console.log("stoping grain");
+		if(verbose) console.log("stoping grain");
 		this.buffer_src.stop();
+		this.grain_on = false;
 	}
 
 Grain.prototype.refresh_play = function () {
-		console.log("playing with new vals");
-		this.stop();
+		if(verbose) console.log("playing with new vals");
+		if(this.grain_on) this.stop();
 		this.refresh_buffer(full_buffer);
 		this.play();
 	}
 
 Grain.prototype.strike = function () {
-		console.log("striking grain");
+		if(verbose) console.log("striking grain");
 		//write this?
 	}
 

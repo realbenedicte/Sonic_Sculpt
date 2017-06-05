@@ -22,10 +22,10 @@ var grains;
 var grain_uis;
 
 //for debugging
-var verbose = 1;
+var verbose = 0;
 
 const NUM_CHANS = 2;
-const NUM_GRAINS = 1;
+const NUM_GRAINS = 5;
 const G_DEF_DICT = { "start":0.5, "length":1000, "detune": 0};
 
 const START_MIN = 0;

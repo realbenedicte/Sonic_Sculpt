@@ -47,11 +47,9 @@ function init(){
  */
 function init_buttons() {
 	rec_button = new GButton("rec_stop", handle_rec_press,  0);
-	play_button = new GButton("play", handle_play_stop_press,  0);
 	//submit_button = new GButton("g_submit", function(){grains[0].refresh_play();}, 0);
 
 	init_button_listener(rec_button);
-	init_button_listener(play_button);
 	//init_button_listener(submit_button);
 }
 
@@ -65,6 +63,26 @@ function init_button_listener(btn) {
 	btn.button.addEventListener('click', function(){btn.click_func(btn); });
 }
 
+function get_grains_playing() {
+	var playing = [];
+	for(var i = 0; i < NUM_GRAINS; i++){
+		if(grains[i].grain_on){
+			playing.push(i);
+		}
+	}
+	if(playing.length > 0) {
+		return playing;
+	} else {
+		return null;
+	}
+}
+
+function stop_grains(playing) {
+	for(var i = 0; i < playing.length; i++){
+		grains[playing[i]].stop();
+	}
+}
+
 /* Function: handle_rec_press
  * --------------------
  * This function handles the pressing of the record button.
@@ -76,9 +94,9 @@ function handle_rec_press() {
 	if (rec_button.is_active) {
 		end_record();
 	} else {
-		if(play_button.is_active) {
-			stop_full_audio();
-			play_button.is_active = 0;
+		var playing = get_grains_playing()
+		if(playing) {
+			stop_grains(playing);
 		}
 		delete_rec_blob();
 		begin_record();
@@ -123,53 +141,6 @@ function begin_record() {
 	g_fields_set_read_only(true);
 	if(verbose) { console.log("recording started"); }
 	rec_button.is_active = 1;
-}
-
-/* Function: play_full_audio
- * -------------------------
- * This plays the audio recording from the beginning, and changes the activity
- * boolean of the play button to reflect this.
- */
-function play_full_audio() {
-	grains[0].play();
-
-	//full_buffer_src = get_audio_buffer_source(context.destination);
-	//full_buffer_src.start(0);
-	if(verbose) { console.log("file playing"); }
-	play_button.is_active = 1;
-}
-
-/* Function: stop_full_audio
- * -------------------------
- * This stops the currently playing audio recording, and resets
- * the activity boolean on the play button.
- */
-function stop_full_audio() {
-	grains[0].stop();
-
-	//full_buffer_src.stop(0);
-	if(verbose) { console.log("file stopped"); }
-	play_button.is_active = 0;
-}
-
-/* Function: handle_play_stop_press
- * --------------------------------
- * This function handles behavior when the "Play/Pause" button is
- * pressed. If the recording is not currently being played, and
- * the button is pressed, then the recording is played. If the recording
- * is being played at the time the button is pressed, then the recording
- * is stopped. If no audio has been recorded, that is caught
- */
-function handle_play_stop_press() {
-	if(full_audio) {
-		if (play_button.is_active && !full_audio.ended) {
-			stop_full_audio();
-		} else {
-			play_full_audio();	
-		}
-	} else {
-			console.log("No audio recorded!");
-	}
 }
 
 /* Function: delete_rec_blob
@@ -291,9 +262,9 @@ function init_grains() {
 	grain_uis = new Array();
 	grains = new Array();
 	for (var i = 0; i < NUM_GRAINS; i++){
-		grain_uis.push(new GrainUI(i, "g_start_0", "g_length_0", "g_detune_0"));
+		grain_uis.push(new GrainUI(i, "g_start_"+i, "g_length_"+i, "g_detune_"+i, "g_play_"+i));
 		grains.push(new Grain(i, grain_uis[i]));
-		grain_uis[i].init_sliders();
+		grain_uis[i].init_buttons();
 	}
 }
 
