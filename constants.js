@@ -40,8 +40,8 @@ var grain_uis;
 //declaring app-div-related vars
 var app;
 
-//for grain rect resizing
-var g_changing = false;
+//index of grain rect currently changing
+var g_changing = -1;
 
 //for debugging
 var verbose = 1;
@@ -75,3 +75,5 @@ const APP_HEIGHT_RATIO = 0.7;
 const APP_BORDER_STYLE = "20px solid black";
 const APP_BORDER_RADIUS = "75px";
 const APP_PAD = 25;
+
+const G_RECT_SIDE_PERC = 0.1;

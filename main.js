@@ -316,10 +316,10 @@ function get_grain_box_width(){
 function get_grain_box_posit(g_ind) {
 	var posit = [];
 	//get x val
-	posit[0] = get_css_val(APP_ID, "left", true);
+	posit[0] = get_css_val(APP_ID, "left", true) + APP_PAD;
 	//get y val
 	var g_box_height = get_grain_box_height();
-	posit[1] = get_css_val(APP_ID, "top", true) + (g_ind * g_box_height);
+	posit[1] = get_css_val(APP_ID, "top", true) + (g_ind * g_box_height) + APP_PAD;
 	return posit;
 }
 
@@ -360,7 +360,14 @@ function handle_mouse_down(event) {
 	if(event.target.className == "add_grain_text"){
 		var g_ind = get_g_ind_from_id(event.target.id);
 		grain_uis[g_ind].handle_spawn_grain();
-		grains[g_ind].play();
+		//grains[g_ind].play();
+
+	} else if (event.target.className == "g_rect"){
+		event.preventDefault();
+		var g_ind = get_g_ind_from_id(event.target.id);
+		grain_uis[g_ind].handle_grain_rect_click(event.clientX);
+		g_changing = g_ind;
+
 	} else if (event.target.id == "rec_stop"){
 		handle_rec_press();
 	}
@@ -368,12 +375,18 @@ function handle_mouse_down(event) {
 
 // This function handles the mouse move event.
 function handle_mouse_move(event) {
-
+	if(g_changing > -1){
+		event.preventDefault();
+		grain_uis[g_changing].handle_new_mouse_coords(event.clientX);
+	}
 }
 
 // This function handles the mouse up event.
 function handle_mouse_up(event) {
-
+	if (g_changing > -1){
+		grain_uis[g_changing].handle_grain_rect_release();
+		g_changing = -1;
+	}
 }
 
 function init_doc_listeners() {
