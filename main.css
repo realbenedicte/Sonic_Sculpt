@@ -27,15 +27,17 @@ table {
 }
 /* ######## End Reset ######## */
 
+body {
+	font-family: 'Poppins', sans-serif;;
+}
+
 h1 {
 	color: green;
 }
 
-fieldset {
-	margin: 1em;
-	border: solid black .1em;
-}
-
-input, label, legend {
- 	margin: .7em;
+.add_grain_text {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 }

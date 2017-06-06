@@ -4,6 +4,7 @@
 /* ON THE LIST:
  * - Implement front end, all grains
  * - Implement good grain sound (volume envelope, overlapping)
+ * - Implement dynamic add/remove grain rendering?
  */
 
 /* File: main.js
@@ -39,6 +40,7 @@ function init(){
 	init_audio_stream();
 	init_grains();
 	init_interface();
+	init_doc_listeners();
 }
 
 /* Function: init_buttons
@@ -49,8 +51,7 @@ function init(){
  */
 function init_buttons() {
 	rec_button = new GButton("rec_stop", handle_rec_press,  0);
-
-	init_button_listener(rec_button);
+	//init_button_listener(rec_button);
 }
 
 /* Function: init_button_listener
@@ -77,9 +78,10 @@ function get_grains_playing() {
 	}
 }
 
-function stop_grains(playing) {
+function kill_grains(playing) {
 	for(var i = 0; i < playing.length; i++){
 		grains[playing[i]].stop();
+		grain_uis[playing[i]].handle_remove_grain();
 	}
 }
 
@@ -96,7 +98,7 @@ function handle_rec_press() {
 	} else {
 		var playing = get_grains_playing()
 		if(playing) {
-			stop_grains(playing);
+			kill_grains(playing);
 		}
 		delete_rec_blob();
 		begin_record();
@@ -113,7 +115,6 @@ function end_record() {
 
 	if(verbose) { console.log("recording stopped"); }
 	rec_button.is_active = 0;
-	g_fields_set_read_only(false);
 }
 
 /* Function: begin_record
@@ -254,7 +255,6 @@ function link_grains_to_uis() {
  * as the corresponding GrainUI objects for each grain.
  */
 function init_grains() {
-	grain_uis = new Array();
 	grains = new Array();
 	for (var i = 0; i < NUM_GRAINS; i++){
 		// init grains
@@ -262,51 +262,135 @@ function init_grains() {
 	}
 }
 
-// most of this is a modified version of init function in https://goo.gl/2r1KPl
-function init_canvas() {
-	var app_container = document.createElement( 'div' );
-
-    app_container.id = "app_container";
-    canvas = document.createElement('canvas');
-    canvas_context = canvas.getContext('2d');
+function center_app() {
     //set canvas width, height 
-    canvas.style.width = window.innerWidth * CANV_WIDTH_RATIO + "px";
-    canvas.style.height = window.innerHeight * CANV_HEIGHT_RATIO + "px";
+    app.style.width = window.innerWidth * APP_WIDTH_RATIO + "px";
+    app.style.height = window.innerHeight * APP_HEIGHT_RATIO + "px";
     //set canvas x, y
-    canvas.style.position = "absolute";
-    canvas.style.left = (window.innerWidth - (window.innerWidth * CANV_WIDTH_RATIO))/2.0 + "px";
-    canvas.style.top = (window.innerHeight - (window.innerHeight * CANV_HEIGHT_RATIO))/2.0 + "px";
+    app.style.position = "absolute";
+    app.style.left = (window.innerWidth - app.offsetWidth)/2.0 + "px";
+    app.style.top = (window.innerHeight - app.offsetHeight)/2.0 + "px";
+}
+
+// most of this is a modified version of init function in https://goo.gl/2r1KPl
+function init_app_div() {
+	var app_container = document.createElement('div');
+    app_container.id = "app_container";
+    app = document.createElement('div');
+    app.id = APP_ID;
+    //set padding
+    app.style.padding = APP_PAD + "px";
     //set border
-    canvas.style.border = CANV_BORDER_STYLE;
-    canvas.style.borderRadius = CANV_BORDER_RADIUS;
-    
+    app.style.border = APP_BORDER_STYLE;
+    app.style.borderRadius = APP_BORDER_RADIUS;
+
     document.body.appendChild(app_container);
-    app_container.appendChild(canvas);
+    app_container.appendChild(app);
+
+    center_app();
+}
+
+
+function get_css_val_by_elem(elem, val_name, return_as_num) {
+	var style_val = window.getComputedStyle(elem).getPropertyValue(val_name);
+	if(return_as_num) return parseFloat(style_val);
+	return style_val;
+}
+
+function get_css_val(elem_id, val_name, return_as_num) {
+	var elem = document.getElementById(elem_id);
+	var style_val = window.getComputedStyle(elem).getPropertyValue(val_name);
+	if(return_as_num) return parseFloat(style_val);
+	return style_val;
+}
+
+function get_grain_box_height(){
+	var app_height = get_css_val(APP_ID, "height", true);
+	return app_height/(NUM_GRAINS * 1.0);
+}
+
+function get_grain_box_width(){
+	return get_css_val(APP_ID, "width", true);
+}
+
+function get_grain_box_posit(g_ind) {
+	var posit = [];
+	//get x val
+	posit[0] = get_css_val(APP_ID, "left", true);
+	//get y val
+	var g_box_height = get_grain_box_height();
+	posit[1] = get_css_val(APP_ID, "top", true) + (g_ind * g_box_height);
+	return posit;
 }
 
 function init_interface() {
-	// init canvas
-	init_canvas();
+	// init app div
+	init_app_div();
 	//init grain_uis
 	grain_uis = new Array();
 	for (var i = 0; i < NUM_GRAINS; i++){
 		//calc GrainUI init values (box_x, box_y, box_width, box_height)
+		var gb_height = get_grain_box_height();
+		var gb_width = get_grain_box_width();
+		var gb_posit = get_grain_box_posit(i);
 		//grain_uis.push(new GrainUI( calculated values ));
-		grain_uis.push(new GrainUI(i))
+		grain_uis.push(new GrainUI(i, gb_posit[0], gb_posit[1], gb_width, gb_height, COLORS[i]))
 	}
 
 	// link grains to ui's
 	link_grains_to_uis();
-	window.requestAnimFrame(draw_interface);
+	draw_init_grain_uis();
+	//window.requestAnimFrame(draw_interface);
 }
 
-function draw_interface() {
+function draw_init_grain_uis(){
+	//grain_uis[0].draw_init();
 	for(var i = 0; i < NUM_GRAINS; i++){
-		grain_uis[i].draw();
+		grain_uis[i].draw_init();
 	}
 }
 
+function get_g_ind_from_id(str) {
+	var ind_str = str.charAt(str.length - 1);
+	return parseInt(ind_str);
+}
+
+// This function handles a mouse down event.
+function handle_mouse_down(event) {
+	if(event.target.className == "add_grain_text"){
+		var g_ind = get_g_ind_from_id(event.target.id);
+		grain_uis[g_ind].handle_spawn_grain();
+		grains[g_ind].play();
+	} else if (event.target.id == "rec_stop"){
+		handle_rec_press();
+	}
+}
+
+// This function handles the mouse move event.
+function handle_mouse_move(event) {
+
+}
+
+// This function handles the mouse up event.
+function handle_mouse_up(event) {
+
+}
+
+function init_doc_listeners() {
+	document.addEventListener("mousemove",handle_mouse_move,false);
+	document.addEventListener("mousedown",handle_mouse_down,false);
+	document.addEventListener("mouseup",handle_mouse_up,false);
+}
 
 // BONEYARD //// BONEYARD //// BONEYARD //// BONEYARD //
 // BONEYARD //// BONEYARD //// BONEYARD //// BONEYARD //
 // BONEYARD //// BONEYARD //// BONEYARD //// BONEYARD //
+
+/*
+function draw_interface() {
+	//grain_uis[0].draw();
+	for(var i = 0; i < NUM_GRAINS; i++){
+		grain_uis[i].draw();
+	}
+	//window.requestAnimFrame(draw_interface);
+}*/

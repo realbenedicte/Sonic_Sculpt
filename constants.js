@@ -37,9 +37,11 @@ var full_buffer_src;
 var grains;
 var grain_uis;
 
-//declaring canvas-related vars
-var canvas;
-var canvas_context;
+//declaring app-div-related vars
+var app;
+
+//for grain rect resizing
+var g_changing = false;
 
 //for debugging
 var verbose = 1;
@@ -50,7 +52,7 @@ var verbose = 1;
 
 const NUM_CHANS = 2;
 const NUM_GRAINS = 5;
-const G_DEF_DICT = { "start":0.5, "length":1000, "detune": 0};
+const COLORS = ["red", "green", "orange", "purple", "blue"];
 
 const START_MIN = 0;
 const START_MAX = 1;
@@ -64,7 +66,12 @@ const DETUNE_MIN = -1200;
 const DETUNE_MAX = 1200;
 const DETUNE_STEP = 1;
 
-const CANV_WIDTH_RATIO = 0.7;
-const CANV_HEIGHT_RATIO = 0.7;
-const CANV_BORDER_STYLE = "20px solid black";
-const CANV_BORDER_RADIUS = "75px";
+const APP_ID = "app_div";
+
+//calculated pre-padding
+const APP_WIDTH_RATIO = 0.7;
+const APP_HEIGHT_RATIO = 0.7;
+
+const APP_BORDER_STYLE = "20px solid black";
+const APP_BORDER_RADIUS = "75px";
+const APP_PAD = 25;
