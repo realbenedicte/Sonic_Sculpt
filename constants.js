@@ -1,5 +1,21 @@
+//GLOBALS////GLOBALS////GLOBALS////GLOBALS////GLOBALS//
+//GLOBALS////GLOBALS////GLOBALS////GLOBALS////GLOBALS//
+//GLOBALS////GLOBALS////GLOBALS////GLOBALS////GLOBALS//
+
 //create context
 var context = new (window.AudioContext || window.webkitAudioContext)();
+// Shim the requestAnimationFrame API, with a setTimeout fallback
+window.requestAnimFrame = (function(){
+    return  window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function( callback ){
+        window.setTimeout(callback, 1000 / 60);
+    };
+})();
+
 //declare the nodes
 var mic_recorder;
 var full_array_buffer;
@@ -21,8 +37,16 @@ var full_buffer_src;
 var grains;
 var grain_uis;
 
+//declaring canvas-related vars
+var canvas;
+var canvas_context;
+
 //for debugging
 var verbose = 1;
+
+//CONSTANTS////CONSTANTS////CONSTANTS////CONSTANTS///
+//CONSTANTS////CONSTANTS////CONSTANTS////CONSTANTS///
+//CONSTANTS////CONSTANTS////CONSTANTS////CONSTANTS///
 
 const NUM_CHANS = 2;
 const NUM_GRAINS = 5;
@@ -39,3 +63,8 @@ const LENGTH_STEP = 1;
 const DETUNE_MIN = -1200;
 const DETUNE_MAX = 1200;
 const DETUNE_STEP = 1;
+
+const CANV_WIDTH_RATIO = 0.7;
+const CANV_HEIGHT_RATIO = 0.7;
+const CANV_BORDER_STYLE = "20px solid black";
+const CANV_BORDER_RADIUS = "75px";

@@ -1,3 +1,7 @@
+/* On the list:
+ *  - responsive to window resize (box_x, box_y, etc.)
+ */
+
 /* Object: GrainUI
  * -----------------------
  * This is a grain UI. It connect to a grain, and tells the grain when the user has
@@ -54,12 +58,12 @@ GrainUI.prototype.init = function() {
 
 //handles spawning the grain interface
 GrainUI.prototype.spawn = function() {
-		
+		if(verbose) console.log("GrainUI: spawing grain ui!")
 	}
 
 //draws the current grain state, must have 
 GrainUI.prototype.draw = function() {
-		
+		if(verbose) console.log("GrainUI: drawing grain ui!")
 	}
 
 //handles the event where the entire grain slides left

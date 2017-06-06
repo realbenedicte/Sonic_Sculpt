@@ -38,6 +38,7 @@ function init(){
 	init_buttons();
 	init_audio_stream();
 	init_grains();
+	init_interface();
 }
 
 /* Function: init_buttons
@@ -122,7 +123,6 @@ function end_record() {
  */
 function begin_record() {
 	mic_recorder.start();
-	g_fields_set_read_only(true);
 	if(verbose) { console.log("recording started"); }
 	rec_button.is_active = 1;
 }
@@ -259,12 +259,53 @@ function init_grains() {
 	for (var i = 0; i < NUM_GRAINS; i++){
 		// init grains
 		grains.push(new Grain(i));
-		// init grain_uis
-		grain_uis.push(new GrainUI(i))
-		// link grains to ui's
-		link_grains_to_uis();
 	}
 }
+
+// most of this is a modified version of init function in https://goo.gl/2r1KPl
+function init_canvas() {
+	var app_container = document.createElement( 'div' );
+
+    app_container.id = "app_container";
+    canvas = document.createElement('canvas');
+    canvas_context = canvas.getContext('2d');
+    //set canvas width, height 
+    canvas.style.width = window.innerWidth * CANV_WIDTH_RATIO + "px";
+    canvas.style.height = window.innerHeight * CANV_HEIGHT_RATIO + "px";
+    //set canvas x, y
+    canvas.style.position = "absolute";
+    canvas.style.left = (window.innerWidth - (window.innerWidth * CANV_WIDTH_RATIO))/2.0 + "px";
+    canvas.style.top = (window.innerHeight - (window.innerHeight * CANV_HEIGHT_RATIO))/2.0 + "px";
+    //set border
+    canvas.style.border = CANV_BORDER_STYLE;
+    canvas.style.borderRadius = CANV_BORDER_RADIUS;
+    
+    document.body.appendChild(app_container);
+    app_container.appendChild(canvas);
+}
+
+function init_interface() {
+	// init canvas
+	init_canvas();
+	//init grain_uis
+	grain_uis = new Array();
+	for (var i = 0; i < NUM_GRAINS; i++){
+		//calc GrainUI init values (box_x, box_y, box_width, box_height)
+		//grain_uis.push(new GrainUI( calculated values ));
+		grain_uis.push(new GrainUI(i))
+	}
+
+	// link grains to ui's
+	link_grains_to_uis();
+	window.requestAnimFrame(draw_interface);
+}
+
+function draw_interface() {
+	for(var i = 0; i < NUM_GRAINS; i++){
+		grain_uis[i].draw();
+	}
+}
+
 
 // BONEYARD //// BONEYARD //// BONEYARD //// BONEYARD //
 // BONEYARD //// BONEYARD //// BONEYARD //// BONEYARD //
