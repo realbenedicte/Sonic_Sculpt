@@ -49,29 +49,6 @@ function GrainUI(g_ind, box_x, box_y, box_width, box_height, color) {
 	this.grain = null;
 }
 
-/* gets how far the left side of the grain is from the left
- * side of the container (distance ratio)
- */
-GrainUI.prototype.get_left_dist = function() {
-
-	}
-
-/* gets how far the right side of the grain is from the left
- * side of the container (distance ratio)
- */
-GrainUI.prototype.get_right_dist = function() {
-
-	}
-
-/* converts a distance ratio from left side of container to point
- * (0 is all the way to the left, 1 all the way to the right, 0.5 
- * in the middle) and coverts it to the number of samples into the
- * buffer array that is.
- */
-GrainUI.prototype.dist_ratio_to_samps = function() {
-
-	}
-
 GrainUI.prototype.make_box = function() {
 		this.box = document.createElement('div');
 		this.box.style.position = "absolute";
@@ -219,6 +196,7 @@ GrainUI.prototype.handle_new_mouse_coords = function(client_x){
 			var next_center = this.get_x_rel_to_box(client_x) + this.mouse_offset;
 			this.center_grain_rect_on_x(next_center);
 			this.refresh_grain_rect_vals();
+			this.grain.refresh_play();
 		} else if(this.left_changing) {
 			//continue left change
 		} else if(this.right_changing){
@@ -296,15 +274,17 @@ GrainUI.prototype.handle_spawn_grain = function() {
 
 //returns the starting position
 GrainUI.prototype.get_start = function () {
-		return parseFloat(this.start_ctl.value)
+		return this.g_left;
 	}
 
-GrainUI.prototype.get_length = function () {
-		return parseFloat(this.length_ctl.value)
+GrainUI.prototype.get_end = function () {
+		return this.g_right;
 	}
 
 GrainUI.prototype.get_detune = function () {
-		return parseFloat(this.detune_ctl.value)
+		//return parseFloat(this.detune_ctl.value)
+		//temp 
+		return 1;
 	}
 
 //BONEYARD////BONEYARD////BONEYARD////BONEYARD////BONEYARD//

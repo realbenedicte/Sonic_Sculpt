@@ -360,7 +360,7 @@ function handle_mouse_down(event) {
 	if(event.target.className == "add_grain_text"){
 		var g_ind = get_g_ind_from_id(event.target.id);
 		grain_uis[g_ind].handle_spawn_grain();
-		//grains[g_ind].play();
+		grains[g_ind].play();
 
 	} else if (event.target.className == "g_rect"){
 		event.preventDefault();
