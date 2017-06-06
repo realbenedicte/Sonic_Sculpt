@@ -58,7 +58,7 @@ const START_MIN = 0;
 const START_MAX = 1;
 const START_STEP = 0.005;
 
-const LENGTH_MIN = 0;
+const LENGTH_MIN = 100;
 const LENGTH_MAX = 10000;
 const LENGTH_STEP = 1;
 

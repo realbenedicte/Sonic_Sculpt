@@ -48,9 +48,10 @@ function Grain(g_ind, g_ui) {
 Grain.prototype.refresh_buffer = function (buf) {
 		if(verbose) console.log("refreshing grain buffer");
 		//new_start in seconds
-		new_start = this.ui.get_start() * buf.duration;
-		new_end = this.ui.get_end() * buf.duration;
-		//new_end = new_start + (this.ui.get_length()/ buf.sampleRate);
+		new_start = this.ui.g_left * buf.duration;
+		new_end = this.ui.g_right * buf.duration;
+
+		if(new_end == 1) console.log("at end");
 		// get the new buffer and assign
 		AudioBufferSlice(buf, new_start, new_end, this, function(e, new_buffer, grain){
 			if (e) {
@@ -91,9 +92,18 @@ Grain.prototype.refresh_play = function () {
 		this.play();
 	}
 
+Grain.prototype.get_min_grain_perc = function() {
+		return LENGTH_MIN / (full_buffer.length * 1.0);
+	}
+
+Grain.prototype.get_max_grain_perc = function() {
+		return LENGTH_MAX / (full_buffer.length * 1.0);
+	}
+
 Grain.prototype.strike = function () {
 		if(verbose) console.log("striking grain");
 		//write this?
 	}
+
 
 /* ##### End GButton ##### */
