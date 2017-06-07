@@ -16,14 +16,6 @@
 
 function Grain(g_ind, g_ui) {
 
-	this.fire = function() {
-		var g_src = context.createBufferSource();
-		g_src.buffer = this.buffer;
-		g_src.detune.value = this.ui.get_detune();
-		g_src.connect(context.destination);
-		g_src.start(0, 0, g_src.buffer.duration);
-	}
-
 	this.apply_vol_env = function() {
 		if(this.buffer) {
 			var half_len = this.buffer.length/2
@@ -43,6 +35,8 @@ function Grain(g_ind, g_ui) {
 	this.buffer_src = null;
 	this.buffer_set = false;
 	this.grain_on = false;
+	this.intID = null;
+	this.last_fire_time = null;
 }
 
 Grain.prototype.refresh_buffer = function (buf) {
@@ -64,24 +58,65 @@ Grain.prototype.refresh_buffer = function (buf) {
 		this.buffer_set = true;
 	}
 
+Grain.prototype.fire = function(g_buf, time) {
+		var g_src = context.createBufferSource();
+		g_src.buffer = g_buf;
+		g_src.detune.value = this.ui.get_detune();
+		g_src.connect(context.destination);
+		g_src.start(time, 0, g_src.buffer.duration);
+	}
+
+/*Grain.prototype.fire_schedule = function(grain) {
+		//get number of grain_fires to schedule
+		var sched_call = context.currentTime;
+		var samps_in_lookahead = FIRE_SCHED_LOOKAHEAD * (context.sampleRate/1000.0);
+		var samps_btw_fires = grain.buffer.length/2.0;
+		var samps_til_next_fire = ((grain.last_fire_time * context.sampleRate) + samps_btw_fires) - 
+										((sched_call) * context.sampleRate);
+		if(samps_in_lookahead >= samps_til_next_fire){
+			while(samps_til_next_fire < samps_in_lookahead){
+				var fire_time = samps_til_next_fire / (context.sampleRate * 1.0);
+				grain.fire(grain.buffer, fire_time);
+				this.last_fire_time = fire_time;
+				samps_til_next_fire += samps_btw_fires;
+			}
+		}
+	}*/
+
+Grain.prototype.fire_schedule = function(grain) {
+		//get number of grain_fires to schedule
+		var sec_in_lookahead = FIRE_SCHED_LOOKAHEAD/1000.0;
+		var sec_btw_fires = grain.buffer.duration/2.0;
+		if(grain.last_fire_time){
+			var next_fire_time = grain.last_fire_time + sec_btw_fires;
+		} else {
+			var next_fire_time = context.currentTime + (context.currentTime%sec_btw_fires);
+		}
+		while(next_fire_time < context.currentTime + sec_in_lookahead){
+			grain.fire(grain.buffer, next_fire_time);
+			this.last_fire_time = next_fire_time;
+			next_fire_time += sec_btw_fires;
+		}
+	}	
+
+Grain.prototype.init_fire_scheduler = function() {
+	var _this = this;
+	this.intID = setInterval(function(){
+		_this.fire_schedule(_this);
+	}, FIRE_SCHED_TIMEOUT);
+};
+
 Grain.prototype.play = function () {
 		if(verbose) console.log("playing grain");
 		if(!this.buffer) this.refresh_buffer(full_buffer);
-		
-		this.buffer_src = context.createBufferSource();
-		
-		this.buffer_src.buffer = this.buffer;
-		this.buffer_src.loop = true;
-		this.buffer_src.detune.value = this.ui.get_detune();
-		this.buffer_src.connect(context.destination);
-
-		this.buffer_src.start();
+		this.init_fire_scheduler();
+		this.fire_schedule(this);
 		this.grain_on = true;
 	}
 
 Grain.prototype.stop = function () {
 		if(verbose) console.log("stoping grain");
-		this.buffer_src.stop();
+		clearInterval(this.intID);
 		this.grain_on = false;
 	}
 

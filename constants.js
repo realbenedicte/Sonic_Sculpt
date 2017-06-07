@@ -77,3 +77,6 @@ const APP_BORDER_RADIUS = "75px";
 const APP_PAD = 25;
 
 const G_RECT_SIDE_PERC = 0.1;
+
+const FIRE_SCHED_TIMEOUT = 25;
+const FIRE_SCHED_LOOKAHEAD = 100;
