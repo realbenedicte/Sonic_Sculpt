@@ -187,8 +187,8 @@ GrainUI.prototype.set_grain_rect_sides = function(left_px, right_px) {
 		this.set_grain_rect_width(right_px - left_px);
 	}
 
-/* Function: 
- * ------------------------------
+/* Function: make_grain_rect
+ * -------------------------
  *
  */
 GrainUI.prototype.make_grain_rect = function() {
@@ -198,7 +198,6 @@ GrainUI.prototype.make_grain_rect = function() {
 		this.grain_rect.style.borderRadius = "20px";
 
 		this.grain_rect.style.background = this.color;
-		//this.grain_rect.style.opacity = "0.5";
 
 		this.grain_rect.className = "g_rect";
 		this.grain_rect.id = "g_rect_" + this.g_ind;
@@ -208,8 +207,8 @@ GrainUI.prototype.make_grain_rect = function() {
 		this.box.appendChild(this.grain_rect);
 	}
 
-/* Function: 
- * ------------------------------
+/* Function: draw_dormant
+ * ----------------------
  *
  */
 GrainUI.prototype.draw_dormant = function() {
@@ -219,8 +218,8 @@ GrainUI.prototype.draw_dormant = function() {
 		this.remove_div.style.display = "none";
 	}
 
-/* Function: 
- * ------------------------------
+/* Function: draw_live
+ * -------------------
  *
  */
 GrainUI.prototype.draw_live = function() {
@@ -233,26 +232,22 @@ GrainUI.prototype.draw_live = function() {
 		this.grain_rect.style.zIndex = "1";
 	}
 
-/* Function: 
- * ------------------------------
+/* Function: draw_init
+ * -------------------
  *
  */
 GrainUI.prototype.draw_init = function() {
-		//make outer_box
 		this.make_box();
 		this.make_block();
-		//make spawn_grain div
 		this.make_spawn_div();
-		//make canvas
 		this.make_canvas();
-		//make grain_rect
 		this.make_grain_rect();
 		this.make_remove_div();
 		this.draw_dormant();
 	}
 
-/* Function: 
- * ------------------------------
+/* Function: handle_grain_rect_click
+ * ---------------------------------
  * returns which control zone the coordinate lands in
  */
 GrainUI.prototype.handle_grain_rect_click = function(client_x) {
@@ -273,8 +268,8 @@ GrainUI.prototype.handle_grain_rect_click = function(client_x) {
 		}
 	}	
 
-/* Function: 
- * ------------------------------
+/* Function: handle_grain_rect_release
+ * -----------------------------------
  * 
  */
 GrainUI.prototype.handle_grain_rect_release = function() {
@@ -287,9 +282,8 @@ GrainUI.prototype.handle_grain_rect_release = function() {
 		}
 	}
 
-//relative to box
-/* Function: 
- * ------------------------------
+/* Function: get_grain_rect_center
+ * -------------------------------
  * 
  */
 GrainUI.prototype.get_grain_rect_center = function() {
@@ -297,47 +291,44 @@ GrainUI.prototype.get_grain_rect_center = function() {
 					(get_css_val(this.grain_rect.id, "width", true)/2.0)
 	}
 
-//relative to box
-/* Function: 
- * ------------------------------
+/* Function: get_x_rel_to_box
+ * --------------------------
  * 
  */
 GrainUI.prototype.get_x_rel_to_box = function(x) {
 		return x - this.box.getBoundingClientRect().left;
 	}
 
-//relative to box
-/* Function: 
- * ------------------------------
+/* Function: store_center_mouse_offset
+ * -----------------------------------
  * 
  */
 GrainUI.prototype.store_center_mouse_offset = function(client_x) {
 		this.mouse_offset = this.get_grain_rect_center() - this.get_x_rel_to_box(client_x);
 	}
 
-//relative to box
-/* Function: 
- * ------------------------------
- * 
+/* Function: store_right_mouse_offset
+ * ----------------------------------
+ * relative to box
  */
 GrainUI.prototype.store_right_mouse_offset = function(client_x) {
 		this.mouse_offset = this.g_right_px - this.get_x_rel_to_box(client_x);
 	}
 
-//relative to box
-/* Function: 
- * ------------------------------
- * 
+/* Function: store_left_mouse_offset
+ * ---------------------------------
+ * relative to box
  */
 GrainUI.prototype.store_left_mouse_offset = function(client_x) {
 		this.mouse_offset = this.get_x_rel_to_box(client_x) - this.g_left_px;
 	}
 
-/* Function: 
- * ------------------------------
+/* Function: handle_new_mouse_coords
+ * ---------------------------------
  * 
  */
 GrainUI.prototype.handle_new_mouse_coords = function(client_x){
+
 		function check_change_is_safe(left, right, g) {
 			var width = right - left;
 			var min = g.get_min_grain_perc();
@@ -368,7 +359,7 @@ GrainUI.prototype.handle_new_mouse_coords = function(client_x){
 		}
 	}
 
-/* Function: 
+/* Function: draw_grain_rect
  * ------------------------------
  * 
  */
@@ -379,18 +370,9 @@ GrainUI.prototype.draw_grain_rect = function(center, width_px) {
 		this.center_grain_rect_on_x(center);
 	}
 
-/* Function: 
+/* Function: center_grain_rect_on_x
  * ------------------------------
- * 
- */
-GrainUI.prototype.center_grain_rect_perc = function(x_perc) {
-		this.center_grain_rect_on_x(x_perc * this.box_width);
-	}
-
-//centers on an x, relative to box
-/* Function: 
- * ------------------------------
- * 
+ * centers on an x, relative to box
  */
 GrainUI.prototype.center_grain_rect_on_x = function(center_x){
 		var curr_width_px = get_css_val(this.grain_rect.id, "width", true);
@@ -404,8 +386,8 @@ GrainUI.prototype.center_grain_rect_on_x = function(center_x){
 		}
 	}
 
-/* Function: 
- * ------------------------------
+/* Function: handle_slide_start
+ * ----------------------------
  * handles the event where the entire grain slides left or right
  * (grain start shift only)
  */
@@ -414,8 +396,8 @@ GrainUI.prototype.handle_slide_start = function(client_x) {
 		this.store_center_mouse_offset(client_x);
 	}
 
-/* Function: 
- * ------------------------------
+/* Function: handle_right_change_start
+ * -----------------------------------
  * handles the event where the right side of grain is stretched
  * or compressed
  */
@@ -424,8 +406,8 @@ GrainUI.prototype.handle_right_change_start = function(client_x) {
 		this.store_right_mouse_offset(client_x);
 	}
 
-/* Function: 
- * ------------------------------
+/* Function: handle_left_change_start
+ * ----------------------------------
  * handles the event where the left side of grain is stretched
  * or compressed
  */
@@ -434,8 +416,8 @@ GrainUI.prototype.handle_left_change_start = function(client_x) {
 		this.store_left_mouse_offset(client_x);
 	}
 
-/* Function: 
- * ------------------------------
+/* Function: handle_slide_end
+ * --------------------------
  * handles the event where the entire grain slides left
  * or right (grain start shift only)
  */
@@ -454,8 +436,8 @@ GrainUI.prototype.handle_right_change_end = function() {
 		this.mouse_offset = 0;
 	}
 
-/* Function: handle_right_change_end
- * ------------------------------
+/* Function: handle_left_change_end
+ * --------------------------------
  * handles the event where the left side of grain is stretched
  * or compressed
  */
@@ -464,8 +446,8 @@ GrainUI.prototype.handle_left_change_end = function() {
 		this.mouse_offset = 0;
 	}
 
-/* Function: handle_right_change_end
- * ------------------------------
+/* Function: handle_remove_grain
+ * -----------------------------
  * handles the event where the grain is removed, and should be
  * reset
  */

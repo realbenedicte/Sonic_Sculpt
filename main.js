@@ -24,6 +24,8 @@
  * - Fix mobile-browser bugs
  * - Draw Waveform in the grain box
  * - Add Detune Controls
+ * - Add Grain Envelope Controls
+ * - Add Randomness (grain start/length randomness, fire randomness, etc)
  * - Make Grain and GrainUI functions private (if they should be)
  * 
  * For the Far Future:

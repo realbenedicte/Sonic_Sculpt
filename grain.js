@@ -4,16 +4,13 @@
  * of a grain. Some important things it contains: grain length, grain start time,
  * grain playback rate, (some other stuff I don't know I need yet). It also prototypes
  * the functionality of playing the grain. Lemme write it and then back to this...
-
- * For the Future:
- * - different sound envelope shapes?
  */
 
 function Grain(g_ind, g_ui) {
 
 
-	/* Function: 
-	 * ----------------------
+	/* Function: apply_vol_env
+	 * -----------------------
 	 *
 	 */
 	this.apply_vol_env = function() {
@@ -39,8 +36,8 @@ function Grain(g_ind, g_ui) {
 	this.last_fire_time = null;
 }
 
-/* Function: 
- * ----------------------
+/* Function: refresh_buffer
+ * ------------------------
  *
  */
 Grain.prototype.refresh_buffer = function (buf) {
@@ -62,8 +59,8 @@ Grain.prototype.refresh_buffer = function (buf) {
 		this.buffer_set = true;
 	}
 
-/* Function: 
- * ----------------------
+/* Function: fire
+ * --------------
  *
  */
 Grain.prototype.fire = function(g_buf, time) {
@@ -74,8 +71,8 @@ Grain.prototype.fire = function(g_buf, time) {
 		g_src.start(time, 0, g_src.buffer.duration);
 	}
 
-/* Function: 
- * ----------------------
+/* Function: fire_schedule
+ * -----------------------
  *
  */
 Grain.prototype.fire_schedule = function(grain) {
@@ -94,8 +91,8 @@ Grain.prototype.fire_schedule = function(grain) {
 		}
 	}	
 
-/* Function: 
- * ----------------------
+/* Function: init_fire_scheduler
+ * -----------------------------
  *
  */
 Grain.prototype.init_fire_scheduler = function() {
@@ -105,8 +102,8 @@ Grain.prototype.init_fire_scheduler = function() {
 		}, FIRE_SCHED_TIMEOUT);
 	}
 
-/* Function: 
- * ----------------------
+/* Function: play
+ * --------------
  *
  */
 Grain.prototype.play = function () {
@@ -116,8 +113,8 @@ Grain.prototype.play = function () {
 		this.grain_on = true;
 	}
 
-/* Function: 
- * ----------------------
+/* Function: stop
+ * --------------
  *
  */
 Grain.prototype.stop = function () {
@@ -127,7 +124,7 @@ Grain.prototype.stop = function () {
 		this.grain_on = false;
 	}
 
-/* Function: 
+/* Function: refresh_play
  * ----------------------
  *
  */
@@ -138,16 +135,16 @@ Grain.prototype.refresh_play = function () {
 		this.play();
 	}
 
-/* Function: 
- * ----------------------
+/* Function: get_min_grain_perc
+ * ----------------------------
  *
  */
 Grain.prototype.get_min_grain_perc = function() {
 		return LENGTH_MIN / (full_buffer.length * 1.0);
 	}
 
-/* Function: 
- * ----------------------
+/* Function: get_max_grain_perc
+ * ----------------------------
  *
  */
 Grain.prototype.get_max_grain_perc = function() {

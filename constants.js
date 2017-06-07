@@ -5,7 +5,7 @@
 //create context
 var context = new (window.AudioContext || window.webkitAudioContext)();
 // Shim the requestAnimationFrame API, with a setTimeout fallback
-window.requestAnimFrame = (function(){
+/*window.requestAnimFrame = (function(){
     return  window.requestAnimationFrame ||
     window.webkitRequestAnimationFrame ||
     window.mozRequestAnimationFrame ||
@@ -14,7 +14,7 @@ window.requestAnimFrame = (function(){
     function( callback ){
         window.setTimeout(callback, 1000 / 60);
     };
-})();
+})();*/
 
 //declare the nodes
 var mic_recorder;
