@@ -17,9 +17,9 @@ function GrainUI(g_ind, box_x, box_y, box_width, box_height, color) {
 	//concerning overall grain state
 	this.dormant = true;
 
-	this.g_left_perc = 0.4;
-	this.g_right_perc = 0.6;
-	this.g_width_perc = 0.2;
+	this.g_left_perc = G_RECT_DEF[0];
+	this.g_right_perc = G_RECT_DEF[1];
+	this.g_width_perc = G_RECT_DEF[2];
 
 	this.g_left_px = this.g_left_perc * box_width;
 	this.g_right_px = this.g_right_perc * box_width;
@@ -34,15 +34,27 @@ function GrainUI(g_ind, box_x, box_y, box_width, box_height, color) {
 	//concerning grain draw elements, to be filled
 	//in draw_init
 	this.box = null;
+	this.block = null;
 	this.spawn_div = null;
 	this.canvas = null;
 	this.canvas_ctx = null;
 	this.grain_rect = null;
+	this.remove_div = null;
 
 	//other
 	this.g_ind = g_ind;
 	this.grain = null;
 }
+
+GrainUI.prototype.grain_rect_dims_to_def = function() {
+		this.g_left_perc = G_RECT_DEF[0];
+		this.g_right_perc = G_RECT_DEF[1];
+		this.g_width_perc = G_RECT_DEF[2];
+
+		this.g_left_px = this.g_left_perc * this.box_width;
+		this.g_right_px = this.g_right_perc * this.box_width;
+		this.g_width_px = this.g_width_perc * this.box_width;
+	}
 
 GrainUI.prototype.make_box = function() {
 		this.box = document.createElement('div');
@@ -58,6 +70,43 @@ GrainUI.prototype.make_box = function() {
 		this.box.style.margin = GRAIN_BOX_MARGIN + "px";
 		
 		app.appendChild(this.box);
+	}
+
+GrainUI.prototype.make_block = function() {
+		this.block = document.createElement('div');
+		this.block.style.position = "absolute";
+		this.block.style.width = this.box_width + "px";
+		this.block.style.height = this.box_height + "px";
+		this.block.style.left = this.box_x + "px";
+		this.block.style.top = this.box_y + "px";
+
+		this.block.className = "grain_block_box";
+		this.block.style.border = "5px solid gray";
+
+		this.block.style.margin = GRAIN_BOX_MARGIN + "px";
+		
+		app.appendChild(this.block);
+	}
+
+GrainUI.prototype.make_remove_div = function() {
+		this.remove_div = document.createElement('div');
+		this.remove_div.style.position = "absolute";
+		this.remove_div.style.width = this.box_width * 0.1 + "px";
+		this.remove_div.style.height = this.box_height + "px";
+		this.remove_div.style.left = this.box_x + this.box_width + "px";
+		this.remove_div.style.top = "-5px";
+
+		var inner_msg = document.createElement("h3");
+		inner_msg.className = "remove_text";
+		inner_msg.id = "g_reset_" + this.g_ind;
+		inner_msg.innerHTML = "clear grain";
+		inner_msg.style.color = "white";
+
+		this.remove_div.style.background = this.color;
+		this.remove_div.style.border = "5px solid " + this.color;
+
+		this.remove_div.appendChild(inner_msg);
+		this.box.appendChild(this.remove_div);
 	}
 
 GrainUI.prototype.make_spawn_div = function() {
@@ -83,8 +132,8 @@ GrainUI.prototype.make_canvas = function() {
 		this.canvas.style.width = this.box_width + "px";
 		this.canvas.style.height = this.box_height + "px";
 
-		this.canvas_ctx.font = "30px Arial";
-		this.canvas_ctx.fillText("waveform",10,50);
+		this.canvas_ctx.fillStyle="#CCCCCC";
+		this.canvas_ctx.fillRect(0,0,this.canvas.width, this.canvas.height);
 
 		this.box.appendChild(this.canvas);
 	}
@@ -111,9 +160,10 @@ GrainUI.prototype.make_grain_rect = function() {
 		this.grain_rect = document.createElement('div');
 		this.grain_rect.style.position = "absolute";
 		this.grain_rect.style.height = "inherit";
+		this.grain_rect.style.borderRadius = "20px";
 
 		this.grain_rect.style.background = this.color;
-		this.grain_rect.style.opacity = "0.5";
+		//this.grain_rect.style.opacity = "0.5";
 
 		this.grain_rect.className = "g_rect";
 		this.grain_rect.id = "g_rect_" + this.g_ind;
@@ -127,12 +177,14 @@ GrainUI.prototype.draw_dormant = function() {
 		this.spawn_div.style.display = "block";
 		this.canvas.style.display = "none";
 		this.grain_rect.style.display = "none";
+		this.remove_div.style.display = "none";
 	}
 
 GrainUI.prototype.draw_live = function() {
 		this.spawn_div.style.display = "none";
 		this.canvas.style.display = "block";
 		this.grain_rect.style.display = "block";
+		this.remove_div.style.display = "block";
 
 		this.canvas.style.zIndex = "0";
 		this.grain_rect.style.zIndex = "1";
@@ -141,12 +193,14 @@ GrainUI.prototype.draw_live = function() {
 GrainUI.prototype.draw_init = function() {
 		//make outer_box
 		this.make_box();
+		this.make_block();
 		//make spawn_grain div
 		this.make_spawn_div();
 		//make canvas
 		this.make_canvas();
 		//make grain_rect
 		this.make_grain_rect();
+		this.make_remove_div();
 		this.draw_dormant();
 	}
 
@@ -307,6 +361,9 @@ GrainUI.prototype.handle_left_change_end = function() {
 //reset
 GrainUI.prototype.handle_remove_grain = function() {
 		this.draw_dormant();
+		this.grain_rect_dims_to_def();
+		this.set_grain_rect_sides(this.g_left_px, this.g_right_px);
+		this.grain.buffer = null;
 	}
 
 GrainUI.prototype.normalize_buf = function(buf) {
@@ -361,6 +418,14 @@ GrainUI.prototype.handle_spawn_grain = function() {
 		this.draw_live();
 	}
 
+GrainUI.prototype.unblock_me = function() {
+		this.block.style.display = "none";
+	}
+
+GrainUI.prototype.block_me = function() {
+		this.block.style.display = "block";
+	}
+
 // REWRITE THESE
 
 GrainUI.prototype.get_detune = function () {
@@ -372,38 +437,3 @@ GrainUI.prototype.get_detune = function () {
 //BONEYARD////BONEYARD////BONEYARD////BONEYARD////BONEYARD//
 //BONEYARD////BONEYARD////BONEYARD////BONEYARD////BONEYARD//
 //BONEYARD////BONEYARD////BONEYARD////BONEYARD////BONEYARD//
-
-/*GrainUI.prototype.draw_waveform = function() {
-		function check_to_draw(curr_x, last_px){
-			if(parseInt(curr_x) > last_px){
-				last_px = parseInt(curr_x);
-				return true;
-			}
-			return false;
-		}
-
-		function get_draw_wave_arr(){
-
-		}
-
-		this.canvas_ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-		var buf_floats = this.normalize_buf(full_buffer.getChannelData(0));
-		var x_step = this.box_width/(1.0 * full_buffer.length);
-		var mid_y = this.box_height/2.0;
-
-		var curr_x = 0;
-		var last_px = 0;
-		var curr_y = mid_y;
-
-		this.canvas_ctx.beginPath();
-		this.canvas_ctx.moveTo(0, mid_y);
-		for(var i = 0; i < full_buffer.length; i++){
-			curr_x += x_step;
-			if (check_to_draw(curr_x, last_px)){
-				curr_y = (buf_floats[buf_floats.length - (i+1)] * mid_y) + mid_y;
-				this.canvas_ctx.lineTo(curr_x, curr_y);
-			}
-		}
-
-		this.canvas_ctx.stroke();
-	}*/

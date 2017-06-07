@@ -78,3 +78,4 @@ const G_RECT_SIDE_PERC = 0.1;
 
 const FIRE_SCHED_TIMEOUT = 25;
 const FIRE_SCHED_LOOKAHEAD = 100;
+const G_RECT_DEF = [0.4, 0.6, 0.2];

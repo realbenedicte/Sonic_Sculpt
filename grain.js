@@ -94,13 +94,13 @@ Grain.prototype.play = function () {
 		if(verbose) console.log("playing grain");
 		if(!this.buffer) this.refresh_buffer(full_buffer);
 		this.init_fire_scheduler();
-		this.fire_schedule(this);
 		this.grain_on = true;
 	}
 
 Grain.prototype.stop = function () {
 		if(verbose) console.log("stoping grain");
 		clearInterval(this.intID);
+		this.last_fire_time = null;
 		this.grain_on = false;
 	}
 

@@ -51,7 +51,6 @@ function init(){
  */
 function init_buttons() {
 	rec_button = new GButton("rec_stop", handle_rec_press,  0);
-	//init_button_listener(rec_button);
 }
 
 /* Function: init_button_listener
@@ -105,6 +104,18 @@ function handle_rec_press() {
 	}
 }
 
+function unblock_app() {
+	for(var i = 0; i < NUM_GRAINS; i++){
+		grain_uis[i].unblock_me();
+	}
+}
+
+function block_app() {
+	for(var i = 0; i < NUM_GRAINS; i++){
+		grain_uis[i].block_me();
+	}
+}
+
 /* Function: end_record
  * ----------------------
  * This ends the recording process, and changes the activity boolean of
@@ -112,8 +123,10 @@ function handle_rec_press() {
  */
 function end_record() {
 	mic_recorder.stop();
-
 	if(verbose) { console.log("recording stopped"); }
+	document.getElementById("rec_stop").style.backgroundColor = "gray";
+	document.getElementById("rec_stop").innerHTML = "Record";
+	unblock_app();
 	rec_button.is_active = 0;
 }
 
@@ -125,6 +138,9 @@ function end_record() {
 function begin_record() {
 	mic_recorder.start();
 	if(verbose) { console.log("recording started"); }
+	document.getElementById("rec_stop").style.backgroundColor = "red";
+	document.getElementById("rec_stop").innerHTML = "Stop";
+	block_app();
 	rec_button.is_active = 1;
 }
 
@@ -335,6 +351,7 @@ function init_interface() {
 	// link grains to ui's
 	link_grains_to_uis();
 	draw_init_grain_uis();
+	block_app();
 }
 
 function draw_init_grain_uis(){
@@ -364,6 +381,10 @@ function handle_mouse_down(event) {
 
 	} else if (event.target.id == "rec_stop"){
 		handle_rec_press();
+	} else if (event.target.className == "remove_text"){
+		var g_ind = get_g_ind_from_id(event.target.id);
+		grains[g_ind].stop();
+		grain_uis[g_ind].handle_remove_grain();
 	}
 }
 
