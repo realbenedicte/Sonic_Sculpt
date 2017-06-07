@@ -48,8 +48,8 @@ function Grain(g_ind, g_ui) {
 Grain.prototype.refresh_buffer = function (buf) {
 		if(verbose) console.log("refreshing grain buffer");
 		//new_start in seconds
-		new_start = this.ui.g_left * buf.duration;
-		new_end = this.ui.g_right * buf.duration;
+		new_start = this.ui.g_left_perc * buf.duration;
+		new_end = this.ui.g_right_perc * buf.duration;
 
 		if(new_end == 1) console.log("at end");
 		// get the new buffer and assign

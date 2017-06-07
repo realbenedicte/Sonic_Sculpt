@@ -1,10 +1,3 @@
-//RIGHT NOW:
-// - figuring out how to draw box/grain (lines 67 - 100)
-
-/* On the list:
- *  - responsive to window resize (box_x, box_y, etc.)
- */
-
 /* Object: GrainUI
  * -----------------------
  * This is a grain UI. It connect to a grain, and tells the grain when the user has
@@ -25,10 +18,13 @@ function GrainUI(g_ind, box_x, box_y, box_width, box_height, color) {
 	//concerning overall grain state
 	this.dormant = true;
 
-	//distance ratios, distance from left of container
-	this.g_left = 0.4;
-	this.g_right = 0.6;
-	this.g_width = 0.2;
+	this.g_left_perc = 0.4;
+	this.g_right_perc = 0.6;
+	this.g_width_perc = 0.2;
+
+	this.g_left_px = this.g_left_perc * box_width;
+	this.g_right_px = this.g_right_perc * box_width;
+	this.g_width_px = this.g_width_perc * box_width;
 
 	//for slide/transformations
 	this.mouse_offset = 0;
@@ -57,7 +53,7 @@ GrainUI.prototype.make_box = function() {
 		this.box.style.left = APP_PAD + "px"
 		this.box.style.top = (this.box_height * this.g_ind) + APP_PAD + "px";
 
-		//temp
+		this.box.className = "grain_outer_box";
 		this.box.style.border = "5px solid " + this.color;
 		
 		app.appendChild(this.box);
@@ -92,11 +88,22 @@ GrainUI.prototype.make_canvas = function() {
 		this.box.appendChild(this.canvas);
 	}
 
-GrainUI.prototype.calc_grain_rect_sides = function() {
-		var left = this.box_width * this.g_left;
-		var right = this.box_width * this.g_right;
-		this.grain_rect.style.left = left + "px";
-		this.grain_rect.style.width = (right - left) + "px";
+GrainUI.prototype.set_grain_rect_width = function(width_px) {
+		this.g_width_px = width_px;
+		this.grain_rect.style.width = this.g_width_px + "px";
+		this.g_width_perc = this.g_width_px/(1.0*this.box_width);
+	}
+
+GrainUI.prototype.set_grain_rect_sides = function(left_px, right_px) {
+		this.g_left_px = left_px;
+		this.g_right_px = right_px;
+
+		this.grain_rect.style.left = this.g_left_px + "px";
+
+		this.g_left_perc = this.g_left_px/(1.0*this.box_width);
+		this.g_right_perc = this.g_right_px/(1.0*this.box_width);
+
+		this.set_grain_rect_width(right_px - left_px);
 	}
 
 GrainUI.prototype.make_grain_rect = function() {
@@ -110,7 +117,7 @@ GrainUI.prototype.make_grain_rect = function() {
 		this.grain_rect.className = "g_rect";
 		this.grain_rect.id = "g_rect_" + this.g_ind;
 
-		this.calc_grain_rect_sides();
+		this.set_grain_rect_sides(this.g_left_px, this.g_right_px);
 
 		this.box.appendChild(this.grain_rect);
 	}
@@ -142,21 +149,19 @@ GrainUI.prototype.draw_init = function() {
 		this.draw_dormant();
 	}
 
-GrainUI.prototype.draw_grain_rect = function() {
-
-	}
-
 //returns which control zone the coordinate lands in
 GrainUI.prototype.handle_grain_rect_click = function(client_x) {
+		
+		var bound_dist = G_RECT_SIDE_PERC * this.g_width_px;
 		// get left boundary
-		var left_x = G_RECT_SIDE_PERC * this.g_width * this.box_width;
+		var left_bound = bound_dist;
 		// get right boundary
-		var right_x = (this.g_width * this.box_width) - left_x;
+		var right_bound = this.g_width_px - bound_dist;
 		// if x < left boundary: return "left"
 		var g_rect_x = client_x - this.grain_rect.getBoundingClientRect().left;
-		if (g_rect_x <= left_x){
+		if (g_rect_x <= left_bound){
 			this.handle_left_change_start(client_x);
-		} else if (g_rect_x >= right_x) {
+		} else if (g_rect_x >= right_bound) {
 			this.handle_right_change_start(client_x);
 		} else {
 			this.handle_slide_start(client_x);	
@@ -191,13 +196,12 @@ GrainUI.prototype.store_center_mouse_offset = function(client_x) {
 
 //relative to box
 GrainUI.prototype.store_right_mouse_offset = function(client_x) {
-		this.mouse_offset = (this.g_right * this.box_width) - this.get_x_rel_to_box(client_x);
+		this.mouse_offset = this.g_right_px - this.get_x_rel_to_box(client_x);
 	}
 
-GrainUI.prototype.refresh_grain_rect_vals = function() {
-		this.g_left = get_css_val(this.grain_rect.id, "left", true)/(this.box_width*1.0)
-		this.g_width = get_css_val(this.grain_rect.id, "width", true)/(this.box_width*1.0)
-		this.g_right = this.g_left + this.g_width;
+//relative to box
+GrainUI.prototype.store_left_mouse_offset = function(client_x) {
+		this.mouse_offset = this.get_x_rel_to_box(client_x) - this.g_left_px;
 	}
 
 GrainUI.prototype.handle_new_mouse_coords = function(client_x){
@@ -210,21 +214,32 @@ GrainUI.prototype.handle_new_mouse_coords = function(client_x){
 
 		if(this.sliding){
 			var next_center = this.get_x_rel_to_box(client_x) + this.mouse_offset;
-			this.center_grain_rect_on_x(next_center);
-			this.refresh_grain_rect_vals();
+			this.draw_grain_rect(next_center, this.g_width_px)
 			this.grain.refresh_play();
 		} else if(this.left_changing) {
-			//continue left change
+			var next_left = this.get_x_rel_to_box(client_x) - this.mouse_offset;
+			var next_width = this.g_right_px - next_left;
+			var next_center = this.g_right_px - next_width/2.0;
+			if(next_left > 0){
+				this.draw_grain_rect(next_center, next_width);
+				this.grain.refresh_play();
+			}
 		} else if(this.right_changing){
-			var next_right = (this.get_x_rel_to_box(client_x) + 
-								this.mouse_offset)/(this.box_width*1.0);
-			if(check_change_is_safe(this.g_left, next_right, this.grain)){
-				this.g_right = next_right;
-				this.g_width = this.g_right - this.g_left;
-				this.center_grain_rect_perc(this.g_left + (this.g_width/2.0));
+			var next_right = this.get_x_rel_to_box(client_x) + this.mouse_offset;
+			var next_width = next_right - this.g_left_px;
+			var next_center = this.g_left_px + next_width/2.0;
+			if(next_right < this.box_width){
+				this.draw_grain_rect(next_center, next_width);
 				this.grain.refresh_play();
 			}
 		}
+	}
+
+GrainUI.prototype.draw_grain_rect = function(center, width_px) {
+		//set width val
+		this.set_grain_rect_width(width_px);
+		//center grain_rect_on_x
+		this.center_grain_rect_on_x(center);
 	}
 
 GrainUI.prototype.center_grain_rect_perc = function(x_perc) {
@@ -232,20 +247,15 @@ GrainUI.prototype.center_grain_rect_perc = function(x_perc) {
 	}
 
 //centers on an x, relative to box
-GrainUI.prototype.center_grain_rect_on_x = function(x){
-		//set g_left and g_right
-		//call calc_grain_rect_sides
-
-
-		var curr_width_px = this.grain_rect.getBoundingClientRect().width;
-		var new_left = x - curr_width/2.0;
+GrainUI.prototype.center_grain_rect_on_x = function(center_x){
+		var curr_width_px = get_css_val(this.grain_rect.id, "width", true);
+		var new_left = center_x - curr_width_px/2.0;
 		if(new_left < 0) {
-			this.g_left = 0;
-			this.grain_rect.style.left = "0px";
-		} else if (new_left + curr_width > this.box_width){
-			this.grain_rect.style.left = this.box_width - curr_width + "px";
+			this.set_grain_rect_sides(0, curr_width_px);
+		} else if (new_left + curr_width_px > this.box_width){
+			this.set_grain_rect_sides(this.box_width - curr_width_px, this.box_width);
 		} else {
-			this.grain_rect.style.left = new_left + "px";
+			this.set_grain_rect_sides(new_left, new_left + curr_width_px);
 		}
 	}
 
@@ -265,8 +275,9 @@ GrainUI.prototype.handle_right_change_start = function(client_x) {
 
 //handles the event where the left side of grain is stretched
 //or compressed
-GrainUI.prototype.handle_left_change_start = function() {
+GrainUI.prototype.handle_left_change_start = function(client_x) {
 		this.left_changing = true;
+		this.store_left_mouse_offset(client_x);
 	}
 
 //handles the event where the entire grain slides left
