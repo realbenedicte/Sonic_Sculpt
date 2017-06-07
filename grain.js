@@ -1,8 +1,3 @@
-/* RIGHT NOW:
- * Implement a new play function that fires at twice the current speed, using
- * the audio clock
- */
-
 /* Object: Grain
  * -----------------------
  * This is a grain object. It contains all of the information and functionality
@@ -16,6 +11,11 @@
 
 function Grain(g_ind, g_ui) {
 
+
+	/* Function: 
+	 * ----------------------
+	 *
+	 */
 	this.apply_vol_env = function() {
 		if(this.buffer) {
 			var half_len = this.buffer.length/2
@@ -39,6 +39,10 @@ function Grain(g_ind, g_ui) {
 	this.last_fire_time = null;
 }
 
+/* Function: 
+ * ----------------------
+ *
+ */
 Grain.prototype.refresh_buffer = function (buf) {
 		if(verbose) console.log("refreshing grain buffer");
 		//new_start in seconds
@@ -58,6 +62,10 @@ Grain.prototype.refresh_buffer = function (buf) {
 		this.buffer_set = true;
 	}
 
+/* Function: 
+ * ----------------------
+ *
+ */
 Grain.prototype.fire = function(g_buf, time) {
 		var g_src = context.createBufferSource();
 		g_src.buffer = g_buf;
@@ -66,7 +74,10 @@ Grain.prototype.fire = function(g_buf, time) {
 		g_src.start(time, 0, g_src.buffer.duration);
 	}
 
-
+/* Function: 
+ * ----------------------
+ *
+ */
 Grain.prototype.fire_schedule = function(grain) {
 		//get number of grain_fires to schedule
 		var sec_in_lookahead = FIRE_SCHED_LOOKAHEAD/1000.0;
@@ -83,13 +94,21 @@ Grain.prototype.fire_schedule = function(grain) {
 		}
 	}	
 
+/* Function: 
+ * ----------------------
+ *
+ */
 Grain.prototype.init_fire_scheduler = function() {
-	var _this = this;
-	this.intID = setInterval(function(){
-		_this.fire_schedule(_this);
-	}, FIRE_SCHED_TIMEOUT);
-};
+		var _this = this;
+		this.intID = setInterval(function(){
+			_this.fire_schedule(_this);
+		}, FIRE_SCHED_TIMEOUT);
+	}
 
+/* Function: 
+ * ----------------------
+ *
+ */
 Grain.prototype.play = function () {
 		if(verbose) console.log("playing grain");
 		if(!this.buffer) this.refresh_buffer(full_buffer);
@@ -97,6 +116,10 @@ Grain.prototype.play = function () {
 		this.grain_on = true;
 	}
 
+/* Function: 
+ * ----------------------
+ *
+ */
 Grain.prototype.stop = function () {
 		if(verbose) console.log("stoping grain");
 		clearInterval(this.intID);
@@ -104,6 +127,10 @@ Grain.prototype.stop = function () {
 		this.grain_on = false;
 	}
 
+/* Function: 
+ * ----------------------
+ *
+ */
 Grain.prototype.refresh_play = function () {
 		if(verbose) console.log("playing with new vals");
 		if(this.grain_on) this.stop();
@@ -111,13 +138,25 @@ Grain.prototype.refresh_play = function () {
 		this.play();
 	}
 
+/* Function: 
+ * ----------------------
+ *
+ */
 Grain.prototype.get_min_grain_perc = function() {
 		return LENGTH_MIN / (full_buffer.length * 1.0);
 	}
 
+/* Function: 
+ * ----------------------
+ *
+ */
 Grain.prototype.get_max_grain_perc = function() {
 		return LENGTH_MAX / (full_buffer.length * 1.0);
 	}
+
+//UNDER CONSTRUCTION////UNDER CONSTRUCTION////UNDER CONSTRUCTION////UNDER CONSTRUCTION//
+//UNDER CONSTRUCTION////UNDER CONSTRUCTION////UNDER CONSTRUCTION////UNDER CONSTRUCTION//
+//UNDER CONSTRUCTION////UNDER CONSTRUCTION////UNDER CONSTRUCTION////UNDER CONSTRUCTION//
 
 Grain.prototype.strike = function () {
 		if(verbose) console.log("striking grain");
