@@ -8,7 +8,6 @@
 function GrainUI(g_ind, box_x, box_y, box_width, box_height, color) {
 
 	//what other things need to happen?
-
 	this.box_x = box_x;
 	this.box_y = box_y;
 	this.box_width = box_width;
@@ -50,11 +49,13 @@ GrainUI.prototype.make_box = function() {
 		this.box.style.position = "absolute";
 		this.box.style.width = this.box_width + "px";
 		this.box.style.height = this.box_height + "px";
-		this.box.style.left = APP_PAD + "px"
-		this.box.style.top = (this.box_height * this.g_ind) + APP_PAD + "px";
+		this.box.style.left = this.box_x + "px";
+		this.box.style.top = this.box_y + "px";
 
 		this.box.className = "grain_outer_box";
 		this.box.style.border = "5px solid " + this.color;
+
+		this.box.style.margin = GRAIN_BOX_MARGIN + "px";
 		
 		app.appendChild(this.box);
 	}
@@ -62,8 +63,8 @@ GrainUI.prototype.make_box = function() {
 GrainUI.prototype.make_spawn_div = function() {
 		this.spawn_div = document.createElement('div');
 		this.spawn_div.style.position = "absolute";
-		this.spawn_div.style.width = "inherit";
-		this.spawn_div.style.height = "inherit";
+		this.spawn_div.style.width = this.box_width + "px";
+		this.spawn_div.style.height = this.box_height + "px";
 
 		var inner_msg = document.createElement("h2");
 		inner_msg.className = "add_grain_text";
@@ -79,8 +80,8 @@ GrainUI.prototype.make_canvas = function() {
 		this.canvas = document.createElement('canvas');
 		this.canvas_ctx = this.canvas.getContext("2d");
 		this.canvas.style.position = "absolute";
-		this.canvas.style.width = "inherit";
-		this.canvas.style.height = "inherit";
+		this.canvas.style.width = this.box_width + "px";
+		this.canvas.style.height = this.box_height + "px";
 
 		this.canvas_ctx.font = "30px Arial";
 		this.canvas_ctx.fillText("waveform",10,50);

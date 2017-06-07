@@ -278,13 +278,8 @@ function init_app_div() {
     app_container.id = "app_container";
     app = document.createElement('div');
     app.id = APP_ID;
-    //set padding
-    app.style.padding = APP_PAD + "px";
-    //set border
-    app.style.border = APP_BORDER_STYLE;
-    app.style.borderRadius = APP_BORDER_RADIUS;
 
-    document.body.appendChild(app_container);
+    document.getElementById("all").appendChild(app_container);
     app_container.appendChild(app);
 
     center_app();
@@ -306,7 +301,7 @@ function get_css_val(elem_id, val_name, return_as_num) {
 
 function get_grain_box_height(){
 	var app_height = get_css_val(APP_ID, "height", true);
-	return app_height/(NUM_GRAINS * 1.0);
+	return (app_height/(NUM_GRAINS * 1.0)) - (2 * GRAIN_BOX_MARGIN);
 }
 
 function get_grain_box_width(){
@@ -316,10 +311,10 @@ function get_grain_box_width(){
 function get_grain_box_posit(g_ind) {
 	var posit = [];
 	//get x val
-	posit[0] = get_css_val(APP_ID, "left", true) + APP_PAD;
+	posit[0] = 0;
 	//get y val
 	var g_box_height = get_grain_box_height();
-	posit[1] = get_css_val(APP_ID, "top", true) + (g_ind * g_box_height) + APP_PAD;
+	posit[1] = (g_ind * (g_box_height+(2*GRAIN_BOX_MARGIN)));
 	return posit;
 }
 
@@ -340,7 +335,6 @@ function init_interface() {
 	// link grains to ui's
 	link_grains_to_uis();
 	draw_init_grain_uis();
-	//window.requestAnimFrame(draw_interface);
 }
 
 function draw_init_grain_uis(){

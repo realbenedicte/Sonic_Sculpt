@@ -69,12 +69,10 @@ const DETUNE_STEP = 1;
 const APP_ID = "app_div";
 
 //calculated pre-padding
-const APP_WIDTH_RATIO = 0.7;
-const APP_HEIGHT_RATIO = 0.7;
+const APP_WIDTH_RATIO = 0.6;
+const APP_HEIGHT_RATIO = 0.8;
 
-const APP_BORDER_STYLE = "20px solid black";
-const APP_BORDER_RADIUS = "75px";
-const APP_PAD = 25;
+const GRAIN_BOX_MARGIN = 10;
 
 const G_RECT_SIDE_PERC = 0.1;
 

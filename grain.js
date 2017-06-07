@@ -66,22 +66,6 @@ Grain.prototype.fire = function(g_buf, time) {
 		g_src.start(time, 0, g_src.buffer.duration);
 	}
 
-/*Grain.prototype.fire_schedule = function(grain) {
-		//get number of grain_fires to schedule
-		var sched_call = context.currentTime;
-		var samps_in_lookahead = FIRE_SCHED_LOOKAHEAD * (context.sampleRate/1000.0);
-		var samps_btw_fires = grain.buffer.length/2.0;
-		var samps_til_next_fire = ((grain.last_fire_time * context.sampleRate) + samps_btw_fires) - 
-										((sched_call) * context.sampleRate);
-		if(samps_in_lookahead >= samps_til_next_fire){
-			while(samps_til_next_fire < samps_in_lookahead){
-				var fire_time = samps_til_next_fire / (context.sampleRate * 1.0);
-				grain.fire(grain.buffer, fire_time);
-				this.last_fire_time = fire_time;
-				samps_til_next_fire += samps_btw_fires;
-			}
-		}
-	}*/
 
 Grain.prototype.fire_schedule = function(grain) {
 		//get number of grain_fires to schedule
@@ -139,6 +123,3 @@ Grain.prototype.strike = function () {
 		if(verbose) console.log("striking grain");
 		//write this?
 	}
-
-
-/* ##### End GButton ##### */
