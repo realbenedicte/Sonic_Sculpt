@@ -43,8 +43,10 @@ function AudioBufferSlice(buffer, begin, end, grain, callback) {
     error = new TypeError('callback must be a function');
   }
 
-  var startOffset = rate * begin;
-  var endOffset = rate * end;
+  // ROUND START AND END OFFSET
+  var startOffset = Math.round(rate * begin);
+  var endOffset = Math.round(rate * end);
+  // ROUND START AND END OFFSET
   var frameCount = endOffset - startOffset;
   var newArrayBuffer;
 

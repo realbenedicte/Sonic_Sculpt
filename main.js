@@ -27,6 +27,7 @@
  * - Add Grain Envelope Controls
  * - Add Randomness (grain start/length randomness, fire randomness, etc)
  * - Page Resize Responsive
+ * - A "What is happening?" button in the top right
  * - Make Grain and GrainUI functions private (if they should be)
  * 
  * For the Far Future:
@@ -338,7 +339,7 @@ function get_grain_box_width(){
 
 /* Function: get_grain_box_posit
  * -----------------------------
- * 
+ * This calculates3
  */
 function get_grain_box_posit(g_ind) {
 	var posit = [];
@@ -352,7 +353,10 @@ function get_grain_box_posit(g_ind) {
 
 /* Function: init_interface
  * ------------------------
- * 
+ * This function initializes the whole app interface. It initializes the app
+ * container div, all of the GrainUI interface objects, links these objects
+ * to their Grain objects, draws the grain interfaces, and then blocks
+ * app interaction (until a recording occurs).
  */
 function init_interface() {
 	// init app div
@@ -375,7 +379,8 @@ function init_interface() {
 
 /* Function: draw_init_grain_uis
  * -----------------------------
- * 
+ * This function initializes the display elements of the GrainUI
+ * objects.
  */
 function draw_init_grain_uis(){
 	for(var i = 0; i < NUM_GRAINS; i++){
@@ -385,7 +390,9 @@ function draw_init_grain_uis(){
 
 /* Function: get_g_ind_from_id
  * ---------------------------
- * 
+ * This function takes in the ID of a GrainUI's HTML element and 
+ * returns the index (in the grains array) of the Grain object that
+ * element belongs to.
  */
 function get_g_ind_from_id(str) {
 	var ind_str = str.charAt(str.length - 1);
@@ -394,7 +401,9 @@ function get_g_ind_from_id(str) {
 
 /* Function: unblock_app
  * ---------------------
- * 
+ * This function unblocks the entire app, allowing interactions
+ * with the grains. This is used once a recording is made by the
+ * user and the grains can be played.
  */
 function unblock_app() {
 	for(var i = 0; i < NUM_GRAINS; i++){
@@ -404,7 +413,9 @@ function unblock_app() {
 
 /* Function: block_app
  * -------------------
- * 
+ * This function makes the entire app blocked, and prevents interactions
+ * with the grains. This is used for when the page is initially loaded and
+ * no recording is in the buffer, or when a recording is happening.
  */
 function block_app() {
 	for(var i = 0; i < NUM_GRAINS; i++){
@@ -414,7 +425,12 @@ function block_app() {
 
 /* Function: handle_mouse_move
  * ---------------------------
- * 
+ * This function handles any mouse down event on the page. There are
+ * four cases that require handling: If the text "add a grain" is clicked
+ * on an inactive grain, then the grain is initiated. If a grain rectangle
+ * is clicked, the correct grain number is retrieved, and transformation
+ * on that grain is initiated. If the Record button is pressed, recording begins.
+ * If the remove button is pressed, the grain is killed.
  */
 function handle_mouse_down(event) {
 	if(event.target.className == "add_grain_text"){
@@ -430,6 +446,7 @@ function handle_mouse_down(event) {
 
 	} else if (event.target.id == "rec_stop"){
 		handle_rec_press();
+
 	} else if (event.target.className == "remove_text"){
 		var g_ind = get_g_ind_from_id(event.target.id);
 		grains[g_ind].stop();
@@ -439,7 +456,9 @@ function handle_mouse_down(event) {
 
 /* Function: handle_mouse_move
  * ---------------------------
- * 
+ * This handles a mouse move event. If a grain rectangle is being transformed,
+ * then the new coordinates of the mouse are passed to the handle_new_mouse_coords
+ * event in the grain being transformed.
  */
 function handle_mouse_move(event) {
 	if(g_changing > -1){
@@ -450,7 +469,9 @@ function handle_mouse_move(event) {
 
 /* Function: handle_mouse_up
  * -------------------------
- * 
+ * This function handles a mouse up event. If one of the grain rectangles
+ * is being transformed, this is stopped, and the g_changing boolean is 
+ * switched to reflect this.
  */
 function handle_mouse_up(event) {
 	if (g_changing > -1){
@@ -462,7 +483,10 @@ function handle_mouse_up(event) {
 
 /* Function: init_doc_listeners
  * ----------------------------
- * 
+ * This function initiates the mouse up, down, and move listeners that act
+ * on the entire page. They are mainly used for recognizing when the user
+ * interacts with a component on the page, and makes sure the correct
+ * page component handles the interaction.
  */
 function init_doc_listeners() {
 	document.addEventListener("mousemove",handle_mouse_move,false);
