@@ -1,6 +1,13 @@
-//GLOBALS////GLOBALS////GLOBALS////GLOBALS////GLOBALS//
-//GLOBALS////GLOBALS////GLOBALS////GLOBALS////GLOBALS//
-//GLOBALS////GLOBALS////GLOBALS////GLOBALS////GLOBALS//
+/* File: constants.js
+ * -------------------
+ * This file contains all of the constants and global variables used in the
+ * Grains4U app. A short description of each can be found above the variable's
+ * declaration.
+ */
+
+//CONSTANTS////CONSTANTS////CONSTANTS////CONSTANTS///
+//CONSTANTS////CONSTANTS////CONSTANTS////CONSTANTS///
+//CONSTANTS////CONSTANTS////CONSTANTS////CONSTANTS///
 
 //create context
 var context = new (window.AudioContext || window.webkitAudioContext)();
@@ -33,11 +40,7 @@ var app;
 var g_changing = -1;
 
 //for debugging
-var verbose = 1;
-
-//CONSTANTS////CONSTANTS////CONSTANTS////CONSTANTS///
-//CONSTANTS////CONSTANTS////CONSTANTS////CONSTANTS///
-//CONSTANTS////CONSTANTS////CONSTANTS////CONSTANTS///
+var verbose = 0;
 
 const NUM_CHANS = 2;
 const NUM_GRAINS = 5;
@@ -51,10 +54,6 @@ const LENGTH_MIN = 100;
 const LENGTH_MAX = 10000;
 const LENGTH_STEP = 1;
 
-const DETUNE_MIN = -1200;
-const DETUNE_MAX = 1200;
-const DETUNE_STEP = 1;
-
 const APP_ID = "app_div";
 
 //calculated pre-padding
@@ -67,4 +66,8 @@ const G_RECT_SIDE_PERC = 0.1;
 
 const FIRE_SCHED_TIMEOUT = 25;
 const FIRE_SCHED_LOOKAHEAD = 100;
-const G_RECT_DEF = [0.4, 0.6, 0.2];
+
+// defines the initial state of the inner grain box, including
+// the starting point, ending point, and total width of the inner
+// grain box
+const G_RECT_DEF = [0.6, 0.8, 0.2];

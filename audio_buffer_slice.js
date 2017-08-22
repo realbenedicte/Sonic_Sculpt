@@ -1,21 +1,16 @@
-/* This comes straight off of this https://miguelmota.com/bytes/slice-audiobuffer/
- * with pretty much no edits, so def not my property. Usage is something like:
-
- AudioBufferSlice(buffer, begin, end, function(error, slicedAudioBuffer) {
-     if (error) {
-       console.error(error);
-     } else {
-       source.buffer = slicedAudioBuffer;
-
-       var gainNode = audioContext.createGain();
-       gainNode.gain.value = 1;
-       source.connect(gainNode);
-       gainNode.connect(audioContext.destination);
-     }
-
- * buffer = audio buffer to slice from, begin = begining point in
- * seconds, end = ending point in seconds, callback = function to execute
- * when slice is completed
+/* File: audio_buffer_slice.js
+ * --------------------------- 
+ * This file contains the AudioBufferSlice function. This function recieves
+ * a AudioBuffer object, a start and end time (in seconds), a reference to
+ * a Grain object, and a callback function. Using the start and end times, 
+ * it safely slices a chunk out of the buffer passed into it. It passes this
+ * chunk and the Grain that should keep this chunk into the callback function,
+ * so that the chunk can be saved.
+ * 
+ * NOTE: This function was written by Miguel Mota, and comes from his website at
+ *       https://miguelmota.com/bytes/slice-audiobuffer/. I made only slight edits
+ *       in implementing it for Grains4U, so credits for this function certainly
+ *       go to Mota.
  */
 
 function AudioBufferSlice(buffer, begin, end, grain, callback) {
@@ -43,10 +38,8 @@ function AudioBufferSlice(buffer, begin, end, grain, callback) {
     error = new TypeError('callback must be a function');
   }
 
-  // ROUND START AND END OFFSET
   var startOffset = Math.round(rate * begin);
   var endOffset = Math.round(rate * end);
-  // ROUND START AND END OFFSET
   var frameCount = endOffset - startOffset;
   var newArrayBuffer;
 

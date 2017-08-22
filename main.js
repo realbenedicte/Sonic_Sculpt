@@ -19,20 +19,7 @@
  * - https://goo.gl/t7ivz4 - working with clock timing
  * - https://goo.gl/iMWzDQ - Music 220b granular lecture
  * 
- * For the Future:
- * - Fix cross-browser bugs
- * - Fix mobile-browser bugs
- * - Draw Waveform in the grain box
- * - Add Detune Controls
- * - Add Grain Envelope Controls
- * - Add Randomness (grain start/length randomness, fire randomness, etc)
- * - Page Resize Responsive
- * - A "What is happening?" button in the top right
- * - Make Grain and GrainUI functions private (if they should be)
- * 
- * For the Far Future:
- * - Midi Control?
- * - Save States/ recordings?
+ * List of Future Bug Fixes/ Future Features on Asana Project
  */
 
 /* Function: init
@@ -71,7 +58,9 @@ function init_button_listener(btn) {
 
 /* Function: get_grains_playing
  * ----------------------------
- * 
+ * This function gathers the indexes of all the grains currently playing.
+ * If there are one or more currently active grains, an array of all active
+ * indices is returned. Else, null is returned.
  */
 function get_grains_playing() {
 	var playing = [];
@@ -89,7 +78,10 @@ function get_grains_playing() {
 
 /* Function: kill_grains
  * ---------------------
- * 
+ * When called, this function kills all of the grains with the indexes
+ * passed into it via the playing array. It first stops the audio of 
+ * the grain, then resets the UI display of the grain box to its 
+ * uninitialized state.
  */
 function kill_grains(playing) {
 	for(var i = 0; i < playing.length; i++){
@@ -258,7 +250,11 @@ function init_audio_stream() {
 
 /* Function: link_grains_to_uis
  * ----------------------------
- * 
+ * This function links each GrainUI object to its respective Grain object.
+ * It does this by assigning a reference of each GrainUI to a member variable in
+ * its proper Grain object, and vice versa. This must happen in the initialization
+ * phase of the application, so that GrainUI's and Grain's can reference each other
+ * while running. 
  */
 function link_grains_to_uis() {
 	for(var i = 0; i < grains.length; i++){
@@ -281,13 +277,16 @@ function init_grains() {
 
 /* Function: init_app_div
  * ---------------------
- * 
+ * This function centers the app div in the current browser window. It set the
+ * width, height, and x-y coordinates of the top-left corner of the app div. 
+ * The width and height are calculated according to two constants from the 
+ * constants.js document.
  */
 function center_app() {
-    //set canvas width, height 
+    //set app div width, height 
     app.style.width = window.innerWidth * APP_WIDTH_RATIO + "px";
     app.style.height = window.innerHeight * APP_HEIGHT_RATIO + "px";
-    //set canvas x, y
+    //set app div x, y
     app.style.position = "absolute";
     app.style.left = (window.innerWidth - app.offsetWidth)/2.0 + "px";
     app.style.top = (window.innerHeight - app.offsetHeight)/2.0 + "px";
@@ -295,7 +294,10 @@ function center_app() {
 
 /* Function: init_app_div
  * ---------------------
- * 
+ * This function initializes two divs on the page, an app_container div, which
+ * acts as a general wrapper for the app, and an app div, which contains the app.
+ * The app div is made to be the child of the app_container div, and both are
+ * appended to the page. Finally, the app div is centered within the window.
  */
 function init_app_div() {
 	var app_container = document.createElement('div');
@@ -311,7 +313,11 @@ function init_app_div() {
 
 /* Function: get_css_val
  * ---------------------
- * 
+ * This is a general purpose function for retrieving the final, calculated value
+ * of an object's css property on the page. The function takes in the id string
+ * of the object (elem_id), the name of the property that will be queried (val_name)
+ * and a boolean indicating whether the return value should be processed into a float
+ * or not (return_as_num).
  */
 function get_css_val(elem_id, val_name, return_as_num) {
 	var elem = document.getElementById(elem_id);
@@ -322,7 +328,9 @@ function get_css_val(elem_id, val_name, return_as_num) {
 
 /* Function: get_grain_box_height
  * ------------------------------
- * 
+ * This function returns the height that each grain box should be
+ * in the application. The quantity is returned as a number variable
+ * with pixels as the unit.
  */
 function get_grain_box_height(){
 	var app_height = get_css_val(APP_ID, "height", true);
@@ -331,7 +339,9 @@ function get_grain_box_height(){
 
 /* Function: get_grain_box_width
  * -----------------------------
- * 
+ * This function returns the width that each grain box should be
+ * in the application. The quantity is returned as a number variable
+ * with pixels as the unit.
  */
 function get_grain_box_width(){
 	return get_css_val(APP_ID, "width", true);
@@ -339,7 +349,10 @@ function get_grain_box_width(){
 
 /* Function: get_grain_box_posit
  * -----------------------------
- * This calculates3
+ * This calculates the x and y coordinates of the top-left corner of
+ * each grain box on the page. The coordinate pair depends on the 
+ * index of the grain box, and the height of the window. The coordinate pair
+ * is returned in the posit array.
  */
 function get_grain_box_posit(g_ind) {
 	var posit = [];

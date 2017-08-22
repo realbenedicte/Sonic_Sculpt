@@ -1,53 +1,84 @@
-/* Object: GrainUI
+/* Files: grain_ui.js
  * -----------------------
- * This is a grain UI. It connect to a grain, and tells the grain when the user has
- * set new grain parameters, and what it should do to handle those new parameters.
- * Again, lemme write it and get back to you...
+ * This is the GrainUI object, the front-end controller for a grain object.
+ * In order for a Grain object to be controlled by the user, it must be
+ * linked to a GrainUI object. A GrainUI object takes care of user interactions
+ * such as:
+ * 		- adding and clearing a grain
+ * 		- resizing a grain (right/ left stretch)
+ * 		- moving a grain (slide)
+ * The GrainUI may be displayed in two modes, either dormant or live. When it is
+ * dormant, it is making no noise, and awaiting user interaction. Once the user
+ * clicks the "click to add grain" prompt, the GrainUI object becomes live, begins
+ * making noise, and allows for grain resizing and moving. All member variables and
+ * functions are described in the comments below.
  */
 
+
+/* Constructor: GrainUI
+ * --------------------
+ * This is the constructor for the GrainUI object. The arguments passed into the 
+ * constructor include the g_ind (which of the 5 displayed grains this one
+ * is), the dimensions of the outer GrainUI box, and its color. All member
+ * variables and functions are described internally.
+ */
 function GrainUI(g_ind, box_x, box_y, box_width, box_height, color) {
 
+	// Store the box dimensions and color passed into the constructor 
 	this.box_x = box_x;
 	this.box_y = box_y;
 	this.box_width = box_width;
 	this.box_height = box_height;
 	this.color = color;
 
-	//concerning overall grain state
+	// Grain should be initialized to a dormant state
 	this.dormant = true;
 
-	this.g_left_perc = G_RECT_DEF[0];
-	this.g_right_perc = G_RECT_DEF[1];
-	this.g_width_perc = G_RECT_DEF[2];
+	// Initializes the grain_rect object, a div inside the GrainUI that
+	// represents grain position and length. This is the main GrainUI
+	// component the user interacts with.
+	this.grain_rect = null;
+	// Initializes some grain_rect related member variables, which track
+	// grain_rect position within the GrainUI
+	this.grain_rect_dims_to_def();
 
-	this.g_left_px = this.g_left_perc * box_width;
-	this.g_right_px = this.g_right_perc * box_width;
-	this.g_width_px = this.g_width_perc * box_width;
-
-	//for slide/transformations
-	this.mouse_offset = 0;
+	// Initialize booleans that track states of user grain interaction
 	this.sliding = false;
 	this.left_changing = false;
 	this.right_changing = false;
 
-	//concerning grain draw elements, to be filled
-	//in draw_init
+	// This member variable prevents visually bad grain resizing, maintaining
+	// the onset distance between the part of the grain being transformed
+	this.mouse_offset = 0;
+
+	// Initializes some of the other html components of the of the 
+	// GrainUI object (see respective "make" functions below for more
+	// descriptions)
 	this.box = null;
 	this.block = null;
 	this.spawn_div = null;
-	this.canvas = null;
-	this.canvas_ctx = null;
-	this.grain_rect = null;
 	this.remove_div = null;
 
-	//other
+	// Tracks the index of which GrainUI object this one is on the page
 	this.g_ind = g_ind;
+	// Links this GrainUI object to a noise-generating Grain object.
 	this.grain = null;
 }
 
 /* Function: grain_rect_dims_to_def
  * --------------------------------
+ * This functions initializes the member variables within the GrainUI object
+ * pertaining to the dimensions and positioning of the inner grain
+ * rectangle (grain_rect). It does this by grabbing the default values for 
+ * the grain_rect's left side position, right side position, and width from
+ * the G_RECT_DEF array. The values in this array are stored as percentages,
+ * relative to the overall GrainUI box width (ie: g_left_perc is the percent)
+ * distance from the left side of the overall box to the left side of the
+ * grain_rect box). These values as then used to calculate the corresponding
+ * member variables that store grain_rect position values in pixels.
  *
+ * NOTE: Eventually, this should be implemented using either percentages OR
+ * 		 pixel information, since it's confusing to use them both.
  */
 GrainUI.prototype.grain_rect_dims_to_def = function() {
 		this.g_left_perc = G_RECT_DEF[0];
@@ -60,8 +91,10 @@ GrainUI.prototype.grain_rect_dims_to_def = function() {
 	}
 
 /* Function: make_box
- * ------------------
- *
+ * -------------------
+ * This function initializes the div that outlines the GrainUI object,
+ * essentially, the visual container for the GrainUI box. Parameters such
+ * as box position, dimensions, and border size color are set.
  */
 GrainUI.prototype.make_box = function() {
 		this.box = document.createElement('div');
@@ -81,7 +114,9 @@ GrainUI.prototype.make_box = function() {
 
 /* Function: make_block
  * --------------------
- *
+ * This function initializes the div that blocks the GrainUI object from
+ * user interaction while the grain is dormant. Parameters such as box position,
+ * dimensions, and fill color are set.
  */
 GrainUI.prototype.make_block = function() {
 		this.block = document.createElement('div');
@@ -101,7 +136,11 @@ GrainUI.prototype.make_block = function() {
 
 /* Function: make_remove_div
  * -------------------------
- *
+ * This function creates the "clear grain" div that allows you to clear
+ * the grain once it has been active. Note: this div only displays when
+ * the grain is active, and switches the grain from an active to dormant
+ * state. The message is created inside the div, and parameters such as
+ * div position, dimensions, and fill color are set.
  */
 GrainUI.prototype.make_remove_div = function() {
 		this.remove_div = document.createElement('div');
@@ -126,7 +165,11 @@ GrainUI.prototype.make_remove_div = function() {
 
 /* Function: make_spawn_div
  * ------------------------
- *
+ * This function creates the "click to add grain" spawn div that allows you
+ * initialize the grain, once a sample has been recorded. Note: this div
+ * only displays when the div is dormant, and switches the grain from a dormant
+ * to an active state. The message is created inside the div, and parameters such as
+ * div position, dimensions, and fill color are set.
  */
 GrainUI.prototype.make_spawn_div = function() {
 		this.spawn_div = document.createElement('div');
@@ -144,26 +187,13 @@ GrainUI.prototype.make_spawn_div = function() {
 		this.box.appendChild(this.spawn_div);
 	}
 
-/* Function: make_canvas
- * ---------------------
- *
- */
-GrainUI.prototype.make_canvas = function() {
-		this.canvas = document.createElement('canvas');
-		this.canvas_ctx = this.canvas.getContext("2d");
-		this.canvas.style.position = "absolute";
-		this.canvas.style.width = this.box_width + "px";
-		this.canvas.style.height = this.box_height + "px";
-
-		this.canvas_ctx.fillStyle="#CCCCCC";
-		this.canvas_ctx.fillRect(0,0,this.canvas.width, this.canvas.height);
-
-		this.box.appendChild(this.canvas);
-	}
-
 /* Function: set_grain_rect_width
  * ------------------------------
- *
+ * This function is called when the width of the inner grain rectangle
+ * (grain_rect) must be changed, as a result of the grain length being
+ * changed. First, the new width of the grain_rect in pixels is saved in the
+ * g_width_px member variable, then the grain_rect div is set with its
+ * new width, then the g_width_perc member variable is set.
  */
 GrainUI.prototype.set_grain_rect_width = function(width_px) {
 		this.g_width_px = width_px;
@@ -173,7 +203,10 @@ GrainUI.prototype.set_grain_rect_width = function(width_px) {
 
 /* Function: set_grain_rect_sides
  * ------------------------------
- *
+ * This function is called when there are new position values that the
+ * left and right sides of the grain_rect box should have, and sets the
+ * GrainUI member variables (g_left, g_right, g_width) and grain_rect div
+ * properties to reflect these new values.
  */
 GrainUI.prototype.set_grain_rect_sides = function(left_px, right_px) {
 		this.g_left_px = left_px;
@@ -189,7 +222,11 @@ GrainUI.prototype.set_grain_rect_sides = function(left_px, right_px) {
 
 /* Function: make_grain_rect
  * -------------------------
- *
+ * This function initializes the grain_rect div in the GrainUI object, and
+ * adds it to the html document. This grain_rect object is responsible for
+ * reflecting and controlling the grain position and size within the 
+ * overall sample. By resizing and moving the grain_rect object, the user
+ * resizes and moves the grain being played.
  */
 GrainUI.prototype.make_grain_rect = function() {
 		this.grain_rect = document.createElement('div');
@@ -209,38 +246,41 @@ GrainUI.prototype.make_grain_rect = function() {
 
 /* Function: draw_dormant
  * ----------------------
- *
+ * This function draws the GrainUI object to the screen in a 
+ * dormant state. In its dormant state, the grain is inactive,
+ * and the "click to add grain" prompt is displayed.
  */
 GrainUI.prototype.draw_dormant = function() {
 		this.spawn_div.style.display = "block";
-		this.canvas.style.display = "none";
 		this.grain_rect.style.display = "none";
 		this.remove_div.style.display = "none";
 	}
 
 /* Function: draw_live
  * -------------------
- *
+ * This function draws the GrainUI object to the screen in a 
+ * live state. In its live state, the grain is active,
+ * and the user is able to drag and resize the grain_rect. 
  */
 GrainUI.prototype.draw_live = function() {
 		this.spawn_div.style.display = "none";
-		this.canvas.style.display = "block";
 		this.grain_rect.style.display = "block";
 		this.remove_div.style.display = "block";
 
-		this.canvas.style.zIndex = "0";
 		this.grain_rect.style.zIndex = "1";
 	}
 
 /* Function: draw_init
  * -------------------
- *
+ * This function creats all the components of the GrainUI object, then
+ * draws the UI in its initial, dormant state. It creates the outer box, 
+ * the blocking box, the spawn div, the grain rect, and them the "clear grain"
+ * div (remove_div). Finally, it draws all these objects to the screen.
  */
 GrainUI.prototype.draw_init = function() {
 		this.make_box();
 		this.make_block();
 		this.make_spawn_div();
-		this.make_canvas();
 		this.make_grain_rect();
 		this.make_remove_div();
 		this.draw_dormant();
@@ -248,7 +288,15 @@ GrainUI.prototype.draw_init = function() {
 
 /* Function: handle_grain_rect_click
  * ---------------------------------
- * returns which control zone the coordinate lands in
+ * This function handles the event of a user clicking/ beginning to
+ * manipulate the grain_rect object. First, it calculates the left and
+ * right stretch boundaries. These boundaries define x-value ranges on the right
+ * and left sides of the grain_rect. If the click is within either of these
+ * ranges, a grain stretch interaction is initiated (either the right side or
+ * left side of the grain moves, the other is still) rather than a grain slide 
+ * interaction (the whole grain moves). Using these boundaries, the function
+ * determines if the user's location of click should initiate a slide, left stretch
+ * or right stretch, and begins that interaction.
  */
 GrainUI.prototype.handle_grain_rect_click = function(client_x) {
 		
@@ -266,11 +314,14 @@ GrainUI.prototype.handle_grain_rect_click = function(client_x) {
 		} else {
 			this.handle_slide_start(client_x);	
 		}
-	}	
+	}
 
 /* Function: handle_grain_rect_release
  * -----------------------------------
- * 
+ * This function should be called when a user's interaction
+ * with the grain_rect object ends (mouse up event). It determines
+ * whether a right stretch, left stretch, or slide event was occuring
+ * and does event clean-up for the appropriate one.
  */
 GrainUI.prototype.handle_grain_rect_release = function() {
 		if(this.sliding){
@@ -284,7 +335,9 @@ GrainUI.prototype.handle_grain_rect_release = function() {
 
 /* Function: get_grain_rect_center
  * -------------------------------
- * 
+ * This function returns the x-value (in pixels) of the grain_rect's
+ * center, relative to the GrainUI outer box (distance from left side).
+ * The value is returned as a number, not a css property string.
  */
 GrainUI.prototype.get_grain_rect_center = function() {
 		return get_css_val(this.grain_rect.id, "left", true) + 
@@ -293,7 +346,11 @@ GrainUI.prototype.get_grain_rect_center = function() {
 
 /* Function: get_x_rel_to_box
  * --------------------------
- * 
+ * This function returns the distance between the x-value (pixels) passed
+ * into the function and the x-value of the left side of the GrainUI object, 
+ * relative to the viewport. If the x value is on the left of the GrainUI
+ * box, then the returned number is negative. If it is on the right, the returned
+ * number is positive.
  */
 GrainUI.prototype.get_x_rel_to_box = function(x) {
 		return x - this.box.getBoundingClientRect().left;
@@ -301,7 +358,10 @@ GrainUI.prototype.get_x_rel_to_box = function(x) {
 
 /* Function: store_center_mouse_offset
  * -----------------------------------
- * 
+ * This function stores the distance between the current user's mouse position
+ * and the center of the grain_rect. This is stored in the mouse_offset member
+ * variable, which is used during a grain_rect slide interaction, so that
+ * the grain_rect moves relative to where the mouse was clicked.
  */
 GrainUI.prototype.store_center_mouse_offset = function(client_x) {
 		this.mouse_offset = this.get_grain_rect_center() - this.get_x_rel_to_box(client_x);
@@ -309,7 +369,10 @@ GrainUI.prototype.store_center_mouse_offset = function(client_x) {
 
 /* Function: store_right_mouse_offset
  * ----------------------------------
- * relative to box
+ * This function stores the distance between the current user's mouse position
+ * and the right side of the grain_rect. This is stored in the mouse_offset member
+ * variable, which is used during a grain_rect stretch interaction, so that
+ * the right side of the grain_rect moves relative to where the mouse was clicked. 
  */
 GrainUI.prototype.store_right_mouse_offset = function(client_x) {
 		this.mouse_offset = this.g_right_px - this.get_x_rel_to_box(client_x);
@@ -317,7 +380,10 @@ GrainUI.prototype.store_right_mouse_offset = function(client_x) {
 
 /* Function: store_left_mouse_offset
  * ---------------------------------
- * relative to box
+ * This function stores the distance between the current user's mouse position
+ * and the left side of the grain_rect. This is stored in the mouse_offset member
+ * variable, which is used during a grain_rect stretch interaction, so that
+ * the left side of the grain_rect moves relative to where the mouse was clicked. 
  */
 GrainUI.prototype.store_left_mouse_offset = function(client_x) {
 		this.mouse_offset = this.get_x_rel_to_box(client_x) - this.g_left_px;
@@ -325,16 +391,16 @@ GrainUI.prototype.store_left_mouse_offset = function(client_x) {
 
 /* Function: handle_new_mouse_coords
  * ---------------------------------
+ * This function handles changes in mouse position, and changes the 
+ * state of the GrainUI object (grain_rect size/position) if need be.
+ * If the object is in a state of grain_rect interaction, the type of
+ * interaction is recognized, the necessary grain_rect changes are made, 
+ * and the grain is refreshed to play the new grain's sounds.
  * 
+ * NOTE: this should be decomposed, maybe writing a get_new_position_values function
+ * that calculates next_left, next_right, next_center, ect.?
  */
 GrainUI.prototype.handle_new_mouse_coords = function(client_x){
-
-		function check_change_is_safe(left, right, g) {
-			var width = right - left;
-			var min = g.get_min_grain_perc();
-			var max = g.get_max_grain_perc();
-			return (width > min) && (width < max);
-		}
 
 		if(this.sliding){
 			var next_center = this.get_x_rel_to_box(client_x) + this.mouse_offset;
@@ -361,7 +427,10 @@ GrainUI.prototype.handle_new_mouse_coords = function(client_x){
 
 /* Function: draw_grain_rect
  * ------------------------------
- * 
+ * This function handles drawing the grain_rect object to its appropriate place
+ * on the screen, based on the center and width_px values passed into the function.
+ * It does this by first setting the width of the grain_rect to width_px, and then
+ * centering the grain_rect on that x value.
  */
 GrainUI.prototype.draw_grain_rect = function(center, width_px) {
 		//set width val
@@ -372,7 +441,14 @@ GrainUI.prototype.draw_grain_rect = function(center, width_px) {
 
 /* Function: center_grain_rect_on_x
  * ------------------------------
- * centers on an x, relative to box
+ * This function centers the grain_rect div object on the x value that has been
+ * passed in. First, it finds the current width of the grain_rect, as well as the
+ * potential new left x value of the grain_rect, if we go ahead and center it on
+ * that x value. If the user wants to center the grain_rect somewhere that puts 
+ * the left side at or over the GrainUI box's edge, then grain_rect is drawn at 
+ * the extreme of the GrainUI box, and no further. The same goes for a right-side
+ * stretch. Otherwise, the box is drawn to the screen with the correct new
+ * slide-resultant resistant.
  */
 GrainUI.prototype.center_grain_rect_on_x = function(center_x){
 		var curr_width_px = get_css_val(this.grain_rect.id, "width", true);
@@ -389,7 +465,7 @@ GrainUI.prototype.center_grain_rect_on_x = function(center_x){
 /* Function: handle_slide_start
  * ----------------------------
  * handles the event where the entire grain slides left or right
- * (grain start shift only)
+ * (grain start shift only).
  */
 GrainUI.prototype.handle_slide_start = function(client_x) {
 		this.sliding = true;
@@ -399,7 +475,7 @@ GrainUI.prototype.handle_slide_start = function(client_x) {
 /* Function: handle_right_change_start
  * -----------------------------------
  * handles the event where the right side of grain is stretched
- * or compressed
+ * or compressed.
  */
 GrainUI.prototype.handle_right_change_start = function(client_x) {
 		this.right_changing = true;
@@ -409,7 +485,7 @@ GrainUI.prototype.handle_right_change_start = function(client_x) {
 /* Function: handle_left_change_start
  * ----------------------------------
  * handles the event where the left side of grain is stretched
- * or compressed
+ * or compressed.
  */
 GrainUI.prototype.handle_left_change_start = function(client_x) {
 		this.left_changing = true;
@@ -419,7 +495,7 @@ GrainUI.prototype.handle_left_change_start = function(client_x) {
 /* Function: handle_slide_end
  * --------------------------
  * handles the event where the entire grain slides left
- * or right (grain start shift only)
+ * or right (grain start shift only).
  */
 GrainUI.prototype.handle_slide_end = function() {
 		this.sliding = false;
@@ -429,7 +505,7 @@ GrainUI.prototype.handle_slide_end = function() {
 /* Function: handle_right_change_end
  * ------------------------------
  * handles the event where the right side of grain is stretched
- * or compressed
+ * or compressed.
  */
 GrainUI.prototype.handle_right_change_end = function() {
 		this.right_changing = false;
@@ -439,7 +515,7 @@ GrainUI.prototype.handle_right_change_end = function() {
 /* Function: handle_left_change_end
  * --------------------------------
  * handles the event where the left side of grain is stretched
- * or compressed
+ * or compressed.
  */
 GrainUI.prototype.handle_left_change_end = function() {
 		this.left_changing = false;
@@ -449,7 +525,7 @@ GrainUI.prototype.handle_left_change_end = function() {
 /* Function: handle_remove_grain
  * -----------------------------
  * handles the event where the grain is removed, and should be
- * reset
+ * reset.
  */
 GrainUI.prototype.handle_remove_grain = function() {
 		this.draw_dormant();
@@ -464,13 +540,14 @@ GrainUI.prototype.handle_remove_grain = function() {
  * jump into action!
  */
 GrainUI.prototype.handle_spawn_grain = function() {
-		//this.draw_waveform();
 		this.draw_live();
 	}
 
 /* Function: unblock_me
  * --------------------
- * 
+ * This function deactivates the GrainUI object's block div, allowing the
+ * user to interact with the grain. This should be called when the app is
+ * active and users can play with the grains.
  */
 GrainUI.prototype.unblock_me = function() {
 		this.block.style.display = "none";
@@ -478,64 +555,11 @@ GrainUI.prototype.unblock_me = function() {
 
 /* Function: block_me
  * --------------------
- * 
+ * This function activates the GrainUI object's block div, which sits above 
+ * the UI and prevents them from using the grain. Should be called when the
+ * grain is inactive, such as while the user is recording a sound sample, or
+ * before they have done so (on app load).  
  */
 GrainUI.prototype.block_me = function() {
 		this.block.style.display = "block";
-	}
-
-//UNDER CONSTRUCTION////UNDER CONSTRUCTION////UNDER CONSTRUCTION////UNDER CONSTRUCTION//
-//UNDER CONSTRUCTION////UNDER CONSTRUCTION////UNDER CONSTRUCTION////UNDER CONSTRUCTION//
-//UNDER CONSTRUCTION////UNDER CONSTRUCTION////UNDER CONSTRUCTION////UNDER CONSTRUCTION//
-
-
-GrainUI.prototype.get_detune = function () {
-		//return parseFloat(this.detune_ctl.value)
-		//temp 
-		return 1;
-	}
-
-GrainUI.prototype.normalize_buf = function(buf) {
-	var return_buf = new Array();
-	var buf_max = Math.max(... buf);
-	for(var i = 0; i < buf.length; i++){
-		return_buf.push(buf[i]/buf_max);
-	}
-	return return_buf;
-}
-
-GrainUI.prototype.draw_waveform = function() {
-		function check_to_draw(curr_x, last_px){
-			if(parseInt(curr_x) > last_px){
-				last_px = parseInt(curr_x);
-				return true;
-			}
-			return false;
-		}
-
-		// go by percentage through array
-		function get_draw_wave_arr(){
-
-		}
-
-		this.canvas_ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-		var buf_floats = this.normalize_buf(full_buffer.getChannelData(0));
-		var x_step = this.box_width/(1.0 * full_buffer.length);
-		var mid_y = this.box_height/2.0;
-
-		var curr_x = 0;
-		var last_px = 0;
-		var curr_y = mid_y;
-
-		this.canvas_ctx.beginPath();
-		this.canvas_ctx.moveTo(0, mid_y);
-		for(var i = 0; i < full_buffer.length; i++){
-			curr_x += x_step;
-			if (check_to_draw(curr_x, last_px)){
-				curr_y = (buf_floats[buf_floats.length - (i+1)] * mid_y) + mid_y;
-				this.canvas_ctx.lineTo(curr_x, curr_y);
-			}
-		}
-
-		this.canvas_ctx.stroke();
 	}
