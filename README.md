@@ -1,1 +1,1 @@
-This is the readme! Isn't it swell??
+"Don't look! I'm naked!" - the current readme
