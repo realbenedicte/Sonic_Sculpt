@@ -1,4 +1,4 @@
-<h1><a href="https://ccrma.stanford.edu/~mherrero/220c/grains4u/">Grains4u</a> - The Granular Synthesis Sandbox Application</h1>
+<h1><a href="https://ccrma.stanford.edu/~mherrero/220c/grains4u/">Grains4u</a> - The Granular Synthesis Sandbox</h1>
 
 ## What is Grains4u?
 #### Grains4u is a granular synthesis web application, built using HTML, CSS, Javascript, and the Web Audio API. It is intended to be a fun sandbox application for folks with no knowledge of granular synthesis, so they can get their hands dirty and play with this cool form of sound generation!
