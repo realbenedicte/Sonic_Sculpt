@@ -8,29 +8,32 @@ dirty and play with this cool form of sound generation!
 ## How do I use Grains4u?
 When the Grains4u page loads, this is what you will see:
 
-[first img of the loaded page]
+<img src="readme_files/load_screen.png" alt="initial screen" width="800">
 
 To use the app, follow these steps!
 
-1. Make sure to allow Grains4u access to your microphone:
-
-[accept media record request gif]
-
-2. Record a sound!
-
-[record sound gif]
-
-3. Click a Grain Box to start a grain playing:
-
-[click to add grain gif]
-
-4. Drag and stretch the grain to change it's position and length:
-
-[drag and stretch]
-
-5. Click to add more! Or click "Clear Grain" to remove grains:
-
-[add and clear gif]
+<ol>
+    <li>
+        Make sure to allow Grains4u access to your microphone:<br>
+        <img src="readme_files/allow_access.gif" alt="accept media record request gif" width="500">
+    </li>
+    <li>
+        Record a sound!<br>
+        <img src="readme_files/record.gif" alt="record sound gif" width="500">
+    </li>
+    <li>
+        Click a Grain Box to start a grain playing:<br>
+        <img src="readme_files/click_to_add.gif" alt="click to add grain gif" width="800">
+    </li>
+    <li>
+        Drag and stretch the grain to change it's position and length:<br>
+        <img src="readme_files/drag_and_stretch.gif" alt="drag and stretch" width="800">
+    </li>
+    <li>
+        Click to add more! Or click "Clear Grain" to remove grains:<br>
+        <img src="readme_files/add_and_clear.gif" alt="add and clear" width="800">
+    </li>
+</ol>
 
 Recording a new audio sample automatically clears all grains. So get granular, see what crazy sounds you can make!
 
@@ -59,6 +62,14 @@ parameters can include proabilities, and changes in these values often generate 
 For further reading, as always, one can check out the [Wikipedia page for Granular Synthesis] (https://en.wikipedia.org/wiki/Granular_synthesis) 
 
 ## Sources
-And I also list all my sources...
+ * https://goo.gl/NIerhh
+ * https://goo.gl/nZF0x5
+ * https://goo.gl/bcIYL7
+ * https://goo.gl/VaV8kX
+ * https://goo.gl/86PNFT
+ * https://goo.gl/RVYeG5
+ * https://goo.gl/tNB9Bf
+ * https://goo.gl/t7ivz4
+ * https://goo.gl/iMWzDQ
 
 #### built by Matt Herrero, 2016
