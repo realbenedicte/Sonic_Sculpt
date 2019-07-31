@@ -215,14 +215,14 @@ function handle_store_full_buffer() {
  * MediaRecorder object is done recording.
  */
 function init_mic_recorder(stream) {
-	mic_recorder = new MediaRecorder(stream, {audioBitsPerSecond : 64000});
-  	mic_recorder.ondataavailable = function(e) {
-  		rec_chunks.push(e.data);
-  	};
-  	mic_recorder.onstop = function(e) {
-  		save_rec_blob();
-  		handle_store_full_buffer();
-  	};
+  mic_recorder = new MediaRecorder(stream, {audioBitsPerSecond : 64000});
+	mic_recorder.ondataavailable = function(e) {
+		rec_chunks.push(e.data);
+	};
+	mic_recorder.onstop = function(e) {
+		save_rec_blob();
+		handle_store_full_buffer();
+	};
 }
 
 /* Function: init_audio_stream
@@ -289,7 +289,12 @@ function center_app() {
     //set app div x, y
     app.style.position = "absolute";
     app.style.left = (window.innerWidth - app.offsetWidth)/2.0 + "px";
-    app.style.top = (window.innerHeight - app.offsetHeight)/2.0 + "px";
+    var rec_stop_height = get_css_val(REC_STOP_ID, "height", true);
+    app.style.top = ((window.innerHeight - app.offsetHeight)/2.0 - rec_stop_height) + "px";
+}
+
+function init_rec_stop_wrapper() {
+  document.getElementById(REC_STOP_ID).style.width = window.innerWidth + "px";
 }
 
 /* Function: init_app_div
@@ -301,14 +306,14 @@ function center_app() {
  */
 function init_app_div() {
 	var app_container = document.createElement('div');
-    app_container.id = "app_container";
-    app = document.createElement('div');
-    app.id = APP_ID;
+  app_container.id = "app_container";
+  app = document.createElement('div');
+  app.id = APP_ID;
 
-    document.getElementById("all").appendChild(app_container);
-    app_container.appendChild(app);
+  document.getElementById("all").appendChild(app_container);
+  app_container.appendChild(app);
 
-    center_app();
+  center_app();
 }
 
 /* Function: get_css_val
@@ -372,7 +377,8 @@ function get_grain_box_posit(g_ind) {
  * app interaction (until a recording occurs).
  */
 function init_interface() {
-	// init app div
+	init_rec_stop_wrapper();
+  // init app div
 	init_app_div();
 	//init grain_uis
 	grain_uis = new Array();

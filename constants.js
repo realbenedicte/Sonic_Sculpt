@@ -58,6 +58,9 @@ const COLORS = ["red", "green", "orange", "purple", "blue"];
 // the HTML id label of the app div
 const APP_ID = "app_div";
 
+// the HTML id label of the div containing the Rec/Stop button
+const REC_STOP_ID = "rec_stop_wrapper";
+
 // The percentage of the browser window which the app takes up
 const APP_WIDTH_RATIO = 0.6;
 const APP_HEIGHT_RATIO = 0.8;
