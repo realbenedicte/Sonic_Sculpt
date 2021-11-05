@@ -20,7 +20,7 @@ MongoClient.connect("mongodb://localhost/")
     // FILE UPLOAD ( SHOUld BE OUR SAVE STATE )
     app.post('/upload', upload.single('soundBlob'), function (req, res, next) {
       console.log(req.file); // see what got uploaded
-    
+
       let uploadLocation = __dirname + '/media/' + req.file.originalname // where to save the file to. make sure the incoming name has a .wav extension
       fs.writeFileSync(uploadLocation, Buffer.from(new Uint8Array(req.file.buffer))); // write the blob to the server as a file
       res.sendStatus(200); //send back that everything went ok
@@ -34,12 +34,12 @@ MongoClient.connect("mongodb://localhost/")
       })
       .catch(error => console.error(error))
     })
-    
 
+app.use('/', express.static('app'));
 
     app.use('/:roomID', express.static('app'));
 
-    app.use('/', express.static('app'));
+
 
 
     // START SERVER
@@ -49,4 +49,3 @@ MongoClient.connect("mongodb://localhost/")
 
   })
   .catch(console.error)
-

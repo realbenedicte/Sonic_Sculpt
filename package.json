@@ -19,7 +19,6 @@
   "homepage": "https://github.com/realbenedicte/Sonic_Sculpt#readme",
   "dependencies": {
     "express": "^4.17.1",
-    "express-fileupload": "^1.2.1",
     "mongodb": "^4.1.4",
     "multer": "^1.4.3"
   }
