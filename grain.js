@@ -17,25 +17,29 @@
  */
 
 function Grain(g_ind) {
-	// Reflects the index of the Grain object in the app
-	this.g_ind = g_ind;
 
-	// Links to the GrainUI object that controls this Grain object
-	this.ui = null;
+  console.log("got grain id ", g_ind)
+  // Reflects the index of the Grain object in the app
+  this.g_ind = g_ind;
 
-	// Buffer that contains the actual grain audio data. Updated by
-	// refresh_grain(), and played by fire() 
-	this.buffer = null;
+  // Links to the GrainUI object that controls this Grain object
+  this.ui = null;
 
-	// Boolean that tracks if the grain is being played or not.
-	this.grain_on = false;
+  // Buffer that contains the actual grain audio data. Updated by
+  // refresh_grain(), and played by fire() 
+  this.buffer = null;
 
-	// Tracks the ID number of an interval-repeating fire_schedule
-	// function, so that it can be cleared when the grain is stopped
-	this.intID = null;
+  this.full_buffer = null;
 
-	// Stores the time (Audio Context clock) of most recent call to fire() 
-	this.last_fire_time = null;
+  // Boolean that tracks if the grain is being played or not.
+  this.grain_on = false;
+
+  // Tracks the ID number of an interval-repeating fire_schedule
+  // function, so that it can be cleared when the grain is stopped
+  this.intID = null;
+
+  // Stores the time (Audio Context clock) of most recent call to fire() 
+  this.last_fire_time = null;
 }
 
 /* Function: apply_vol_env
@@ -47,18 +51,18 @@ function Grain(g_ind) {
  * iteration has reached the sample in the middle of the buffer, the i / half_len
  * value is 1, and the function is finished.
  */
-Grain.prototype.apply_vol_env = function() {
-	if(this.buffer) {
-		var half_len = this.buffer.length/2
-		for (var i = 0; i < half_len; i++){
-				for(var c = 0; c < this.buffer.numberOfChannels; c++){
-					chan_buf = this.buffer.getChannelData(c);
-					chan_buf[i] *= i / (1.0 * half_len);
-					chan_buf[this.buffer.length-(i+1)] *= i / (1.0 * half_len);
-				}
-			}
-		}
-	}
+Grain.prototype.apply_vol_env = function () {
+  if (this.buffer) {
+    var half_len = this.buffer.length / 2
+    for (var i = 0; i < half_len; i++) {
+      for (var c = 0; c < this.buffer.numberOfChannels; c++) {
+        chan_buf = this.buffer.getChannelData(c);
+        chan_buf[i] *= i / (1.0 * half_len);
+        chan_buf[this.buffer.length - (i + 1)] *= i / (1.0 * half_len);
+      }
+    }
+  }
+}
 
 /* Function: refresh_buffer
  * ------------------------
@@ -72,18 +76,18 @@ Grain.prototype.apply_vol_env = function() {
  * envelope is applied to the grain.
  */
 Grain.prototype.refresh_buffer = function (buf) {
-		if(verbose) console.log("refreshing grain buffer");
-		new_start = this.ui.g_left_perc * buf.duration;
-		new_end = this.ui.g_right_perc * buf.duration;
-		AudioBufferSlice(buf, new_start, new_end, this, function(e, new_buffer, grain){
-			if (e) {
-				console.log(e);
-			} else {
-				grain.buffer = new_buffer;
-			}
-		});
-		this.apply_vol_env();
-	}
+  if (verbose) console.log("refreshing grain buffer");
+  new_start = this.ui.g_left_perc * buf.duration;
+  new_end = this.ui.g_right_perc * buf.duration;
+  AudioBufferSlice(buf, new_start, new_end, this, function (e, new_buffer, grain) {
+    if (e) {
+      console.log(e);
+    } else {
+      grain.buffer = new_buffer;
+    }
+  });
+  this.apply_vol_env();
+}
 
 /* Function: fire
  * --------------
@@ -93,12 +97,12 @@ Grain.prototype.refresh_buffer = function (buf) {
  * and playing it. The BufferSource object is destroyed after it
  * is finished playing, based on the .start() call syntax.
  */
-Grain.prototype.fire = function(g_buf, time) {
-		var g_src = context.createBufferSource();
-		g_src.buffer = g_buf;
-		g_src.connect(context.destination);
-		g_src.start(time, 0, g_src.buffer.duration);
-	}
+Grain.prototype.fire = function (g_buf, time) {
+  var g_src = context.createBufferSource();
+  g_src.buffer = g_buf;
+  g_src.connect(context.destination);
+  g_src.start(time, 0, g_src.buffer.duration);
+}
 
 /* Function: fire_schedule
  * -----------------------
@@ -111,20 +115,20 @@ Grain.prototype.fire = function(g_buf, time) {
  * clock time when it should play the grain. Once the function has scheduled all of the
  * fire calls it can, it terminates.
  */
-Grain.prototype.fire_schedule = function(grain) {
-		var sec_in_lookahead = FIRE_SCHED_LOOKAHEAD/1000.0;
-		var sec_btw_fires = grain.buffer.duration/2.0;
-		if(grain.last_fire_time){
-			var next_fire_time = grain.last_fire_time + sec_btw_fires;
-		} else {
-			var next_fire_time = context.currentTime + (context.currentTime%sec_btw_fires);
-		}
-		while(next_fire_time < context.currentTime + sec_in_lookahead){
-			grain.fire(grain.buffer, next_fire_time);
-			this.last_fire_time = next_fire_time;
-			next_fire_time += sec_btw_fires;
-		}
-	}	
+Grain.prototype.fire_schedule = function (grain) {
+  var sec_in_lookahead = FIRE_SCHED_LOOKAHEAD / 1000.0;
+  var sec_btw_fires = grain.buffer.duration / 2.0;
+  if (grain.last_fire_time) {
+    var next_fire_time = grain.last_fire_time + sec_btw_fires;
+  } else {
+    var next_fire_time = context.currentTime + (context.currentTime % sec_btw_fires);
+  }
+  while (next_fire_time < context.currentTime + sec_in_lookahead) {
+    grain.fire(grain.buffer, next_fire_time);
+    this.last_fire_time = next_fire_time;
+    next_fire_time += sec_btw_fires;
+  }
+}
 
 /* Function: init_fire_scheduler
  * -----------------------------
@@ -135,12 +139,12 @@ Grain.prototype.fire_schedule = function(grain) {
  * allowed for by repeated calls with short look-ahead times of this fire_scheduler
  * function (For more information on this algorithm, check out https://goo.gl/t7ivz4)
  */
-Grain.prototype.init_fire_scheduler = function() {
-		var _this = this;
-		this.intID = setInterval(function(){
-			_this.fire_schedule(_this);
-		}, FIRE_SCHED_TIMEOUT);
-	}
+Grain.prototype.init_fire_scheduler = function () {
+  var _this = this;
+  this.intID = setInterval(function () {
+    _this.fire_schedule(_this);
+  }, FIRE_SCHED_TIMEOUT);
+}
 
 /* Function: play
  * --------------
@@ -149,11 +153,11 @@ Grain.prototype.init_fire_scheduler = function() {
  * playing by calling the init_fire_scheduler function.
  */
 Grain.prototype.play = function () {
-		if(verbose) console.log("playing grain");
-		if(!this.buffer) this.refresh_buffer(full_buffer);
-		this.init_fire_scheduler();
-		this.grain_on = true;
-	}
+  if (verbose) console.log("playing grain");
+  if (!this.buffer) this.refresh_buffer(this.full_buffer);
+  this.init_fire_scheduler();
+  this.grain_on = true;
+}
 
 /* Function: stop
  * --------------
@@ -161,11 +165,11 @@ Grain.prototype.play = function () {
  * call of the fire_schedule function, and does some member function clean-up.
  */
 Grain.prototype.stop = function () {
-		if(verbose) console.log("stoping grain");
-		clearInterval(this.intID);
-		this.last_fire_time = null;
-		this.grain_on = false;
-	}
+  if (verbose) console.log("stoping grain");
+  clearInterval(this.intID);
+  this.last_fire_time = null;
+  this.grain_on = false;
+}
 
 /* Function: refresh_play
  * ----------------------
@@ -174,8 +178,8 @@ Grain.prototype.stop = function () {
  * grain again.
  */
 Grain.prototype.refresh_play = function () {
-		if(verbose) console.log("playing with new vals");
-		if(this.grain_on) this.stop();
-		this.refresh_buffer(full_buffer);
-		this.play();
-	}
+  if (verbose) console.log("playing with new vals");
+  if (this.grain_on) this.stop();
+  this.refresh_buffer(this.full_buffer);
+  this.play();
+}
