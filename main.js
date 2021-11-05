@@ -1,13 +1,13 @@
 /* File: main.js
  * -----------------------
- * This is the main file for the Grains4u web app. The aim of this web app is to 
- * be a simple, intuitive sandbox toy for learning about and playing with 
+ * This is the main file for the Grains4u web app. The aim of this web app is to
+ * be a simple, intuitive sandbox toy for learning about and playing with
  * granular synthesis. Using the app, a user will be able to record a live sample
  * of audio from their microphone input, and then start adding grains on top
  * of that sample. They can use the GrainUI interface to extend, shorten, or slide the
  * grain around on the sample. At any point, the user can record a new live audio sample,
  * and the state of the app is reset.
- * 
+ *
  * Important Sources:
  * - https://goo.gl/NIerhh
  * - https://goo.gl/nZF0x5
@@ -18,7 +18,7 @@
  * - https://goo.gl/tNB9Bf - setting up localhost
  * - https://goo.gl/t7ivz4 - working with clock timing
  * - https://goo.gl/iMWzDQ - Music 220b granular lecture
- * 
+ *
  * List of Future Bug Fixes/ Future Features on Asana Project
  */
 
@@ -45,12 +45,12 @@ function init() {
  * for both of these buttons.
  */
 function init_buttons() {
-  rec_button = new GButton("rec_stop", handle_rec_press, 0);
+  //rec_button = new GButton("rec_stop", handle_rec_press, 0);
 }
 
 /* Function: init_button_listener
  * ------------------------------
- * This initializes a new Event Listener, listening for clicks on 
+ * This initializes a new Event Listener, listening for clicks on
  * whichever button is passed into it. When the button is clicked,
  * the button's "click_func" function fires.
  */
@@ -81,13 +81,13 @@ function get_grains_playing() {
 /* Function: kill_grains
  * ---------------------
  * When called, this function kills all of the grains with the indexes
- * passed into it via the playing array. It first stops the audio of 
- * the grain, then resets the UI display of the grain box to its 
+ * passed into it via the playing array. It first stops the audio of
+ * the grain, then resets the UI display of the grain box to its
  * uninitialized state.
  */
 function kill_grains(playing) {
   for (var i = 0; i < playing.length; i++) {
-    // grains[playing[i]].stop();
+     grains[playing[i]].stop(); //stop playing any grain while recording
     // grain_uis[playing[i]].handle_remove_grain();
   }
 }
@@ -100,9 +100,11 @@ function kill_grains(playing) {
  * and the recording is begun.
  */
 function handle_rec_press() {
-  if (rec_button.is_active) {
+  if (isRecording) {
     end_record();
+    isRecording = false;
   } else {
+    isRecording =true;
     var playing = get_grains_playing()
     if (playing) {
       kill_grains(playing);
@@ -120,10 +122,9 @@ function handle_rec_press() {
 function end_record() {
   mic_recorder.stop();
   if (verbose) { console.log("recording stopped"); }
-  document.getElementById("rec_stop").style.backgroundColor = "gray";
-  document.getElementById("rec_stop").innerHTML = "Record";
+
   unblock_app();
-  rec_button.is_active = 0;
+  // rec_button.is_active = 0;
 }
 
 /* Function: begin_record
@@ -134,10 +135,10 @@ function end_record() {
 function begin_record() {
   mic_recorder.start();
   if (verbose) { console.log("recording started"); }
-  document.getElementById("rec_stop").style.backgroundColor = "red";
-  document.getElementById("rec_stop").innerHTML = "Stop";
+  // document.getElementById("rec_stop").style.backgroundColor = "red";
+  // document.getElementById("rec_stop").innerHTML = "Stop";
   block_app();
-  rec_button.is_active = 1;
+  // rec_button.is_active = 1;
 }
 
 /* Function: delete_rec_blob
@@ -153,7 +154,7 @@ function delete_rec_blob() {
  * -----------------------
  * This function fires every time the mic_recorder object finishes
  * recording. It first creates a new audio blob, then gets an object
- * url for this blob. It then passes this object url to the Audio 
+ * url for this blob. It then passes this object url to the Audio
  * contructor to make a new HTMLAudioElement object. If this object
  * has already been initialized, then the source value of the Audio
  * element is replaced.
@@ -168,13 +169,13 @@ function save_rec_blob() {
     full_audio = new Audio(rec_url);
   }
 
-  audios.push(new Audio(rec_url))
+  // audios.push(new Audio(rec_url))
 }
 
 
 /* Function: get_audio_buffer_source
  * -----------------------------------
- * This function creates and returns an AudioBufferSource object that 
+ * This function creates and returns an AudioBufferSource object that
  * can play the current full buffer.
  */
 function get_audio_buffer_source(out_node) {
@@ -186,10 +187,10 @@ function get_audio_buffer_source(out_node) {
 
 /* Function: handle_store_full_buffer
  * -----------------------------------
- * This function stores the AudioBuffer object containing the data for 
+ * This function stores the AudioBuffer object containing the data for
  * the current audio recording. It it passed an ArrayBuffer object, and
  * processes it with the decodeAudioData function of the AudioContext.
- * 
+ *
  * This function uses a FileReader instance to feed the raw data from
  * the full recording blob into an ArrayBuffer object, which we can
  * use later to create playable AudioBuffer objects.
@@ -222,7 +223,7 @@ function handle_store_full_buffer() {
  * ---------------------------
  * Initializes the MediaRecorder mic_recorder object. Links it to the
  * audio stream, and declares callback functions for when data is
- * available from the MediaRecorder API, and what to do when the 
+ * available from the MediaRecorder API, and what to do when the
  * MediaRecorder object is done recording.
  */
 function init_mic_recorder(stream) {
@@ -243,7 +244,7 @@ function init_mic_recorder(stream) {
  * is possible. If so, it passes the stream to init_mic_recorder, so that
  * it can be linked to the MediaRecorder. It catches any errors/ MediaStream
  * incompatibilities with the browser.
- * 
+ *
  * Code Sources: https://goo.gl/etOCTm, https://goo.gl/5X2Fzt
  */
 function init_audio_stream() {
@@ -265,7 +266,7 @@ function init_audio_stream() {
  * It does this by assigning a reference of each GrainUI to a member variable in
  * its proper Grain object, and vice versa. This must happen in the initialization
  * phase of the application, so that GrainUI's and Grain's can reference each other
- * while running. 
+ * while running.
  */
 function link_grains_to_uis() {
   for (var i = 0; i < grains.length; i++) {
@@ -289,24 +290,24 @@ function init_grains() {
 /* Function: init_app_div
  * ---------------------
  * This function centers the app div in the current browser window. It set the
- * width, height, and x-y coordinates of the top-left corner of the app div. 
- * The width and height are calculated according to two constants from the 
+ * width, height, and x-y coordinates of the top-left corner of the app div.
+ * The width and height are calculated according to two constants from the
  * constants.js document.
  */
 function center_app() {
-  //set app div width, height 
+  //set app div width, height
   app.style.width = window.innerWidth * APP_WIDTH_RATIO + "px";
   app.style.height = window.innerHeight * APP_HEIGHT_RATIO + "px";
   //set app div x, y
   app.style.position = "absolute";
   app.style.left = (window.innerWidth - app.offsetWidth) / 2.0 + "px";
-  var rec_stop_height = get_css_val(REC_STOP_ID, "height", true);
-  app.style.top = ((window.innerHeight - app.offsetHeight) / 2.0 - rec_stop_height) + "px";
+//  var rec_stop_height = get_css_val(REC_STOP_ID, "height", true);
+  //app.style.top = ((window.innerHeight - app.offsetHeight) / 2.0 - rec_stop_height) + "px";
 }
 
-function init_rec_stop_wrapper() {
-  document.getElementById(REC_STOP_ID).style.width = window.innerWidth + "px";
-}
+// function init_rec_stop_wrapper() {
+//   document.getElementById(REC_STOP_ID).style.width = window.innerWidth + "px";
+// }
 
 /* Function: init_app_div
  * ---------------------
@@ -366,7 +367,7 @@ function get_grain_box_width() {
 /* Function: get_grain_box_posit
  * -----------------------------
  * This calculates the x and y coordinates of the top-left corner of
- * each grain box on the page. The coordinate pair depends on the 
+ * each grain box on the page. The coordinate pair depends on the
  * index of the grain box, and the height of the window. The coordinate pair
  * is returned in the posit array.
  */
@@ -388,7 +389,7 @@ function get_grain_box_posit(g_ind) {
  * app interaction (until a recording occurs).
  */
 function init_interface() {
-  init_rec_stop_wrapper();
+  //init_rec_stop_wrapper();
   // init app div
   init_app_div();
   //init grain_uis
@@ -420,7 +421,7 @@ function draw_init_grain_uis() {
 
 /* Function: get_g_ind_from_id
  * ---------------------------
- * This function takes in the ID of a GrainUI's HTML element and 
+ * This function takes in the ID of a GrainUI's HTML element and
  * returns the index (in the grains array) of the Grain object that
  * element belongs to.
  */
@@ -463,34 +464,41 @@ function block_app() {
  * If the remove button is pressed, the grain is killed.
  */
 function handle_mouse_down(event) {
-  if (event.target.className == "add_grain_text") {
-    var g_ind = get_g_ind_from_id(event.target.id);
-    grain_uis[g_ind].handle_spawn_grain();
-    grains[g_ind].play();
-
-  } else if (event.target.className == "g_rect") {
+  
+  if (event.target.className == "g_rect") {
     event.preventDefault();
     var g_ind = get_g_ind_from_id(event.target.id);
     grain_uis[g_ind].handle_grain_rect_click(event.clientX);
     g_changing = g_ind;
-
-  } else if (event.target.id == "rec_stop") {
-    handle_rec_press();
-
-  } else if (event.target.className == "remove_text") {
+  }
+  else if (event.target.className == "remove_text") {
     var g_ind = get_g_ind_from_id(event.target.id);
     grains[g_ind].stop();
     grain_uis[g_ind].handle_remove_grain();
-  } else if (event.target.className == "grain_record_box") {
+  }
+ else if (event.target.className == "pause_text") {
+  var g_ind = get_g_ind_from_id(event.target.id);
+  //toggle for play/pause
+  if(grains[g_ind].grain_on){
+    grains[g_ind].stop();
+  }
+  else {
+    grains[g_ind].play();
+  }
+  //grain_uis[g_ind].handle_remove_grain();
+}
 
+  else if (event.target.className == "record_text") {
     if (isRecording) {
-      isRecording = false;
+      // isRecording = false;
+      event.target.innerHTML = "record";
       console.log("ending record ", current_grain_id)
       handle_rec_press()
       return;
     }
 
-    isRecording = true;
+    // isRecording = true;
+    event.target.innerHTML = "stop"; //change text
     var g_ind = get_g_ind_from_id(event.target.id);
     console.log("got record id ", g_ind)
     current_grain_id = g_ind;
@@ -515,7 +523,7 @@ function handle_mouse_move(event) {
 /* Function: handle_mouse_up
  * -------------------------
  * This function handles a mouse up event. If one of the grain rectangles
- * is being transformed, this is stopped, and the g_changing boolean is 
+ * is being transformed, this is stopped, and the g_changing boolean is
  * switched to reflect this.
  */
 function handle_mouse_up(event) {

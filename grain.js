@@ -11,7 +11,7 @@
 
 /* Constructor: Grain
  * --------------------
- * This is the constructor for the Grain object. The argument passed into the 
+ * This is the constructor for the Grain object. The argument passed into the
  * constructor is the g_ind (which of the 5 grains of the app this one
  * is). All member variables and functions are described internally.
  */
@@ -26,7 +26,7 @@ function Grain(g_ind) {
   this.ui = null;
 
   // Buffer that contains the actual grain audio data. Updated by
-  // refresh_grain(), and played by fire() 
+  // refresh_grain(), and played by fire()
   this.buffer = null;
 
   this.full_buffer = null;
@@ -38,7 +38,7 @@ function Grain(g_ind) {
   // function, so that it can be cleared when the grain is stopped
   this.intID = null;
 
-  // Stores the time (Audio Context clock) of most recent call to fire() 
+  // Stores the time (Audio Context clock) of most recent call to fire()
   this.last_fire_time = null;
 }
 
@@ -68,11 +68,11 @@ Grain.prototype.apply_vol_env = function () {
  * ------------------------
  * This function refreshes the grain buffer after user interaction with
  * the GrainUI object. Whenever manipulation of the grain_rect in the
- * GrainUI object occurs, this function should be called. It first 
+ * GrainUI object occurs, this function should be called. It first
  * determines where within the buffer passed to it (buf) the grain
  * should be sliced from, and passes this into the AudioBufferSlice function,
  * which takes care of slicing the new grain and saving the new grain in the
- * grain.buffer member variable within the Grain object. Then, the volume 
+ * grain.buffer member variable within the Grain object. Then, the volume
  * envelope is applied to the grain.
  */
 Grain.prototype.refresh_buffer = function (buf) {
@@ -93,7 +93,7 @@ Grain.prototype.refresh_buffer = function (buf) {
  * --------------
  * This function plays the current grain buffer exactly once. It
  * does this by creating a new BufferSource audio source, linking
- * it to the audio context, linking the grain audio buffer to it, 
+ * it to the audio context, linking the grain audio buffer to it,
  * and playing it. The BufferSource object is destroyed after it
  * is finished playing, based on the .start() call syntax.
  */
@@ -109,9 +109,9 @@ Grain.prototype.fire = function (g_buf, time) {
  * This function schedules calls of the .fire() function such that the grain
  * is played precises at the correct time (currently, this means once every half
  * of a grain.buffer length's duration). When called, this function looks ahead
- * some set amount (FIRE_SCHED_LOOKAHEAD milliseconds), determines how many times 
+ * some set amount (FIRE_SCHED_LOOKAHEAD milliseconds), determines how many times
  * the grain should be played within the lookahead time, and calls fire() function
- * the appropriate number of times, passing each one the exact audio context 
+ * the appropriate number of times, passing each one the exact audio context
  * clock time when it should play the grain. Once the function has scheduled all of the
  * fire calls it can, it terminates.
  */
@@ -133,9 +133,9 @@ Grain.prototype.fire_schedule = function (grain) {
 /* Function: init_fire_scheduler
  * -----------------------------
  * This function uses setInterval to schedule the fire_schedule function once
- * every set amount of time (FIRE_SCHED_TIMEOUT milliseconds). This way, the 
+ * every set amount of time (FIRE_SCHED_TIMEOUT milliseconds). This way, the
  * fire_schedule function can time grains precisely with the AudioContext clock,
- * while still providing users the flexibility of live-updating manipulations 
+ * while still providing users the flexibility of live-updating manipulations
  * allowed for by repeated calls with short look-ahead times of this fire_scheduler
  * function (For more information on this algorithm, check out https://goo.gl/t7ivz4)
  */
@@ -157,6 +157,7 @@ Grain.prototype.play = function () {
   if (!this.buffer) this.refresh_buffer(this.full_buffer);
   this.init_fire_scheduler();
   this.grain_on = true;
+  this.ui.update_playstate(true);
 }
 
 /* Function: stop
@@ -169,6 +170,7 @@ Grain.prototype.stop = function () {
   clearInterval(this.intID);
   this.last_fire_time = null;
   this.grain_on = false;
+  this.ui.update_playstate(false);
 }
 
 /* Function: refresh_play
