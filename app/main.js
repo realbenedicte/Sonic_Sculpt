@@ -87,7 +87,7 @@ function get_grains_playing() {
  */
 function kill_grains(playing) {
   for (var i = 0; i < playing.length; i++) {
-     grains[playing[i]].stop(); //stop playing any grain while recording
+    grains[playing[i]].stop(); //stop playing any grain while recording
     // grain_uis[playing[i]].handle_remove_grain();
   }
 }
@@ -104,7 +104,7 @@ function handle_rec_press() {
     end_record();
     isRecording = false;
   } else {
-    isRecording =true;
+    isRecording = true;
     var playing = get_grains_playing()
     if (playing) {
       kill_grains(playing);
@@ -150,6 +150,18 @@ function delete_rec_blob() {
   window.URL.revokeObjectURL(rec_url);
 }
 
+
+function makeid(length) {
+  var result = '';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() *
+      charactersLength));
+  }
+  return result;
+}
+
 /* Function: save_rec_blob
  * -----------------------
  * This function fires every time the mic_recorder object finishes
@@ -169,7 +181,29 @@ function save_rec_blob() {
     full_audio = new Audio(rec_url);
   }
 
-  // audios.push(new Audio(rec_url))
+
+  let formdata = new FormData(); //create a from to of data to upload to the server
+  
+  var pathname = window.location.pathname; 
+  let room_id = pathname
+  let sound_id = makeid(4)
+
+  formdata.append('soundBlob', rec_blob, `${sound_id}.wav`);
+  formdata.append("room", `${room_id}`);
+  // Now we can send the blob to a server...
+  var serverUrl = '/upload'; //we've made a POST endpoint on the server at /upload
+  //build a HTTP POST request
+
+  var request = new XMLHttpRequest();
+  request.open("POST", serverUrl);
+  request.onload = function(evt) {
+    if (request.status == 200) {
+      console.log("successful upload")
+    } else {
+      console.log("got error ", evt)
+    }
+  };
+  request.send(formdata);
 }
 
 
@@ -301,7 +335,7 @@ function center_app() {
   //set app div x, y
   app.style.position = "absolute";
   app.style.left = (window.innerWidth - app.offsetWidth) / 2.0 + "px";
-//  var rec_stop_height = get_css_val(REC_STOP_ID, "height", true);
+  //  var rec_stop_height = get_css_val(REC_STOP_ID, "height", true);
   //app.style.top = ((window.innerHeight - app.offsetHeight) / 2.0 - rec_stop_height) + "px";
 }
 
@@ -464,7 +498,7 @@ function block_app() {
  * If the remove button is pressed, the grain is killed.
  */
 function handle_mouse_down(event) {
-  
+
   if (event.target.className == "g_rect") {
     event.preventDefault();
     var g_ind = get_g_ind_from_id(event.target.id);
@@ -476,17 +510,17 @@ function handle_mouse_down(event) {
     grains[g_ind].stop();
     grain_uis[g_ind].handle_remove_grain();
   }
- else if (event.target.className == "pause_text") {
-  var g_ind = get_g_ind_from_id(event.target.id);
-  //toggle for play/pause
-  if(grains[g_ind].grain_on){
-    grains[g_ind].stop();
+  else if (event.target.className == "pause_text") {
+    var g_ind = get_g_ind_from_id(event.target.id);
+    //toggle for play/pause
+    if (grains[g_ind].grain_on) {
+      grains[g_ind].stop();
+    }
+    else {
+      grains[g_ind].play();
+    }
+    //grain_uis[g_ind].handle_remove_grain();
   }
-  else {
-    grains[g_ind].play();
-  }
-  //grain_uis[g_ind].handle_remove_grain();
-}
 
   else if (event.target.className == "record_text") {
     if (isRecording) {
