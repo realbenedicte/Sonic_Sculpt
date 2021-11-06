@@ -152,6 +152,12 @@ h1 {
   display: none;
 }
 
+.g_rect{
+position: absolute;
+height: inherit;
+border-radius: 20px;
+}
+
 .dormant .g_rect {
   display: none;
 }
