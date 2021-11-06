@@ -164,6 +164,7 @@ GrainUI.prototype.make_grain_rect = function () {
   this.grain_rect = document.createElement('div');
   this.grain_rect.className = "g_rect";
   this.grain_rect.id = "g_rect_" + this.g_ind;
+  this.grain_rect.style.background = this.color;
   this.set_grain_rect_sides(this.g_left_px, this.g_right_px);
   this.box.appendChild(this.grain_rect);
 }
