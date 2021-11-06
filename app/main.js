@@ -182,7 +182,8 @@ function save_rec_blob() {
   formdata.append('soundBlob', rec_blob, `${sound_id}.wav`);
   formdata.append("room", `${room_id}`);
   // Now we can send the blob to a server...
-  var serverUrl = '/upload'; //we've made a POST endpoint on the server at /upload
+
+var serverUrl = '/upload'; //we've made a POST endpoint on the server at /upload
   //build a HTTP POST request
 
   var request = new XMLHttpRequest();
