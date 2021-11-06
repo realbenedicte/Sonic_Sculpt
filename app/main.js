@@ -22,8 +22,9 @@
  * List of Future Bug Fixes/ Future Features on Asana Project
  */
 
+//each grain box gets its own id
 let current_grain_id = null;
-let isRecording = false;
+let isRecording = false;//set boolean for knowing if its recording or not
 /* Function: init
  * --------------
  * This is the master initialization function for the script. It
@@ -73,7 +74,7 @@ function kill_grains(playing) {
 
 /* Function: handle_rec_press
  * --------------------
- * This function handles the pressing of the record button.
+ * This function handles the pressing of a record button.
  * if the recording is currently happening, it is ended. If it
  * is not, then playback of the sound is stopped (if it is going),
  * and the recording is begun.
@@ -86,7 +87,7 @@ function handle_rec_press() {
     isRecording = true;
     var playing = get_grains_playing()
     if (playing) {
-      kill_grains(playing);
+      kill_grains(playing);//stop playing any grain while recording
     }
     delete_rec_blob();
     begin_record();
@@ -130,6 +131,8 @@ function delete_rec_blob() {
 }
 
 
+//random id for each wav file recorded :)
+//
 function makeid(length) {
   var result = '';
   var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -150,6 +153,14 @@ function makeid(length) {
  * has already been initialized, then the source value of the Audio
  * element is replaced.
  */
+
+//notes on Blob
+/*The Blob object represents a blob,
+/*which is a file-like object of immutable,
+/*raw data; they can be read as text or binary data,
+/*or converted into a ReadableStream so its methods can be used for processing the data.
+*/
+
 function save_rec_blob() {
   rec_blob = new Blob(rec_chunks, { 'type': 'audio/ogg; codecs=opus' });
   rec_chunks = [];
@@ -161,11 +172,12 @@ function save_rec_blob() {
   }
 
 
+  //SERVER STUFF
   let formdata = new FormData(); //create a from to of data to upload to the server
 
   var pathname = window.location.pathname;
-  let room_id = pathname
-  let sound_id = makeid(4)
+  let room_id = pathname;
+  let sound_id = makeid(4);
 
   formdata.append('soundBlob', rec_blob, `${sound_id}.wav`);
   formdata.append("room", `${room_id}`);
@@ -184,7 +196,6 @@ function save_rec_blob() {
   };
   request.send(formdata);
 }
-
 
 /* Function: get_audio_buffer_source
  * -----------------------------------
@@ -210,13 +221,20 @@ function get_audio_buffer_source(out_node) {
 
  * ALSO, it inits the grain buffers
  */
+
+ //AUDIO BUFFER STUFF
+ //
+ //https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer
 function handle_store_full_buffer() {
   var reader = new FileReader();
   reader.onloadstart = function () { if (verbose) { console.log("beginning buffer load"); } }
   reader.onloadend = function () {
     arr_buf = reader.result;
+
     context.decodeAudioData(arr_buf).then(function (data) {
       full_buffer = data;
+        console.log(data);//data is our audio buffer :)
+        console.log(data.duration)// can find duration (how long our recording is in seconds)
       if (current_grain_id !== null) {
         grains[current_grain_id].full_buffer = data;
         grain_uis[current_grain_id].handle_spawn_grain();

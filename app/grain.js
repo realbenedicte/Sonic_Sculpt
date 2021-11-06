@@ -51,7 +51,7 @@ function Grain(g_ind) {
  * iteration has reached the sample in the middle of the buffer, the i / half_len
  * value is 1, and the function is finished.
  */
-Grain.prototype.apply_vol_env = function () {
+Grain.prototype.apply_vol_env = function () { //volume envelope
   if (this.buffer) {
     var half_len = this.buffer.length / 2
     for (var i = 0; i < half_len; i++) {
@@ -97,6 +97,8 @@ Grain.prototype.refresh_buffer = function (buf) {
  * and playing it. The BufferSource object is destroyed after it
  * is finished playing, based on the .start() call syntax.
  */
+ //we defined context as a variable in  constants.js
+ //context is our webkitAudioContext
 Grain.prototype.fire = function (g_buf, time) {
   var g_src = context.createBufferSource();
   g_src.buffer = g_buf;
