@@ -1,38 +1,12 @@
-/* Files: grain_ui.js
- * -----------------------
- * This is the GrainUI object, the front-end controller for a grain object.
- * In order for a Grain object to be controlled by the user, it must be
- * linked to a GrainUI object. A GrainUI object takes care of user interactions
- * such as:
- * 		- adding and clearing a grain
- * 		- resizing a grain (right/ left stretch)
- * 		- moving a grain (slide)
- * The GrainUI may be displayed in two modes, either dormant or live. When it is
- * dormant, it is making no noise, and awaiting user interaction. Once the user
- * clicks the "click to add grain" prompt, the GrainUI object becomes live, begins
- * making noise, and allows for grain resizing and moving. All member variables and
- * functions are described in the comments below.
- */
 
-
-/* Constructor: GrainUI
- * --------------------
- * This is the constructor for the GrainUI object. The arguments passed into the
- * constructor include the g_ind (which of the 5 displayed grains this one
- * is), the dimensions of the outer GrainUI box, and its color. All member
- * variables and functions are described internally.
- */
 function GrainUI(g_ind, box_x, box_y, box_width, box_height, color) {
 
   // Store the box dimensions and color passed into the constructor
-
-
   this.box_x = box_x;
   this.box_y = box_y;
   this.box_width = box_width;
   this.box_height = box_height;
   this.color = color;
-
   // Grain should be initialized to a dormant state
   this.dormant = true;
 
@@ -88,7 +62,6 @@ GrainUI.prototype.grain_rect_dims_to_def = function () {
   this.g_left_perc = G_RECT_DEF[0];
   this.g_right_perc = G_RECT_DEF[1];
   this.g_width_perc = G_RECT_DEF[2];
-
   this.g_left_px = this.g_left_perc * this.box_width;
   this.g_right_px = this.g_right_perc * this.box_width;
   this.g_width_px = this.g_width_perc * this.box_width;
@@ -98,26 +71,18 @@ GrainUI.prototype.grain_rect_dims_to_def = function () {
 /* Function: make_record
  * -------------------
  * Make record button for each box
+// MG function
  */
 GrainUI.prototype.make_record_div = function () {
-
-
   this.record_div = document.createElement('div');
-  this.record_div.style.position = "absolute";
-  this.record_div.style.width = this.box_width * 0.1 + "px";
-  this.record_div.style.height = this.box_height + "px";
-  this.record_div.style.left = this.box_x + this.box_width + "px";
-  this.record_div.style.top = "-5px";
+  this.record_div.className = "record_div"
 
   var inner_msg = document.createElement("h3");
   inner_msg.className = "record_text";
   inner_msg.id = "g_record_" + this.g_ind;
   inner_msg.innerHTML = "record";
-  inner_msg.style.color = "white";
-
   this.record_div.style.background = this.color;
   this.record_div.style.border = "5px solid " + this.color;
-
   this.record_div.appendChild(inner_msg);
   this.box.appendChild(this.record_div);
 }
@@ -142,20 +107,8 @@ GrainUI.prototype.update_playstate = function (playing=false) { //defaults to fa
  */
 GrainUI.prototype.make_box = function () {
   this.box = document.createElement('div');
-  this.box.style.position = "absolute";
-  this.box.style.width = this.box_width + "px";
-  this.box.style.height = this.box_height + "px";
-  this.box.style.left = this.box_x + "px";
-  this.box.style.top = this.box_y + "px";
-
   this.box.className = "grain_outer_box";
-  this.box.style.border = "5px solid " + this.color;
-
-  this.box.style.margin = GRAIN_BOX_MARGIN + "px";
-
   app.appendChild(this.box);
-
-  //this.make_record();
 }
 
 /* Function: make_block
@@ -166,18 +119,8 @@ GrainUI.prototype.make_box = function () {
  */
 GrainUI.prototype.make_block = function () {
   this.block = document.createElement('div');
-  this.block.style.position = "absolute";
-  this.block.style.width = this.box_width + "px";
-  this.block.style.height = this.box_height + "px";
-  this.block.style.left = this.box_x + "px";
-  this.block.style.top = this.box_y + "px";
-
   this.block.className = "grain_block_box";
-  this.block.style.border = "5px solid gray";
-
-  this.block.style.margin = GRAIN_BOX_MARGIN + "px";
-
-  app.appendChild(this.block);
+  this.box.appendChild(this.block);
 }
 
 /* Function: make_remove_div
@@ -190,17 +133,16 @@ GrainUI.prototype.make_block = function () {
  */
 GrainUI.prototype.make_remove_div = function () {
   this.remove_div = document.createElement('div');
-  this.remove_div.style.position = "absolute";
-  this.remove_div.style.width = this.box_width * 0.1 + "px";
-  this.remove_div.style.height = this.box_height + "px";
-  this.remove_div.style.left = this.box_x + this.box_width + "px";
-  this.remove_div.style.top = "-5px";
-
+  // this.remove_div.style.position = "absolute";
+  // this.remove_div.style.width = this.box_width * 0.1 + "px";
+  // this.remove_div.style.height = this.box_height + "px";
+  // this.remove_div.style.left = this.box_x + this.box_width + "px";
+  // this.remove_div.style.top = "-5px";
+  this.remove_div.className = "remove_div";
   var inner_msg = document.createElement("h3");
   inner_msg.className = "remove_text";
   inner_msg.id = "g_reset_" + this.g_ind;
-  inner_msg.innerHTML = "clear grain";
-  inner_msg.style.color = "white";
+  inner_msg.innerHTML = "delete grain";
 
   this.remove_div.style.background = this.color;
   this.remove_div.style.border = "5px solid " + this.color;
@@ -209,26 +151,17 @@ GrainUI.prototype.make_remove_div = function () {
   this.box.appendChild(this.remove_div);
 }
 
-
-
-
-
 //Making Pause
 //MG
 //
 GrainUI.prototype.make_pause_div = function () {
   this.pause_div = document.createElement('div');
-  this.pause_div.style.position = "absolute";
-  this.pause_div.style.width = this.box_width * 0.1 + "px";
-  this.pause_div.style.height = this.box_height + "px";
-  this.pause_div.style.left = this.box_x + this.box_width + this.box_width * 0.1 +  "px";
-  this.pause_div.style.top = "-5px";
-
+  this.pause_div.className = "pause_div";
   var inner_msg = document.createElement("h3");
   inner_msg.className = "pause_text";
   inner_msg.id = "g_pause_" + this.g_ind;
   inner_msg.innerHTML = "pause";
-  inner_msg.style.color = "white";
+  // inner_msg.style.color = "white";
 
   this.pause_div.style.background = this.color;
   this.pause_div.style.border = "5px solid " + this.color;
@@ -247,16 +180,12 @@ GrainUI.prototype.make_pause_div = function () {
  */
 GrainUI.prototype.make_spawn_div = function () {
   this.spawn_div = document.createElement('div');
-  this.spawn_div.style.position = "absolute";
-  this.spawn_div.style.width = this.box_width + "px";
-  this.spawn_div.style.height = this.box_height + "px";
-
+  this.spawn_div.className = "spawn_div";
   var inner_msg = document.createElement("h2");
   inner_msg.className = "add_grain_text";
   inner_msg.id = "g_text_" + this.g_ind;
   inner_msg.innerHTML = "no audio";
   inner_msg.style.color = this.color;
-
   this.spawn_div.appendChild(inner_msg);
   this.box.appendChild(this.spawn_div);
 }
@@ -318,31 +247,30 @@ GrainUI.prototype.make_grain_rect = function () {
   this.box.appendChild(this.grain_rect);
 }
 
-/* Function: draw_dormant
+/* Function: togg
  * ----------------------
  * This function draws the GrainUI object to the screen in a
  * dormant state. In its dormant state, the grain is inactive,
  * and the "click to add grain" prompt is displayed.
  */
-GrainUI.prototype.draw_dormant = function () {
-  this.spawn_div.style.display = "block";
-  this.grain_rect.style.display = "none";
-  this.remove_div.style.display = "none";
-  this.pause_div.style.display = "none";
-}
-
 /* Function: draw_live
  * -------------------
  * This function draws the GrainUI object to the screen in a
  * live state. In its live state, the grain is active,
  * and the user is able to drag and resize the grain_rect.
  */
-GrainUI.prototype.draw_live = function () {
-  this.spawn_div.style.display = "none";
-  this.grain_rect.style.display = "block";
-  this.remove_div.style.display = "block";
-  this.pause_div.style.display = "block";
-  this.grain_rect.style.zIndex = "1";
+
+GrainUI.prototype.toggle_live = function (live = true) {
+ if(live){
+   this.box.classList.add('live');
+   this.box.classList.remove('dormant');
+ }
+  else{
+    this.box.classList.add('dormant');
+    this.box.classList.remove('live');
+  }
+
+
 }
 
 /* Function: draw_init
@@ -360,7 +288,7 @@ GrainUI.prototype.draw_init = function () {
   this.make_record_div();
   this.make_remove_div();
   this.make_pause_div();
-  this.draw_dormant();
+  this.toggle_live(false);
 }
 
 /* Function: handle_grain_rect_click
@@ -605,7 +533,7 @@ GrainUI.prototype.handle_left_change_end = function () {
  * reset.
  */
 GrainUI.prototype.handle_remove_grain = function () {
-  this.draw_dormant();
+  this.toggle_live(false);
   this.grain_rect_dims_to_def();
   this.set_grain_rect_sides(this.g_left_px, this.g_right_px);
   this.grain.buffer = null;
@@ -617,7 +545,7 @@ GrainUI.prototype.handle_remove_grain = function () {
  * jump into action!
  */
 GrainUI.prototype.handle_spawn_grain = function () {
-  this.draw_live();
+  this.toggle_live(true);
 }
 
 /* Function: unblock_me
