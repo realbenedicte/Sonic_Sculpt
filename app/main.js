@@ -75,39 +75,21 @@ function init_grains() {
   }
 }
 
-/* Function: init_app_div
- * ---------------------
- * This function centers the app div in the current browser window. It set the
- * width, height, and x-y coordinates of the top-left corner of the app div.
- * The width and height are calculated according to two constants from the
- * constants.js document.
- */
-// function center_app() {
-//   //set app div width, height
-//   app.style.width = window.innerWidth * APP_WIDTH_RATIO + "px";
-//   app.style.height = window.innerHeight * APP_HEIGHT_RATIO + "px";
-//   //set app div x, y
-//   app.style.position = "absolute";
-//   app.style.left = (window.innerWidth - app.offsetWidth) / 2.0 + "px";
-//   //  var rec_stop_height = get_css_val(REC_STOP_ID, "height", true);
-//   //app.style.top = ((window.innerHeight - app.offsetHeight) / 2.0 - rec_stop_height) + "px";
-// }
 
-/* Function: init_app_div
- * ---------------------
- * This function initializes two divs on the page, an app_container div, which
- * acts as a general wrapper for the app, and an app div, which contains the app.
- * The app div is made to be the child of the app_container div, and both are
- * appended to the page. Finally, the app div is centered within the window.
- */
+//add app_div
+//add title
+//
 function init_app_div() {
-  // var app_container = document.createElement("div");
-  // app_container.id = "app_container";
   app = document.createElement("div");
   app.id = APP_ID;
   document.getElementById("all").appendChild(app);
-  // app_container.appendChild(app);
-  //center_app();
+
+  var divTest = document.getElementById('app_div');
+  //adding in our title :D
+  var innerDiv = document.createElement('div');
+  innerDiv.id = 'title_name';
+  innerDiv.innerHTML += '~Sonic Sculpt~';//draw title
+  app.appendChild(innerDiv);
 }
 
 /* Function: get_css_val
@@ -191,6 +173,8 @@ function init_interface() {
   draw_init_grain_uis();
   block_app();
 }
+
+
 
 /* Function: draw_init_grain_uis
  * -----------------------------

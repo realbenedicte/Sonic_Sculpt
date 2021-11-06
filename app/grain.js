@@ -16,6 +16,8 @@
  * is). All member variables and functions are described internally.
  */
 
+ //TO DO: make Grain Class
+
 function Grain(g_ind) {
 
   console.log("got grain id ", g_ind)

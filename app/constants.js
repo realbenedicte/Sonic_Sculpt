@@ -53,7 +53,7 @@ var verbose = 0;
 const NUM_GRAINS = 5;
 
 // The different GrainUI colors
-const COLORS = ["red", "green", "orange", "purple", "blue"];
+const COLORS = ["rgb(255, 74, 74)", "rgb(94, 203, 95)", "rgb(255, 153, 69)", "rgb(215, 101, 255)", "rgb(60, 91, 255)"];
 
 // the HTML id label of the app div
 const APP_ID = "app_div";

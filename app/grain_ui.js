@@ -101,6 +101,9 @@ GrainUI.prototype.make_block = function () {
   this.box.appendChild(this.block);
 }
 
+
+
+
 GrainUI.prototype.make_remove_div = function () {
   this.remove_div = document.createElement('div');
   this.remove_div.className = "remove_div";

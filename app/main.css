@@ -49,11 +49,18 @@ table {
 /* ######## End Reset ######## */
 
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: "Roboto", sans-serif;
+  /* font-family: "Poppins", sans-serif; */
 }
 
 h1 {
   color: green;
+}
+
+#title_name{
+align-items: center;
+display: inline-block;
+font-size: 40px;
 }
 
 #app_div {
@@ -123,7 +130,7 @@ h1 {
   height: 150px;
   display: flex;
   align-items: center;
-  border: 5px solid rgb(218, 218, 218);
+  border: 2px solid black;
 }
 
 .grain_block_box {
