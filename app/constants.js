@@ -21,7 +21,7 @@ var mic_recorder;
 var rec_button;
 
 // Declare vars used during the process of recording the user's
-// microphone input, as well as decoding the audio from the 
+// microphone input, as well as decoding the audio from the
 // sample as a AudioBuffer object
 var rec_chunks = [];
 var rec_url;
@@ -71,7 +71,7 @@ const GRAIN_BOX_MARGIN = 10;
 /* G_RECT_SIDE_PERC: Defines the grain_rect's section boundaries
  * as a percentage of the grain_rect's current length. The grain_rect,
  * a component of the GrainUI object that controls grain position and
- * length, has three sections of interaction, one on each side, and one 
+ * length, has three sections of interaction, one on each side, and one
  * large one in the middle. Different grain manipulations occur depending
  * on which of these sections is clicked. This percentage of the grain_rect's
  * length is reserved on either side of the grain_rect for right or left
@@ -82,7 +82,7 @@ const G_RECT_SIDE_PERC = 0.1;
 /* FIRE_SCHED_TIMEOUT: For use in the Grain object's grain
  * scheduling solution. The timeout constant defines how often
  * (in milliseconds) the fire_schedule method should be called
- * to schedule plays of the current grain buffer. Calls to 
+ * to schedule plays of the current grain buffer. Calls to
  * fire_schedule are scheduled on Javascript's clock.
  */
 const FIRE_SCHED_TIMEOUT = 25;

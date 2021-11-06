@@ -4,17 +4,15 @@ const app = express()
 const multer  = require('multer') //use multer to upload blob data
 const upload = multer(); // set multer to be the upload variable (just like express, see above ( include it, then use it/set it up))
 const fs = require('fs'); //use the file system so we can save files
-const mongodb = require('mongodb');
+const mongodb = require('mongodb'); //our database
 const MongoClient = require('mongodb').MongoClient;
 
-const port = 3000
+const port = 3000 //local host port
 
 MongoClient.connect("mongodb://localhost/")
   .then(client => {
     const db = client.db('sonic')
     const rooms = db.collection('rooms')
-
-
 
 
     // FILE UPLOAD ( SHOUld BE OUR SAVE STATE )
@@ -37,8 +35,7 @@ MongoClient.connect("mongodb://localhost/")
 
 app.use('/', express.static('app'));
 
-    app.use('/:roomID', express.static('app'));
-
+    app.use('/:roomID', express.static('app')); //making room ids possible now :)
 
 
 

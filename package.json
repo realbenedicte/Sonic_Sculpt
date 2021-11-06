@@ -1,5 +1,5 @@
 {
-  "name": "granulate",
+  "name": "sonic_sculpt_test",
   "version": "1.0.0",
   "description": "a granular experiment",
   "main": "server.js",
