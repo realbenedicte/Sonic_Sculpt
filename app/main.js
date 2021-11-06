@@ -31,31 +31,10 @@ let isRecording = false;
  * audio node business. It is called when the HTML page loads.
  */
 function init() {
-  init_buttons();
   init_audio_stream();
   init_grains();
   init_interface();
   init_doc_listeners();
-}
-
-/* Function: init_buttons
- * ----------------------
- * This function creates new GButton objects for the record and play
- * buttons in the HTML document, then intializes click event listeners
- * for both of these buttons.
- */
-function init_buttons() {
-  //rec_button = new GButton("rec_stop", handle_rec_press, 0);
-}
-
-/* Function: init_button_listener
- * ------------------------------
- * This initializes a new Event Listener, listening for clicks on
- * whichever button is passed into it. When the button is clicked,
- * the button's "click_func" function fires.
- */
-function init_button_listener(btn) {
-  btn.button.addEventListener('click', function () { btn.click_func(btn); });
 }
 
 /* Function: get_grains_playing
@@ -183,8 +162,8 @@ function save_rec_blob() {
 
 
   let formdata = new FormData(); //create a from to of data to upload to the server
-  
-  var pathname = window.location.pathname; 
+
+  var pathname = window.location.pathname;
   let room_id = pathname
   let sound_id = makeid(4)
 
