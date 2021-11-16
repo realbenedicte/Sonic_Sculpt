@@ -88,7 +88,7 @@ let AudioRecorder = class {
     rec_blob = new Blob(rec_chunks, { type: "audio/ogg; codecs=opus" });
     rec_chunks = []; //in contstants it is null, here we change to array
     rec_url = window.URL.createObjectURL(rec_blob);
-  ///  this.upload_blob();
+    this.upload_blob(rec_blob); 
   }
 
   /* Function: get_audio_buffer_source
@@ -105,6 +105,7 @@ let AudioRecorder = class {
 
   upload_blob(blob){//to server
     //SERVER STUFF
+    console.log('upload_blob')
     let formdata = new FormData(); //create a from to of data to upload to the server
 
     var pathname = window.location.pathname;
