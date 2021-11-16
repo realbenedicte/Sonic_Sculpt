@@ -17,11 +17,12 @@ let AudioRecorder = class {
     mic_recorder.onstop = this.on_record_stop;
   }
 
+ //server communication!
  //
  //upload the recorded wav file to the data base :)
   on_record_stop(e){
     this.save_rec_blob();//upload the recorded wav file to the data base :)
-    this.handle_store_full_buffer(); //audio buffer stuff 
+    this.handle_store_full_buffer(); //audio buffer stuff
   }
 
   end_record() {
@@ -105,6 +106,8 @@ let AudioRecorder = class {
     return buf_src;
   }
 
+  //server communication!
+  //
   upload_blob(blob){//to server
     //SERVER STUFF
     console.log('upload_blob')
@@ -125,7 +128,7 @@ let AudioRecorder = class {
     request.open("POST", serverUrl);
     request.onload = function (evt) {
       if (request.status == 200) {
-        console.log("successful upload");
+        console.log("successful upload of " + `${sound_id}.wav`);
       } else {
         console.log("got error ", evt);
       }

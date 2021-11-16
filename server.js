@@ -1,8 +1,10 @@
 //server.js
 //
 //Resources:
-// https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html
+//https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html
 //https://docs.mongodb.com/guides/server/introduction/
+//https://docs.mongodb.com/drivers/node/current/fundamentals/crud/write-operations/insert/
+//https://docs.mongodb.com/drivers/node/current/fundamentals/connection/
 //
 //TO DO:
 //figure out how to delete documents in mongodb
@@ -20,10 +22,14 @@ const MongoClient = require("mongodb").MongoClient; //The **MongoClient** class 
 //constants:
 const port = 3000; //local host port
 
-MongoClient.connect("mongodb://localhost/")
+//Connect Node.js application to MongoDB
+//
+//work with data using the Node.js driver
+MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use this string to connect to 'Compass'
   .then((client) => {
     const db = client.db("sonic"); //sonic is the name of our mongodb database
     const rooms = db.collection("rooms"); //our collection in mongodb is named rooms
+
 
     // FILE UPLOAD ( SHOUld BE OUR SAVE STATE )
     //app.post() (.post() method of the express app object)
@@ -43,13 +49,13 @@ MongoClient.connect("mongodb://localhost/")
       //rooms.insertOne
       //inserts a single document into the rooms collection in MongoDB
       //MongoDB document, give field value pairs -> room and path are both fields
-      rooms
-        .insertOne({
-          room: req.body.room,
-          path: "/media/" + req.file.originalname, //media folder stores all the wav files
+      rooms.insertOne({
+          "room": req.body.room,
+          "path": "/media/" + req.file.originalname, //media folder stores all the wav files
         })
         .then((result) => {
-          console.log(result);
+          console.log(result); //console log the result
+          console.log("upload of " + `${req.file.originalname}`+" successful");//console log the name of the wav file 
         })
         .catch((error) => console.error(error));
     });
