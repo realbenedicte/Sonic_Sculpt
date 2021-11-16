@@ -1,4 +1,5 @@
 //server.js
+//currently handles uploading wav files to a mongodb database
 //
 //Resources:
 //https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html
@@ -8,8 +9,9 @@
 //
 //TO DO:
 //figure out how to delete documents in mongodb
-//Node Modules Needed
 //
+//Node Modules Needed:
+//(require is a Node function for importing a module)
 const express = require("express");
 const app = express(); // Init an Express App
 const path = require("path");
@@ -19,25 +21,24 @@ const upload = multer(); // set multer to be the upload variable
 const fs = require("fs"); //use the file system module so we can save files
 const mongodb = require("mongodb"); //our database
 const MongoClient = require("mongodb").MongoClient; //The **MongoClient** class is a class that allows for making Connections to MongoDB
+//
 //constants:
 const port = 3000; //local host port
 
 //Connect Node.js application to MongoDB
-//
 //work with data using the Node.js driver
 MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use this string to connect to 'Compass'
   .then((client) => {
     const db = client.db("sonic"); //sonic is the name of our mongodb database
     const rooms = db.collection("rooms"); //our collection in mongodb is named rooms
 
-
-    // FILE UPLOAD ( SHOUld BE OUR SAVE STATE )
+    // FILE UPLOAD
+    //( SHOUld BE OUR SAVE STATE )
     //app.post() (.post() method of the express app object)
     //
     //app.post(path, callback [, callback ...])
     app.post("/upload", upload.single("soundBlob"), function (req, res, next) {
-      console.log(req.file); // see what got uploaded
-      // req.file is the wav file tht got uploaded
+      // console.log("this is the request.file "+`${req.file}`);
       //media folder stores all the wav files
       let uploadLocation = __dirname + "/media/" + req.file.originalname; // where to save the file to. make sure the incoming name has a .wav extension
       fs.writeFileSync(
@@ -55,7 +56,7 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
         })
         .then((result) => {
           console.log(result); //console log the result
-          console.log("upload of " + `${req.file.originalname}`+" successful");//console log the name of the wav file 
+          console.log("upload of " + `${req.file.originalname}`+" successful");//console log the name of the wav file
         })
         .catch((error) => console.error(error));
     });

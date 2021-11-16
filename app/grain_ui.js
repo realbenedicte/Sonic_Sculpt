@@ -317,11 +317,14 @@ GrainUI.prototype.handle_left_change_end = function () {
   this.mouse_offset = 0;
 }
 
+//handles deleting a grain
+//clear buffer :)
 GrainUI.prototype.handle_remove_grain = function () {
   this.toggle_live(false);
   this.grain_rect_dims_to_def();
   this.set_grain_rect_sides(this.g_left_px, this.g_right_px);
   this.grain.buffer = null;
+  console.log('grain-deleted');
 }
 
 GrainUI.prototype.handle_spawn_grain = function () {
