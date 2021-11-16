@@ -112,7 +112,6 @@ let AudioRecorder = class {
     //SERVER STUFF
     console.log('upload_blob')
     let formdata = new FormData(); //create a from to of data to upload to the server
-
     var pathname = window.location.pathname;
     let room_id = pathname;
     let sound_id = makeid(4);

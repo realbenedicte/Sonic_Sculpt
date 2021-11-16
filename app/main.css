@@ -50,7 +50,7 @@ table {
 
 body {
   font-family: "Roboto", sans-serif;
-  /* font-family: "Poppins", sans-serif; */
+  background-color: white;
 }
 
 h1 {
@@ -168,7 +168,6 @@ border-radius: 20px;
 .dormant .g_rect {
   display: none;
 }
-
 
 .add_grain_text,
 .remove_text {
