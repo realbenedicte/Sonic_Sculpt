@@ -17,9 +17,11 @@ let AudioRecorder = class {
     mic_recorder.onstop = this.on_record_stop;
   }
 
+ //
+ //upload the recorded wav file to the data base :)
   on_record_stop(e){
-    this.save_rec_blob();
-    this.handle_store_full_buffer();
+    this.save_rec_blob();//upload the recorded wav file to the data base :)
+    this.handle_store_full_buffer(); //audio buffer stuff 
   }
 
   end_record() {
@@ -88,7 +90,7 @@ let AudioRecorder = class {
     rec_blob = new Blob(rec_chunks, { type: "audio/ogg; codecs=opus" });
     rec_chunks = []; //in contstants it is null, here we change to array
     rec_url = window.URL.createObjectURL(rec_blob);
-    this.upload_blob(rec_blob); 
+    this.upload_blob(rec_blob); // uncomment if you want to stop the uploading process :)
   }
 
   /* Function: get_audio_buffer_source
