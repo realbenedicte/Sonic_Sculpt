@@ -87,6 +87,7 @@ function createSaveButton(){
 //send this form to the server !!!!
 function saveButtonClick(){
 console.log('save clicked');
+//PAUSE ALL AUDIO
 //show form
 formElement.style.display = 'block';
 let saveButton = document.getElementById("saveRoomId");
@@ -94,6 +95,11 @@ saveButton.style.display = "none";
 var divTest = document.getElementById('app_div');
 divTest.style.visibility = "hidden";
 submitButton.addEventListener("click", submitRoomDetails);
+//turn off all grains!!
+for (let i = 0; i < grains.length; i++) {
+  grains[i].stop();
+}
+console.log('stopped all grains');
 }
 
 //send form details to the server here!!!
@@ -131,15 +137,6 @@ function kill_grains(playing) {
   }
 }
 
-
-/* Function: link_grains_to_uis
- * ----------------------------
- * This function links each GrainUI object to its respective Grain object.
- * It does this by assigning a reference of each GrainUI to a member variable in
- * its proper Grain object, and vice versa. This must happen in the initialization
- * phase of the application, so that GrainUI's and Grain's can reference each other
- * while running.
- */
 function link_grains_to_uis() {
   for (var i = 0; i < grains.length; i++) {
     grains[i].ui = grain_uis[i];
@@ -319,6 +316,7 @@ function handle_mouse_down(event) {
   } else if (event.target.className == "pause_text") {
     var g_ind = get_g_ind_from_id(event.target.id);
     //toggle for play/pause
+
     if (grains[g_ind].grain_on) {
       grains[g_ind].stop();
     } else {
@@ -344,12 +342,7 @@ function handle_mouse_down(event) {
   }
 }
 
-/* Function: handle_mouse_move
- * ---------------------------
- * This handles a mouse move event. If a grain rectangle is being transformed,
- * then the new coordinates of the mouse are passed to the handle_new_mouse_coords
- * event in the grain being transformed.
- */
+
 function handle_mouse_move(event) {
   if (g_changing > -1) {
     event.preventDefault();
