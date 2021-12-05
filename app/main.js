@@ -4,6 +4,8 @@
 let current_grain_id = null;
 let audioRecorder = new AudioRecorder(); //making a new instance of the audioRecorder Class
 
+let createRoomButton = document.getElementById("createRoomID");
+
 //When page loads -> call the init function
 window.addEventListener("load", (event) => {
   console.log("window loaded.");
@@ -14,12 +16,22 @@ window.addEventListener("load", (event) => {
  * --------------
  */
 function init() {
+homePageCreateRoom();
+}
+
+function homePageCreateRoom(){
+  console.log('hopepage created');
+  createRoomButton.addEventListener("click", createRoom);
+}
+
+function createRoom(){
   audioRecorder.init_audio_stream();
   init_grains();
   init_interface();
   init_doc_listeners();
+  //hide create room button
+  createRoomButton.style.display = "none";
 }
-
 /* Function: get_grains_playing
  * ----------------------------
  */
@@ -86,10 +98,10 @@ function init_app_div() {
 
   var divTest = document.getElementById('app_div');
   //adding in our title :D
-  var innerDiv = document.createElement('div');
-  innerDiv.id = 'title_name';
-  innerDiv.innerHTML += '~Sonic Sculpt~';//draw title
-  app.appendChild(innerDiv);
+  // var innerDiv = document.createElement('div');
+  // innerDiv.id = 'title_name';
+  // innerDiv.innerHTML += '~Sonic Sculpt~';//draw title
+  // app.appendChild(innerDiv);
 }
 
 /* Function: get_css_val

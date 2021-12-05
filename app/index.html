@@ -1,22 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Sonic_Sculpt</title>
-<link rel="stylesheet" type="text/css" href="main.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>Sonic_Sculpt</title>
+  <link rel="stylesheet" type="text/css" href="main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div id="all">
+  <div id="page-container">
+    <div id="content-wrap">
+      <div class="nav-container">
+        <ul id="menu" class="main-nav">
+          <li>
+            <div class="homeButton">
+              <p><a href="index.html">~Sonic Sculpt~</a></p>
+            </div>
+          </li>
+          <li>
+            <a href="exercises.html" data-page="exercises" data-title="Exercises" class="link">Explore
+            </a>
+          </li>
+          <li>
+            <a href="semester-project.html" data-page="semester-project" data-title="Semester-Project" class="link">About
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="home-page-create">
+        <button type="button" id="createRoomID">Create A Room</button>
+      </div>
+      <div id="all">
+      </div>
+      <script type="text/javascript" src="audio_buffer_slice.js"></script>
+      <script type="text/javascript" src="constants.js"></script>
+      <script type="text/javascript" src="utils.js"></script>
+      <script type="text/javascript" src="grain_ui.js"></script>
+      <script type="text/javascript" src="grain.js"></script>
+      <script type="text/javascript" src="audio-recorder.js"></script>
+      <script type="text/javascript" src="main.js"></script>
+    </div>
+    <footer id="footer">
+    </footer>
   </div>
-<script type="text/javascript" src="audio_buffer_slice.js"></script>
-<script type="text/javascript" src="constants.js"></script>
-<script type="text/javascript" src="utils.js"></script>
-<script type="text/javascript" src="grain_ui.js"></script>
-<script type="text/javascript" src="grain.js"></script>
-<script type="text/javascript" src="audio-recorder.js"></script>
-<script type="text/javascript" src="main.js"></script>
 </body>
 </html>
