@@ -50,7 +50,7 @@ var g_changing = -1;
 var verbose = 0;
 
 // Number of grains in the app
-const NUM_GRAINS = 5;
+const NUM_GRAINS = 4;
 
 // The different GrainUI colors
 const COLORS = ["rgb(255, 74, 74)", "rgb(94, 203, 95)", "rgb(255, 153, 69)", "rgb(215, 101, 255)", "rgb(60, 91, 255)"];

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Sonic_Sculpt</title>
@@ -23,27 +24,51 @@
             </a>
           </li>
           <li>
-            <p id = "about-button">About</p>
+            <p id="about-button">About</p>
           </li>
         </ul>
       </div>
-
       <div class="home-page-create">
         <div id="myNav" class="overlay">
-    <!-- Overlay content -->
-    <div class="overlay-content">
-    <p> Sonic Sculpt is a web app that let's you manipulate and collaborate on audio sculptures using granular synthesis.
-  <br>
-  <br>
-  Created by Maxime Gordon 2021.
-    </p>
-    </div>
-  </div>
+          <div class="overlay-content">
+            <p> Sonic Sculpt is a web app that let's you manipulate and collaborate on audio sculptures using granular synthesis.
+              <br>
+              <br>
+              Created by Maxime Gordon 2021.
+            </p>
+          </div>
+        </div>
         <button type="button" id="createRoomID">Create A Room</button>
-
+      </div>
+      <div id = saveTest>
+        <!-- form styling resource: -->
+        <!-- https://codepen.io/ainalem/pen/GRqPwoz -->
+        <div id="saveForm">
+        <div class="title">Save Room</div>
+        <div class="input-container ic1">
+          <input id="roomName" class="input" type="text" placeholder=" " />
+          <div class="cut"></div>
+          <label for 'roomName' class="placeholder">Room Name</label>
+        </div>
+        <div class="input-container ic2">
+          <input id="composer" class="input" type="text" placeholder=" " />
+          <div class="cut"></div>
+          <label for 'composer' class="placeholder">Composer</label>
+        </div>
+        <div class="input-container ic2">
+          <input id="tags" class="input" type="text" placeholder=" " />
+          <div class="cut cut-short"></div>
+          <label for 'tags' class="placeholder">Tags</>
+        </div>
+        <button type="text" id="submit">Save!</button>
+      </div>
+      <div id="roomDetailsID">
+      <p>
+        Room Name: Composer: Users:
+      </p></div>
+      <button id="saveRoomId" style="display: none;">Save Room</button>
       </div>
       <div id="all">
-
       </div>
       <script type="text/javascript" src="audio_buffer_slice.js"></script>
       <script type="text/javascript" src="constants.js"></script>
@@ -56,5 +81,7 @@
     <footer id="footer">
     </footer>
   </div>
+</div>
 </body>
+
 </html>

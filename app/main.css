@@ -70,7 +70,7 @@ h1 {
 #app_div {
   position: absolute;
   width: 80vw;
-  height: 90%;
+  height: 75%;
   left: 0;
   right: 0;
   display: flex;
@@ -238,14 +238,14 @@ footer p {
   display: block;
 }
 
-#about-button{
+#about-button {
   color: black;
   font-size: 22px;
   text-decoration: none;
-padding-left: 25px;
-padding-right: 25px;
-padding-top: 40px;
-display: block;
+  padding-left: 25px;
+  padding-right: 25px;
+  padding-top: 40px;
+  display: block;
 }
 
 .main-nav>li>a {
@@ -258,7 +258,7 @@ display: block;
   text-shadow: #ffc0cb 2px 0 10px;
 }
 
-#about-button:hover{
+#about-button:hover {
   color: black;
   text-shadow: #ffc0cb 2px 0 10px;
 }
@@ -292,6 +292,7 @@ main {
 
 #homeButton p:hover {
   color: blue;
+  cursor: pointer;
 }
 
 .home-page-create {
@@ -341,13 +342,18 @@ main {
   /* Height & width depends on how you want to reveal the overlay (see JS below) */
   height: 100%;
   width: 100%;
-  z-index: 1; /* Sit on top */
+  z-index: 1;
+  /* Sit on top */
   left: 0;
   top: 0;
-  background-color: white; /* Black fallback color */
-  background-color: rgba(255,255,255, 0.8); /* Black w/opacity */
-  overflow-x: hidden; /* Disable horizontal scroll */
-  transition: 0.5s; /* 0.5 second transition effect to slide in or slide down the overlay (height or width, depending on reveal) */
+  background-color: white;
+  /* Black fallback color */
+  background-color: rgba(255, 255, 255, 0.8);
+  /* Black w/opacity */
+  overflow-x: hidden;
+  /* Disable horizontal scroll */
+  transition: 0.5s;
+  /* 0.5 second transition effect to slide in or slide down the overlay (height or width, depending on reveal) */
 }
 
 /* Position the content inside the overlay */
@@ -356,10 +362,14 @@ main {
   flex-direction: column;
   justify-content: center;
   position: relative;
-  top: 20%; /* 25% from the top */
-  width: 100%; /* 100% width */
-  text-align: center; /* Centered text/links */
-  margin-top: 30px; /* 30px top margin to avoid conflict with the close button on smaller screens */
+  top: 20%;
+  /* 25% from the top */
+  width: 100%;
+  /* 100% width */
+  text-align: center;
+  /* Centered text/links */
+  margin-top: 30px;
+  /* 30px top margin to avoid conflict with the close button on smaller screens */
 }
 
 /* The navigation links inside the overlay */
@@ -368,10 +378,12 @@ main {
   text-decoration: none;
   font-size: 27px;
   color: black;
-  width: 50%; /* 100% width */
+  width: 50%;
+  /* 100% width */
   display: inline-block;
   align-self: center;
-  transition: 0.3s; /* Transition effects on hover (color) */
+  transition: 0.3s;
+  /* Transition effects on hover (color) */
   padding-top: 50px;
   padding-bottom: 200px;
   /* border: 2px solid black;
@@ -388,10 +400,189 @@ main {
 
 /* When the height of the screen is less than 450 pixels, change the font-size of the links and position the close button again, so they don't overlap */
 @media screen and (max-height: 450px) {
-  .overlay a {font-size: 20px}
+  .overlay a {
+    font-size: 20px
+  }
+
   .overlay .closebtn {
     font-size: 40px;
     top: 15px;
     right: 35px;
   }
+}
+
+#saveRoomId {
+  display: inline-block;
+  align-self: center;
+  border: none;
+  padding: 0.7rem 2rem;
+  text-decoration: none;
+  background: blue;
+  font-family: sans-serif;
+  font-size: 1.2rem;
+  color: blue;
+  cursor: pointer;
+  text-align: center;
+  border-color: blue;
+  border-style: solid;
+  touch-action: manipulation;
+  transition: all 235ms ease-in-out;
+  z-index: 10;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  width: 100%;
+  color: white;
+}
+
+#saveRoomId:hover {
+  background-color: white;
+  color: blue;
+}
+
+#saveTest {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 80vw;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+  justify-content: space-evenly;
+}
+
+#saveForm {
+  background-color: white;
+  box-sizing: border-box;
+  height: 500px;
+  padding: 20px;
+  width: 320px;
+  z-index:10;
+  margin-top: 110px;
+  color: black;
+  border-color: black;
+  border-style: solid;
+}
+
+.title {
+  color: black;
+  font-size: 36px;
+  font-weight: 600;
+  margin-top: 30px;
+  text-align: center;
+}
+
+.input-container {
+  height: 50px;
+  position: relative;
+  width: 100%;
+}
+
+.ic1 {
+  margin-top: 40px;
+}
+
+.ic2 {
+  margin-top: 30px;
+}
+
+.input {
+  background-color: white;
+  border-style: solid;
+  border-color: black;
+  box-sizing: border-box;
+  color: #eee;
+  font-size: 18px;
+  height: 100%;
+  outline: 0;
+  padding: 4px 20px 0;
+  width: 100%;
+
+}
+
+.cut {
+  background-color:white;
+  border-radius: 10px;
+  height: 20px;
+  left: 20px;
+  position: absolute;
+  top: -20px;
+  transform: translateY(0);
+  transition: transform 200ms;
+  width: 76px;
+}
+
+.cut-short {
+  width: 50px;
+}
+
+.input:focus ~ .cut,
+.input:not(:placeholder-shown) ~ .cut {
+  transform: translateY(8px);
+}
+
+.placeholder {
+  color: #65657b;
+  font-family: sans-serif;
+  left: 20px;
+  line-height: 14px;
+  pointer-events: none;
+  position: absolute;
+  transform-origin: 0 50%;
+  transition: transform 200ms, color 200ms;
+  top: 20px;
+}
+
+.input:focus ~ .placeholder,
+.input:not(:placeholder-shown) ~ .placeholder {
+  transform: translateY(-30px) translateX(10px) scale(0.75);
+}
+
+.input:not(:placeholder-shown) ~ .placeholder {
+  color: #808097;
+}
+
+.input:focus ~ .placeholder {
+  color: #dc2f55;
+}
+
+#submit {
+  background-color: blue;
+  border-radius: 12px;
+  border: 0;
+  box-sizing: border-box;
+  color: #eee;
+  cursor: pointer;
+  font-size: 18px;
+  height: 50px;
+  margin-top: 38px;
+  outline: 0;
+  text-align: center;
+  width: 100%;
+}
+
+.submit:active {
+  background-color: #06b;
+}
+
+#roomDetailsID{
+  display: inline-block;
+    align-self: center;
+    border: none;
+    padding: 0.7rem 2rem;
+    text-decoration: none;
+    background: blue;
+    font-family: sans-serif;
+    font-size: 1.2rem;
+    color: blue;
+    text-align: center;
+    border-color: blue;
+    border-style: solid;
+    z-index: 10;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    width: 100%;
+    color: white;
 }
