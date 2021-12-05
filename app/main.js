@@ -3,25 +3,31 @@
 //each grain box gets its own id
 let current_grain_id = null;
 let audioRecorder = new AudioRecorder(); //making a new instance of the audioRecorder Class
-
+//define create room button
 let createRoomButton = document.getElementById("createRoomID");
+let aboutButton = document.getElementById("about-button");
+let overlayElement = document.getElementById("myNav");
+let homePageButton = document.getElementById("homeButton");
 
 //When page loads -> call the init function
 window.addEventListener("load", (event) => {
   console.log("window loaded.");
+  homePageButton.addEventListener("click", homePageCreateRoom);
   init();
 });
 
-/* Function: init
- * --------------
- */
+//load homepage
 function init() {
 homePageCreateRoom();
 }
 
 function homePageCreateRoom(){
-  console.log('hopepage created');
+  console.log('hopepage created.');
+  overlayElement.style.display = "none"; // hide the about button text
   createRoomButton.addEventListener("click", createRoom);
+  aboutButton.addEventListener("click", openAbout);
+  createRoomButton.style.display = "block"; //show the create room button
+  closeAbout();
 }
 
 function createRoom(){
@@ -29,12 +35,22 @@ function createRoom(){
   init_grains();
   init_interface();
   init_doc_listeners();
-  //hide create room button
-  createRoomButton.style.display = "none";
+  createRoomButton.style.display = "none";  //hide create room button
 }
-/* Function: get_grains_playing
- * ----------------------------
- */
+
+function openAbout() {
+  document.getElementById("myNav").style.display = "block";
+  console.log('open');
+  createRoomButton.style.display = "none"; //hide create room button
+  aboutButton.style.color = "blue";
+}
+
+function closeAbout() {
+  overlayElement.style.display = "none";
+  console.log('close');
+  aboutButton.style.color = "black";
+}
+
 function get_grains_playing() {
   var playing = [];
   for (var i = 0; i < NUM_GRAINS; i++) {
@@ -185,8 +201,6 @@ function init_interface() {
   draw_init_grain_uis();
   block_app();
 }
-
-
 
 /* Function: draw_init_grain_uis
  * -----------------------------

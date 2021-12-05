@@ -60,7 +60,6 @@ GrainUI.prototype.grain_rect_dims_to_def = function () {
 GrainUI.prototype.make_record_div = function () {
   this.record_div = document.createElement('div');
   this.record_div.className = "record_div"
-
   var inner_msg = document.createElement("h3");
   inner_msg.className = "record_text";
   inner_msg.id = "g_record_" + this.g_ind;

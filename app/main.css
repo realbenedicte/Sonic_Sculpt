@@ -27,14 +27,17 @@ td {
 body {
   line-height: 1;
 }
+
 ol,
 ul {
   list-style: none;
 }
+
 blockquote,
 q {
   quotes: none;
 }
+
 blockquote:before,
 blockquote:after,
 q:before,
@@ -42,12 +45,13 @@ q:after {
   content: "";
   content: none;
 }
+
 table {
   border-collapse: collapse;
   border-spacing: 0;
 }
-/* ######## End Reset ######## */
 
+/* ######## End Reset ######## */
 body {
   font-family: "Roboto", sans-serif;
   background-color: white;
@@ -57,16 +61,16 @@ h1 {
   color: green;
 }
 
-#title_name{
-align-items: center;
-display: inline-block;
-font-size: 40px;
+#title_name {
+  align-items: center;
+  display: inline-block;
+  font-size: 40px;
 }
 
 #app_div {
   position: absolute;
   width: 80vw;
-  height: 100%;
+  height: 90%;
   left: 0;
   right: 0;
   display: flex;
@@ -100,13 +104,14 @@ font-size: 40px;
   height: 100%;
   box-sizing: border-box;
   z-index: 5;
-	color:white;
-	cursor: pointer;
+  color: white;
+  cursor: pointer;
 }
+
 .record_div {
   right: 0;
-
 }
+
 .pause_div {
   right: 0;
 }
@@ -116,13 +121,12 @@ font-size: 40px;
 }
 
 .dormant .pause_div, .dormant .remove_div {
-	display:none;
+  display: none;
 }
 
 .live .record_div {
   display: none;
 }
-
 
 .grain_outer_box {
   position: relative;
@@ -137,12 +141,11 @@ font-size: 40px;
   left: 0;
   top: 0;
   margin: 0;
-  padding: 0;
   position: absolute;
   width: 100%;
   height: 100%;
   z-index: 2;
-  background-color: gray;
+  /* background-color: gray; */
   opacity: 0.7;
 }
 
@@ -155,14 +158,15 @@ font-size: 40px;
   justify-content: center;
   align-items: center;
 }
+
 .grain_outer_box.live .grain_record_box {
   display: none;
 }
 
-.g_rect{
-position: absolute;
-height: inherit;
-border-radius: 20px;
+.g_rect {
+  position: absolute;
+  height: inherit;
+  border-radius: 20px;
 }
 
 .dormant .g_rect {
@@ -177,15 +181,14 @@ border-radius: 20px;
   transform: translate(-50%, -50%);
 }
 
-
-
 #page-container {
   position: relative;
   min-height: 100vh;
 }
 
 #content-wrap {
-  padding-bottom: 2.5rem;    /* Footer height */
+  padding-bottom: 2.5rem;
+  /* Footer height */
 }
 
 #footer {
@@ -195,12 +198,13 @@ border-radius: 20px;
   width: 100%;
   height: 3rem;
   padding: 20px;
-  text-align: center;      /* Footer height */
+  text-align: center;
+  /* Footer height */
 }
 
-footer p{
+footer p {
   background-color: #f2f2f2;
-  display:inline-block;
+  display: inline-block;
   text-align: center;
 }
 
@@ -209,8 +213,6 @@ footer p{
   justify-content: center;
   /* background-image: linear-gradient(blue, #f2f2f2); */
 }
-
-
 
 .main-nav {
   display: flex;
@@ -221,7 +223,7 @@ footer p{
   width: 100%;
   flex-direction: row;
   width: 80vw;
-
+  padding-bottom: 20px;
 }
 
 .main-nav li {
@@ -236,12 +238,27 @@ footer p{
   display: block;
 }
 
-.main-nav > li > a {
+#about-button{
+  color: black;
+  font-size: 22px;
+  text-decoration: none;
+padding-left: 25px;
+padding-right: 25px;
+padding-top: 40px;
+display: block;
+}
+
+.main-nav>li>a {
   color: black;
   font-size: 22px;
 }
 
-.main-nav > li > a:hover {
+.main-nav>li>a:hover {
+  color: black;
+  text-shadow: #ffc0cb 2px 0 10px;
+}
+
+#about-button:hover{
   color: black;
   text-shadow: #ffc0cb 2px 0 10px;
 }
@@ -259,8 +276,7 @@ main {
   text-decoration: none;
 }
 
-
-.homeButton a {
+#homeButton p {
   font-size: 250%;
   margin-left: 0px;
   margin-right: 10px;
@@ -270,15 +286,15 @@ main {
   color: black;
 }
 
-.homeButton p {
+#homeButton p {
   transform: translateY(10px);
 }
 
-.homeButton a:hover{
+#homeButton p:hover {
   color: blue;
 }
 
-.home-page-create{
+.home-page-create {
   position: absolute;
   width: 80vw;
   height: 100%;
@@ -291,8 +307,7 @@ main {
   justify-content: space-evenly;
 }
 
-
-#createRoomID{
+#createRoomID {
   display: inline-block;
   align-self: center;
   border: none;
@@ -315,8 +330,68 @@ main {
   box-shadow: rgba(0, 0, 255, .3) 2px 20px 20px -3px;
 }
 
-#createRoomID:hover{
-background: blue;
-color:white;
-transform: translate3d(0, 2px, 0);
+#createRoomID:hover {
+  background: blue;
+  color: white;
+  transform: translate3d(0, 2px, 0);
+}
+
+/* The Overlay (background) */
+.overlay {
+  /* Height & width depends on how you want to reveal the overlay (see JS below) */
+  height: 100%;
+  width: 100%;
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  background-color: white; /* Black fallback color */
+  background-color: rgba(255,255,255, 0.8); /* Black w/opacity */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  transition: 0.5s; /* 0.5 second transition effect to slide in or slide down the overlay (height or width, depending on reveal) */
+}
+
+/* Position the content inside the overlay */
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  top: 20%; /* 25% from the top */
+  width: 100%; /* 100% width */
+  text-align: center; /* Centered text/links */
+  margin-top: 30px; /* 30px top margin to avoid conflict with the close button on smaller screens */
+}
+
+/* The navigation links inside the overlay */
+.overlay p {
+  padding: 8px;
+  text-decoration: none;
+  font-size: 27px;
+  color: black;
+  width: 50%; /* 100% width */
+  display: inline-block;
+  align-self: center;
+  transition: 0.3s; /* Transition effects on hover (color) */
+  padding-top: 50px;
+  padding-bottom: 200px;
+  /* border: 2px solid black;
+  background-color: white; */
+}
+
+/* Position the close button (top right corner) */
+.overlay .closebtn {
+  position: absolute;
+  top: 20px;
+  right: 45px;
+  font-size: 60px;
+}
+
+/* When the height of the screen is less than 450 pixels, change the font-size of the links and position the close button again, so they don't overlap */
+@media screen and (max-height: 450px) {
+  .overlay a {font-size: 20px}
+  .overlay .closebtn {
+    font-size: 40px;
+    top: 15px;
+    right: 35px;
+  }
 }
