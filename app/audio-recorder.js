@@ -5,6 +5,7 @@ let AudioRecorder = class {
   constructor() {
     this.isRecording = false;
     this.on_record_stop = this.on_record_stop.bind(this);
+    this.blobs = [null, null, null, null];
   }
 
   //methods for this class
@@ -24,6 +25,13 @@ let AudioRecorder = class {
     this.save_rec_blob();//upload the recorded wav file to the data base :)
     this.handle_store_full_buffer(); //audio buffer stuff
   }
+
+  //server communication!
+  //
+  //upload the recorded wav file to the data base :)
+   on_save_room(e){
+     this.upload_blobs(); // uncomment if you want to stop the uploading process :)
+   }
 
   end_record() {
     mic_recorder.stop();
@@ -63,9 +71,9 @@ let AudioRecorder = class {
     block_app();
   }
 
-  handle_rec_press() {
+  handle_rec_press(current_grain_id) {
     if (this.isRecording) {
-      this.end_record();
+      this.end_record(current_grain_id);
       this.isRecording = false;
     } else {
       this.isRecording = true;
@@ -88,23 +96,29 @@ let AudioRecorder = class {
   //make a blob, create a path to it
   //blob - binary data thing -
   save_rec_blob() {
-    rec_blob = new Blob(rec_chunks, { type: "audio/ogg; codecs=opus" });
+    // rec_blob = new Blob(rec_chunks, { type: "audio/ogg; codecs=opus" });
+    let blob = new Blob(rec_chunks, { type: "audio/ogg; codecs=opus" });
+    rec_blob = blob;
     rec_chunks = []; //in contstants it is null, here we change to array
     rec_url = window.URL.createObjectURL(rec_blob);
-    //this.upload_blob(rec_blob); // uncomment if you want to stop the uploading process :)
+    //create array to store the sound blob
+    //find id of the blob
+    this.blobs[current_grain_id] = blob;
+    console.log('curretn g id', current_grain_id);
+    //
   }
 
-//save multiple files at once
-save_rec_blobs(){
-  for (let i = 0; i < grains.length; i++) {
-    rec_blob = new Blob(rec_chunks, { type: "audio/ogg; codecs=opus" });
-    rec_chunks = []; //in contstants it is null, here we change to array
-    rec_url = window.URL.createObjectURL(rec_blob);
-    this.upload_blob(rec_blob); // uncomment if you want to stop the uploading process :)
-    console.log('many rec blobs called')
-  }
-}
-  /* Function: get_audio_buffer_source
+// //save multiple files at once
+// save_rec_blobs(){
+//   for (let i = 0; i < grains.length; i++) {
+//     rec_blob = new Blob(rec_chunks, { type: "audio/ogg; codecs=opus" });
+//     rec_chunks = []; //in contstants it is null, here we change to array
+//     rec_url = window.URL.createObjectURL(rec_blob);
+//     this.upload_blob(rec_blob); // uncomment if you want to stop the uploading process :)
+//   }
+//     console.log('many rec blobs called')
+// }
+   /* Function: get_audio_buffer_source
    * -----------------------------------
    * This function creates and returns an AudioBufferSource object that
    * can play the current full buffer.
@@ -118,21 +132,29 @@ save_rec_blobs(){
 
   //server communication!
   //
-  upload_blob(blob){//to server
+  upload_blobs(){//to server
     //SERVER STUFF
+
     console.log('upload_blob')
     let formdata = new FormData(); //create a from to of data to upload to the server
     var pathname = window.location.pathname;
     let room_id = pathname;
-    let sound_id = makeid(4);
+    let sound_id = roomID;
 
-    formdata.append("soundBlob", blob, `${sound_id}.wav`);
+    if(!roomID){
+    sound_id = makeid(4);
+    roomID = sound_id;
+    }
+
     formdata.append("room", `${room_id}`);
-    // Now we can send the blob to a server...
+    for (let i = 0; i < this.blobs.length; i++) {
+      let blob = this.blobs[i];
+    formdata.append(`blobs`, blob, `${sound_id}-${i}.wav`);
+    }
 
+    // Now we can send the blob to a server...
     var serverUrl = "/upload"; //we've made a POST endpoint on the server at /upload
     //build a HTTP POST request
-
     var request = new XMLHttpRequest();
     request.open("POST", serverUrl);
     request.onload = function (evt) {

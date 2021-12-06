@@ -37,26 +37,30 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
     //app.post() (.post() method of the express app object)
     //
     //app.post(path, callback [, callback ...])
-    app.post("/upload", upload.single("soundBlob"), function (req, res, next) {
+    app.post("/upload", upload.array("blobs", 4), function(req, res, next) {
       // console.log("this is the request.file "+`${req.file}`);
       //media folder stores all the wav files
-      let uploadLocation = __dirname + "/media/" + req.file.originalname; // where to save the file to. make sure the incoming name has a .wav extension
-      fs.writeFileSync(
-        uploadLocation,
-        Buffer.from(new Uint8Array(req.file.buffer))
-      ); // write the blob to the server as a file
+      let filePaths = [];
+      console.log(req.files);
+      for (let i = 0; i < req.files.length; i++) {
+        let file = req.files[i];
+        let uploadLocation = __dirname + "/media/" + file.originalname; // where to save the file to. make sure the incoming name has a .wav extension
+        filePaths.push("/media/" + file.originalname) //media folder stores all the wav files);
+        fs.writeFileSync(
+          uploadLocation,
+          Buffer.from(new Uint8Array(file.buffer))); // write the blob to the server as a file
+      }
       res.sendStatus(200); //send back that everything went ok
-
       //rooms.insertOne
       //inserts a single document into the rooms collection in MongoDB
       //MongoDB document, give field value pairs -> room and path are both fields
       rooms.insertOne({
           "room": req.body.room,
-          "path": "/media/" + req.file.originalname, //media folder stores all the wav files
+          "paths": filePaths
         })
         .then((result) => {
           console.log(result); //console log the result
-          console.log("upload of " + `${req.file.originalname}`+" successful");//console log the name of the wav file
+          // console.log("upload of " + `${file.originalname}` + " successful"); //console log the name of the wav file
         })
         .catch((error) => console.error(error));
     });

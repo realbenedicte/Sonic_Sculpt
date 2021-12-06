@@ -4,6 +4,7 @@
 let current_grain_id = null;
 let audioRecorder = new AudioRecorder(); //making a new instance of the audioRecorder Class
 
+let roomID = null;
 //defining various buttons
 let createRoomButton = document.getElementById("createRoomID"); //define create room button
 let aboutButton = document.getElementById("about-button");
@@ -98,6 +99,7 @@ submitButton.addEventListener("click", submitRoomDetails);
 //turn off all grains!!
 for (let i = 0; i < grains.length; i++) {
   grains[i].stop();
+  // audioRecorder.on_save_room();
 }
 console.log('stopped all grains');
 }
@@ -113,8 +115,9 @@ function submitRoomDetails(){
   roomDetails.style.display = 'inline-block';
 
   //server test
-audioRecorder.save_rec_blobs();
-
+  //when you submit room details go through each grain channel and save an audio file
+  //right now not working
+  audioRecorder.on_save_room();
 }
 
 function get_grains_playing() {
@@ -328,21 +331,23 @@ function handle_mouse_down(event) {
     }
     //grain_uis[g_ind].handle_remove_grain();
   } else if (event.target.className == "record_text") {
+      var g_ind = get_g_ind_from_id(event.target.id);
+      current_grain_id = g_ind;
     if (audioRecorder.isRecording) {
       // audioRecorder.isRecording = false;
       event.target.innerHTML = "record";
       console.log("ending record ", current_grain_id);
-      audioRecorder.handle_rec_press();
+      audioRecorder.handle_rec_press(current_grain_id);
       return;
     }
 
     // audioRecorder.isRecording = true;
     event.target.innerHTML = "stop"; //change text
-    var g_ind = get_g_ind_from_id(event.target.id);
+
     console.log("got record id ", g_ind);
-    current_grain_id = g_ind;
+
     console.log("beginning record ", g_ind);
-    audioRecorder.handle_rec_press();
+    audioRecorder.handle_rec_press(current_grain_id);
   }
 }
 
