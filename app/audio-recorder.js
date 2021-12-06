@@ -91,9 +91,19 @@ let AudioRecorder = class {
     rec_blob = new Blob(rec_chunks, { type: "audio/ogg; codecs=opus" });
     rec_chunks = []; //in contstants it is null, here we change to array
     rec_url = window.URL.createObjectURL(rec_blob);
-    this.upload_blob(rec_blob); // uncomment if you want to stop the uploading process :)
+    //this.upload_blob(rec_blob); // uncomment if you want to stop the uploading process :)
   }
 
+//save multiple files at once
+save_rec_blobs(){
+  for (let i = 0; i < grains.length; i++) {
+    rec_blob = new Blob(rec_chunks, { type: "audio/ogg; codecs=opus" });
+    rec_chunks = []; //in contstants it is null, here we change to array
+    rec_url = window.URL.createObjectURL(rec_blob);
+    this.upload_blob(rec_blob); // uncomment if you want to stop the uploading process :)
+    console.log('many rec blobs called')
+  }
+}
   /* Function: get_audio_buffer_source
    * -----------------------------------
    * This function creates and returns an AudioBufferSource object that

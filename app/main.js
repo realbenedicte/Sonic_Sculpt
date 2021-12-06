@@ -111,6 +111,10 @@ function submitRoomDetails(){
   formElement.style.display = 'none';
   divTest.style.visibility = 'visible';
   roomDetails.style.display = 'inline-block';
+
+  //server test
+audioRecorder.save_rec_blobs();
+
 }
 
 function get_grains_playing() {
