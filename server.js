@@ -32,6 +32,24 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
     const db = client.db("sonic"); //sonic is the name of our mongodb database
     const rooms = db.collection("rooms"); //our collection in mongodb is named rooms
 
+
+    app.get("/room/:roomID", function(req, res) {
+      let roomID = req.params.roomID;
+      if (!roomID) {
+        res.json({});
+      }
+
+      if (roomID) { //query database
+        rooms.findOne({
+          room: roomID
+        }, function(err, room) {
+          if(err){
+            res.json({});
+          }
+          res.json(room);
+        });
+      }
+    });
     // FILE UPLOAD
     //( SHOUld BE OUR SAVE STATE )
     //app.post() (.post() method of the express app object)

@@ -3,7 +3,7 @@
 //each grain box gets its own id
 let current_grain_id = null;
 let audioRecorder = new AudioRecorder(); //making a new instance of the audioRecorder Class
-
+let currentRoom = null;
 let roomID = null;
 //defining various buttons
 let createRoomButton = document.getElementById("createRoomID"); //define create room button
@@ -21,8 +21,8 @@ window.addEventListener("load", (event) => {
 
 //load homepage
 function init() {
-homePageCreateRoom();
-init_doc_listeners();
+  initRoom();
+  init_doc_listeners();
 }
 
 function init_doc_listeners() {
@@ -35,31 +35,84 @@ function init_doc_listeners() {
   aboutButton.addEventListener("click", openAbout);
 }
 
-function homePageCreateRoom(){
+
+function homePageCreateRoom(r_id = null) {
+  if (r_id) {
+    audioRecorder.init_audio_stream();
+    init_grains();
+    init_interface();
+    createRoomButton.style.display = "none"; //hide create room button
+    createSaveButton();
+    console.log('homepage created.');
+    overlayElement.style.display = "none"; // hide the about button text
+    closeAbout();
+    formElement.style.display = "none"; //hide form
+    roomDetails.style.display = 'none';
+    return;
+  }
+
+  createRoomButton.style.display = "block"; //show the create room button
   console.log('homepage created.');
   overlayElement.style.display = "none"; // hide the about button text
   createRoomButton.style.display = "block"; //show the create room button
   closeAbout();
   formElement.style.display = "none"; //hide form
   roomDetails.style.display = 'none';
-  if(document.getElementById('app_div')){
+  if (document.getElementById('app_div')) {
     var divTest = document.getElementById('app_div');
     divTest.style.visibility = "hidden";
   }
-  if(document.getElementById('saveRoomId')){
+  if (document.getElementById('saveRoomId')) {
     var saveTest2 = document.getElementById('saveRoomId');
     saveTest2.style.display = "none";
   }
 }
 
+function initRoom() {
+  let r_id = window.location.hash.substring(1);
+  console.log(r_id);
+  if (!r_id) {
+    homePageCreateRoom();
+  }
+  // var xmlhttp = new XMLHttpRequest();
+  var url = `/room/${r_id}`;
+  // xmlhttp.onreadystatechange = function() {
+  //   if (this.readyState == 4 && this.status == 200) {
+  //     var roomFromServer = JSON.parse(this.responseText);
+  //     homePageCreateRoom(roomFromServer.room || null);
+  //     console.log('got room from server', room);
+  //
+  //   }
+  // };
+  // xmlhttp.open("GET", url, true);
+  // xmlhttp.send();
+
+  var req = new XMLHttpRequest();
+  req.responseType = 'json';
+  req.open('GET', url, true);
+  req.onload = function() {
+    var roomFromServer = req.response;
+    if(roomFromServer && roomFromServer.room){
+      homePageCreateRoom(roomFromServer.room);
+      console.log('got room from server', roomFromServer);
+    }
+    else{
+      homePageCreateRoom();
+    }
+
+  };
+  req.send(null);
+}
 
 //creates a new room and initializes it
 //TO DO: clear old room -- calling this again creates an old room on top of other ones
-function createRoom(){
+function createRoom() {
+  roomID = makeid(4);
+  window.location.hash = `${roomID}`;
   audioRecorder.init_audio_stream();
   init_grains();
   init_interface();
-  createRoomButton.style.display = "none";  //hide create room button
+  createRoomButton.style.display = "none"; //hide create room button
   createSaveButton();
 }
 
@@ -76,7 +129,7 @@ function closeAbout() {
   aboutButton.style.color = "black";
 }
 
-function createSaveButton(){
+function createSaveButton() {
   let saveButton = document.getElementById("saveRoomId");
   saveButton.style.display = 'block';
   saveButton.addEventListener("click", saveButtonClick)
@@ -86,28 +139,28 @@ function createSaveButton(){
 //bring up dialog that lets you enter in: roomname, composer and tags
 //in a form
 //send this form to the server !!!!
-function saveButtonClick(){
-console.log('save clicked');
-//PAUSE ALL AUDIO
-//show form
-formElement.style.display = 'block';
-let saveButton = document.getElementById("saveRoomId");
-saveButton.style.display = "none";
-var divTest = document.getElementById('app_div');
-divTest.style.visibility = "hidden";
-submitButton.addEventListener("click", submitRoomDetails);
-//turn off all grains!!
-for (let i = 0; i < grains.length; i++) {
-  grains[i].stop();
-  // audioRecorder.on_save_room();
-}
-console.log('stopped all grains');
+function saveButtonClick() {
+  console.log('save clicked');
+  //PAUSE ALL AUDIO
+  //show form
+  formElement.style.display = 'block';
+  let saveButton = document.getElementById("saveRoomId");
+  saveButton.style.display = "none";
+  var divTest = document.getElementById('app_div');
+  divTest.style.visibility = "hidden";
+  submitButton.addEventListener("click", submitRoomDetails);
+  //turn off all grains!!
+  for (let i = 0; i < grains.length; i++) {
+    grains[i].stop();
+    // audioRecorder.on_save_room();
+  }
+  console.log('stopped all grains');
 }
 
 //send form details to the server here!!!
 //post the room to the explore page
 //make the audio not deleteable/recordable at this point (just pause/play/move)
-function submitRoomDetails(){
+function submitRoomDetails() {
   //first show the main app again but needs to now have details from the form!
   var divTest = document.getElementById('app_div');
   formElement.style.display = 'none';
@@ -331,8 +384,8 @@ function handle_mouse_down(event) {
     }
     //grain_uis[g_ind].handle_remove_grain();
   } else if (event.target.className == "record_text") {
-      var g_ind = get_g_ind_from_id(event.target.id);
-      current_grain_id = g_ind;
+    var g_ind = get_g_ind_from_id(event.target.id);
+    current_grain_id = g_ind;
     if (audioRecorder.isRecording) {
       // audioRecorder.isRecording = false;
       event.target.innerHTML = "record";

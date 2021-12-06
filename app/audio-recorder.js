@@ -11,27 +11,29 @@ let AudioRecorder = class {
   //methods for this class
   //
   init_mic_recorder(stream) {
-    mic_recorder = new MediaRecorder(stream, { audioBitsPerSecond: 64000 });
-    mic_recorder.ondataavailable = function (e) {
+    mic_recorder = new MediaRecorder(stream, {
+      audioBitsPerSecond: 64000
+    });
+    mic_recorder.ondataavailable = function(e) {
       rec_chunks.push(e.data); //writing data to a buffer
     };
     mic_recorder.onstop = this.on_record_stop;
   }
 
- //server communication!
- //
- //upload the recorded wav file to the data base :)
-  on_record_stop(e){
-    this.save_rec_blob();//upload the recorded wav file to the data base :)
+  //server communication!
+  //
+  //upload the recorded wav file to the data base :)
+  on_record_stop(e) {
+    this.save_rec_blob(); //upload the recorded wav file to the data base :)
     this.handle_store_full_buffer(); //audio buffer stuff
   }
 
   //server communication!
   //
   //upload the recorded wav file to the data base :)
-   on_save_room(e){
-     this.upload_blobs(); // uncomment if you want to stop the uploading process :)
-   }
+  on_save_room(e) {
+    this.upload_blobs(); // uncomment if you want to stop the uploading process :)
+  }
 
   end_record() {
     mic_recorder.stop();
@@ -51,11 +53,13 @@ let AudioRecorder = class {
     if (navigator.mediaDevices) {
       console.log("getUserMedia supported.");
       navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then(function (stream) {
+        .getUserMedia({
+          audio: true
+        })
+        .then(function(stream) {
           self.init_mic_recorder(stream);
         })
-        .catch(function (err) {
+        .catch(function(err) {
           console.log("Encountered the getUserMedia error: " + err);
         });
     } else {
@@ -97,7 +101,9 @@ let AudioRecorder = class {
   //blob - binary data thing -
   save_rec_blob() {
     // rec_blob = new Blob(rec_chunks, { type: "audio/ogg; codecs=opus" });
-    let blob = new Blob(rec_chunks, { type: "audio/ogg; codecs=opus" });
+    let blob = new Blob(rec_chunks, {
+      type: "audio/ogg; codecs=opus"
+    });
     rec_blob = blob;
     rec_chunks = []; //in contstants it is null, here we change to array
     rec_url = window.URL.createObjectURL(rec_blob);
@@ -108,17 +114,17 @@ let AudioRecorder = class {
     //
   }
 
-// //save multiple files at once
-// save_rec_blobs(){
-//   for (let i = 0; i < grains.length; i++) {
-//     rec_blob = new Blob(rec_chunks, { type: "audio/ogg; codecs=opus" });
-//     rec_chunks = []; //in contstants it is null, here we change to array
-//     rec_url = window.URL.createObjectURL(rec_blob);
-//     this.upload_blob(rec_blob); // uncomment if you want to stop the uploading process :)
-//   }
-//     console.log('many rec blobs called')
-// }
-   /* Function: get_audio_buffer_source
+  // //save multiple files at once
+  // save_rec_blobs(){
+  //   for (let i = 0; i < grains.length; i++) {
+  //     rec_blob = new Blob(rec_chunks, { type: "audio/ogg; codecs=opus" });
+  //     rec_chunks = []; //in contstants it is null, here we change to array
+  //     rec_url = window.URL.createObjectURL(rec_blob);
+  //     this.upload_blob(rec_blob); // uncomment if you want to stop the uploading process :)
+  //   }
+  //     console.log('many rec blobs called')
+  // }
+  /* Function: get_audio_buffer_source
    * -----------------------------------
    * This function creates and returns an AudioBufferSource object that
    * can play the current full buffer.
@@ -132,24 +138,22 @@ let AudioRecorder = class {
 
   //server communication!
   //
-  upload_blobs(){//to server
+  upload_blobs() { //to server
     //SERVER STUFF
 
     console.log('upload_blob')
     let formdata = new FormData(); //create a from to of data to upload to the server
-    var pathname = window.location.pathname;
-    let room_id = pathname;
     let sound_id = roomID;
 
-    if(!roomID){
-    sound_id = makeid(4);
-    roomID = sound_id;
+    if (!roomID) {
+      sound_id = makeid(4);
+      roomID = sound_id;
     }
 
-    formdata.append("room", `${room_id}`);
+    formdata.append("room", `${roomID}`);
     for (let i = 0; i < this.blobs.length; i++) {
       let blob = this.blobs[i];
-    formdata.append(`blobs`, blob, `${sound_id}-${i}.wav`);
+      formdata.append(`blobs`, blob, `${sound_id}-${i}.wav`);
     }
 
     // Now we can send the blob to a server...
@@ -157,7 +161,7 @@ let AudioRecorder = class {
     //build a HTTP POST request
     var request = new XMLHttpRequest();
     request.open("POST", serverUrl);
-    request.onload = function (evt) {
+    request.onload = function(evt) {
       if (request.status == 200) {
         console.log("successful upload of " + `${sound_id}.wav`);
       } else {
@@ -171,17 +175,17 @@ let AudioRecorder = class {
   //https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer
   handle_store_full_buffer() {
     var reader = new FileReader();
-    reader.onloadstart = function () {
+    reader.onloadstart = function() {
       if (verbose) {
         console.log("beginning buffer load");
       }
     };
-    reader.onloadend = function () {
-    let  arr_buf = reader.result;
+    reader.onloadend = function() {
+      let arr_buf = reader.result;
 
       context
         .decodeAudioData(arr_buf)
-        .then(function (data) {
+        .then(function(data) {
           full_buffer = data;
           console.log(data); //data is our audio buffer :)
           console.log(data.duration); // can find duration (how long our recording is in seconds)
@@ -193,7 +197,7 @@ let AudioRecorder = class {
           }
           console.log("initiated buffer on grain: ", current_grain_id);
         })
-        .catch(function (err) {
+        .catch(function(err) {
           console.log("Encountered the decodeAudioData error: " + err);
         });
       if (verbose) {
