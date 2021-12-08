@@ -55,6 +55,7 @@ table {
 body {
   font-family: "Roboto", sans-serif;
   background-color: white;
+background-image: linear-gradient(120deg, #fccb90 0%, #d57eeb 100%);
 }
 
 h1 {
@@ -135,6 +136,7 @@ h1 {
   display: flex;
   align-items: center;
   border: 2px solid black;
+  background: white;
 }
 
 .grain_block_box {
@@ -144,9 +146,9 @@ h1 {
   position: absolute;
   width: 100%;
   height: 100%;
-  z-index: 2;
-  /* background-color: gray; */
-  opacity: 0.7;
+  z-index: -10;
+  background-color: white;
+  opacity: 1;
 }
 
 .grain_outer_box.live .grain_block_box {
@@ -157,6 +159,8 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
+
+  background-color: white;
 }
 
 .grain_outer_box.live .grain_record_box {
@@ -232,8 +236,8 @@ footer p {
 
 .main-nav a {
   text-decoration: none;
-  padding-left: 25px;
-  padding-right: 25px;
+  padding-left: 0px;
+  padding-right: 0px;
   padding-top: 40px;
   display: block;
 }
@@ -250,7 +254,7 @@ footer p {
 
 .main-nav>li>a {
   color: black;
-  font-size: 22px;
+  font-size: 30px;
 }
 
 .main-nav>li>a:hover {
@@ -277,7 +281,7 @@ main {
 }
 
 #homeButton p {
-  font-size: 250%;
+  font-size: 350%;
   margin-left: 0px;
   margin-right: 10px;
   padding-top: 0px;
@@ -611,7 +615,7 @@ main {
    justify-content: center;
    align-items: center;
    border-style: solid;
-
+background-color: white;
 
   margin: 10px;
 }

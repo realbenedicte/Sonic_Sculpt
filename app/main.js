@@ -7,7 +7,7 @@ let currentRoom = null;
 let roomID = null;
 //defining various buttons
 let createRoomButton = document.getElementById("createRoomID"); //define create room button
-let aboutButton = document.getElementById("about-button");
+// let aboutButton = document.getElementById("about-button");
 let overlayElement = document.getElementById("myNav");
 let homePageButton = document.getElementById("homeButton");
 let formElement = document.getElementById('saveForm');
@@ -37,7 +37,7 @@ function init_doc_listeners() {
   // homePageButton.addEventListener("click", homePageCreateRoom);
   //everytime you click the createRoomButton it creates a new room...
   createRoomButton.addEventListener("click", createRoom);
-  aboutButton.addEventListener("click", openAbout);
+  // aboutButton.addEventListener("click", openAbout);
 }
 
 function homePageCreateRoom(r_id = null) {
@@ -49,7 +49,7 @@ function homePageCreateRoom(r_id = null) {
     createSaveButton();
     console.log('homepage created.');
     overlayElement.style.display = "none"; // hide the about button text
-    closeAbout();
+    // closeAbout();
     formElement.style.display = "none"; //hide form
     roomDetails.style.display = 'none';
     return;
@@ -59,7 +59,7 @@ function homePageCreateRoom(r_id = null) {
   console.log('homepage created.');
   overlayElement.style.display = "none"; // hide the about button text
   createRoomButton.style.display = "block"; //show the create room button
-  closeAbout();
+  // closeAbout();
   formElement.style.display = "none"; //hide form
   roomDetails.style.display = 'none';
   if (document.getElementById('app_div')) {
@@ -179,18 +179,18 @@ function createRoom() {
 
 }
 
-function openAbout() {
-  document.getElementById("myNav").style.display = "block";
-  console.log('open');
-  createRoomButton.style.display = "none"; //hide create room button
-  aboutButton.style.color = "blue";
-}
-
-function closeAbout() {
-  overlayElement.style.display = "none";
-  console.log('close');
-  aboutButton.style.color = "black";
-}
+// function openAbout() {
+//   document.getElementById("myNav").style.display = "block";
+//   console.log('open');
+//   createRoomButton.style.display = "none"; //hide create room button
+//   aboutButton.style.color = "blue";
+// }
+//
+// function closeAbout() {
+//   overlayElement.style.display = "none";
+//   console.log('close');
+//   aboutButton.style.color = "black";
+// }
 
 function createSaveButton() {
   let saveButton = document.getElementById("saveRoomId");
