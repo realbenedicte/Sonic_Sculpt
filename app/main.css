@@ -588,13 +588,40 @@ main {
 }
 
 .roomWrapper{
-  display:flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+
 }
 
-#rooms > a{
-  align-self: center;
-  padding:20px;
+#rooms {
+  display: flex;
+   flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin: auto;
+      padding: 0;
+      width: 100%;
+      flex-direction: row;
+      width: 80vw;
+      padding-bottom: 20px;
+      padding-top: 100px;
+}
+#rooms >div  {
+  width: 200px;
+   height: 200px;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   border-style: solid;
+
+
+  margin: 10px;
+}
+
+#rooms >div > a {
+    text-align: center;
+   text-align: center;
+   display: inline-block;
+   border-color: black;
+   font-size: 22px;
+     text-decoration: none;
+  color: blue;
 }

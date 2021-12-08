@@ -21,9 +21,12 @@
         console.log(rooms);
         for (let i =0; i < rooms.length; i++) {
           console.log(rooms[i].room);
-          let roomEl = document.createElement('a');
-          roomEl.setAttribute("href", `/#${rooms[i].room}`) //put url
-          roomEl.innerText = `RoomID: ${rooms[i].room}`;
+
+          let roomEl= document.createElement('div');
+          let roomLink = document.createElement('a');
+          roomLink.setAttribute("href", `/#${rooms[i].room}`) //put url
+          roomLink.innerText = `RoomID: ${rooms[i].room}`;
+          roomEl.appendChild(roomLink);
           roomsContainer.appendChild(roomEl);
         }
       }
