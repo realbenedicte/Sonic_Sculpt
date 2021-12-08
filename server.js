@@ -21,10 +21,17 @@ const upload = multer(); // set multer to be the upload variable
 const fs = require("fs"); //use the file system module so we can save files
 const mongodb = require("mongodb"); //our database
 const MongoClient = require("mongodb").MongoClient; //The **MongoClient** class is a class that allows for making Connections to MongoDB
-//
+
+// let httpServer = require("http").createServer(app);
+
 //constants:
 const port = 3000; //local host port
-
+let io = require("socket.io")(4000, {
+  cors: {
+    origin: 'http://localhost:3000', 
+    methods: ["GET", "POST"]
+  }
+});
 //Connect Node.js application to MongoDB
 //work with data using the Node.js driver
 MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use this string to connect to 'Compass'
@@ -42,7 +49,7 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
         rooms.findOne({
           room: roomID
         }, function(err, room) {
-          if(err){
+          if (err) {
             res.json({});
           }
           res.json(room);
@@ -51,6 +58,16 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
     });
 
 
+    //socket.io
+    //
+    //  make sure its connected - each new user gets original id
+    io.on("connect", function(socket) {
+      console.log("original id:: " + socket.id);
+
+      socket.on("init", (roomID) => {
+        console.log(roomID);
+      });
+    });
 
 
     // FILE UPLOAD

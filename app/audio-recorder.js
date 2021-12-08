@@ -46,7 +46,9 @@ let AudioRecorder = class {
 
   delete_rec_blob() {
     window.URL.revokeObjectURL(rec_url);
+
   }
+
 
   init_audio_stream() {
     var self = this;
@@ -135,6 +137,7 @@ let AudioRecorder = class {
     buf_src.connect(out_node);
     return buf_src;
   }
+
 
   //server communication!
   //

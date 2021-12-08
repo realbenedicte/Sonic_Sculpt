@@ -13,11 +13,13 @@ let homePageButton = document.getElementById("homeButton");
 let formElement = document.getElementById('saveForm');
 let submitButton = document.getElementById('submit');
 let roomDetails = document.getElementById('roomDetailsID');
-
 let audioFilePaths = null;
+
+ // var socket = io();
 //When page loads -> call the init function
 window.addEventListener("load", (event) => {
   console.log("window loaded.");
+
   init();
 });
 
@@ -25,7 +27,8 @@ window.addEventListener("load", (event) => {
 function init() {
   initRoom();
   init_doc_listeners();
-}
+
+};
 
 function init_doc_listeners() {
   document.addEventListener("mousemove", handle_mouse_move, false);
@@ -102,9 +105,20 @@ function initRoom() {
       console.log('got room from server', roomFromServer);
     //  getData(audioFilePaths);
       initGrainsFromServer(audioFilePaths);
-
       //hide and show elements
       loadRoomDetailsInGui(r_id);
+
+      //connect to socket only in saved room
+      let clientSocket = io.connect('http://localhost:4000');
+      //let theIds = [];
+      clientSocket.on('connect', function() {
+        console.log("connected");
+        clientSocket.emit("init", r_id);
+
+        clientSocket.on('disconnect', () => {
+        console.log("disconnected");
+      });
+      });
       if (document.getElementById('saveRoomId')) {
         var saveTest2 = document.getElementById('saveRoomId');
         saveTest2.style.display = "none";
@@ -153,13 +167,16 @@ function initGrain(id, path) {
 //creates a new room and initializes it
 //TO DO: clear old room -- calling this again creates an old room on top of other ones
 function createRoom() {
+
   roomID = makeid(4);
   window.location.hash = `${roomID}`;
+
   audioRecorder.init_audio_stream();
   init_grains();
   init_interface();
   createRoomButton.style.display = "none"; //hide create room button
   createSaveButton();
+
 }
 
 function openAbout() {
@@ -195,7 +212,7 @@ function saveButtonClick() {
       return;
     }
   }
-  
+
   formElement.style.display = 'block';
   let saveButton = document.getElementById("saveRoomId");
   saveButton.style.display = "none";

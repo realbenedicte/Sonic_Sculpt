@@ -81,6 +81,8 @@ Grain.prototype.refresh_buffer = function (buf) {
   if (verbose) console.log("refreshing grain buffer");
   new_start = this.ui.g_left_perc * buf.duration;
   new_end = this.ui.g_right_perc * buf.duration;
+  console.log('new_start', new_start);
+  console.log('new_end', new_end);
   AudioBufferSlice(buf, new_start, new_end, this, function (e, new_buffer, grain) {
     if (e) {
       console.log(e);
