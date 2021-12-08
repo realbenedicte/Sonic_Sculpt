@@ -586,3 +586,15 @@ main {
     width: 100%;
     color: white;
 }
+
+.roomWrapper{
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#rooms > a{
+  align-self: center;
+  padding:20px;
+}

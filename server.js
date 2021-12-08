@@ -28,7 +28,7 @@ const MongoClient = require("mongodb").MongoClient; //The **MongoClient** class 
 const port = 3000; //local host port
 let io = require("socket.io")(4000, {
   cors: {
-    origin: 'http://localhost:3000', 
+    origin: 'http://localhost:3000',
     methods: ["GET", "POST"]
   }
 });
@@ -57,6 +57,21 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
       }
     });
 
+    app.get("/rooms/", function(req, res) {
+      var options = {
+        "limit": 20,
+        "sort": "room"
+      }
+
+      rooms.find({}, options).toArray(function(err, docs) {
+        console.log("retrieved records:");
+        console.log(docs);
+        if(err){
+          res.json([]);
+        }
+        res.json(docs);
+      });
+    });
 
     //socket.io
     //
@@ -103,7 +118,9 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
         })
         .catch((error) => console.error(error));
     });
-
+    app.get('/explore', function(req, res) {
+      res.sendFile(path.join(__dirname, 'app/explore.html'));
+    });
     app.use("/media", express.static("media")); //can query server for file in media
     app.use("/", express.static("app"));
     app.use("/:roomID", express.static("app")); //making room ids possible now :)

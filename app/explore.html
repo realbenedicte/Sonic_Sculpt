@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Sonic_Sculpt</title>
+  <link rel="stylesheet" type="text/css" href="main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+  <script>
+    window.addEventListener("load", (event) => {
+      console.log("window loaded.");
+      var url = '/rooms/';
+      var roomsContainer = document.getElementById('rooms');
+      var req = new XMLHttpRequest();
+      req.responseType = 'json';
+      req.open('GET', url, true);
+      req.onload = function() {
+        var rooms = req.response;
+        console.log(rooms);
+        for (let i =0; i < rooms.length; i++) {
+          console.log(rooms[i].room);
+          let roomEl = document.createElement('a');
+          roomEl.setAttribute("href", `/#${rooms[i].room}`) //put url
+          roomEl.innerText = `RoomID: ${rooms[i].room}`;
+          roomsContainer.appendChild(roomEl);
+        }
+      }
+      req.send(null);
+    });
+  </script>
+</head>
+<body>
+  <div id="page-container">
+    <div id="content-wrap">
+      <div class="nav-container">
+        <ul id="menu" class="main-nav">
+          <li>
+            <div id="homeButton">
+              <a href='/'>
+                <p> ~Sonic Sculpt~</p>
+              </a>
+            </div>
+          </li>
+          <li>
+            <a href="" data-title="Explore" class="link">Explore
+            </a>
+          </li>
+          <li>
+            <p id="about-button">About</p>
+          </li>
+        </ul>
+      </div>
+      <div class = roomWrapper>
+
+      <div id='rooms'>
+      </div>
+    </div>
+    </div>
+  <footer id="footer">
+  </footer>
+  </div>
+</body>
+
+</html>
