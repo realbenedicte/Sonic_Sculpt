@@ -13,6 +13,8 @@ let homePageButton = document.getElementById("homeButton");
 let formElement = document.getElementById('saveForm');
 let submitButton = document.getElementById('submit');
 let roomDetails = document.getElementById('roomDetailsID');
+
+let audioFilePaths = null;
 //When page loads -> call the init function
 window.addEventListener("load", (event) => {
   console.log("window loaded.");
@@ -29,12 +31,11 @@ function init_doc_listeners() {
   document.addEventListener("mousemove", handle_mouse_move, false);
   document.addEventListener("mousedown", handle_mouse_down, false);
   document.addEventListener("mouseup", handle_mouse_up, false);
-  homePageButton.addEventListener("click", homePageCreateRoom);
+  // homePageButton.addEventListener("click", homePageCreateRoom);
   //everytime you click the createRoomButton it creates a new room...
   createRoomButton.addEventListener("click", createRoom);
   aboutButton.addEventListener("click", openAbout);
 }
-
 
 function homePageCreateRoom(r_id = null) {
   if (r_id) {
@@ -68,41 +69,86 @@ function homePageCreateRoom(r_id = null) {
   }
 }
 
+//query the server/db to see if the url typed into the website matches a room !!!!
+//if it does load up that room, if it doesn't load the homepage with createroom
+//we also need to get values from array db
+//
+//mongo db document example:
+//_id:xxxxxxxx
+//room: "e8Rp"
+// paths:Array
+// 0:"/media/e8Rp-0.wav"
+// 1: "/media/e8Rp-1.wav"
+// 2:"/media/e8Rp-2.wav"
+// 3:"/media/e8Rp-3.wav"
+
 function initRoom() {
   let r_id = window.location.hash.substring(1);
   console.log(r_id);
   if (!r_id) {
     homePageCreateRoom();
   }
-  // var xmlhttp = new XMLHttpRequest();
   var url = `/room/${r_id}`;
-  // xmlhttp.onreadystatechange = function() {
-  //   if (this.readyState == 4 && this.status == 200) {
-  //     var roomFromServer = JSON.parse(this.responseText);
-  //     homePageCreateRoom(roomFromServer.room || null);
-  //     console.log('got room from server', room);
-  //
-  //   }
-  // };
-  // xmlhttp.open("GET", url, true);
-  // xmlhttp.send();
-
   var req = new XMLHttpRequest();
   req.responseType = 'json';
   req.open('GET', url, true);
   req.onload = function() {
     var roomFromServer = req.response;
-    if(roomFromServer && roomFromServer.room){
+    if (roomFromServer && roomFromServer.room) {
       homePageCreateRoom(roomFromServer.room);
+      //need to load this files into the audio buffer somehow
+      let audioFilePaths = roomFromServer.paths;
+      console.log('got audio file paths', audioFilePaths);
       console.log('got room from server', roomFromServer);
-    }
-    else{
+    //  getData(audioFilePaths);
+      initGrainsFromServer(audioFilePaths);
+
+      //hide and show elements
+      loadRoomDetailsInGui(r_id);
+      if (document.getElementById('saveRoomId')) {
+        var saveTest2 = document.getElementById('saveRoomId');
+        saveTest2.style.display = "none";
+      }
+      roomDetails.style.display = 'block';
+
+    } else {
       homePageCreateRoom();
     }
-
   };
   req.send(null);
 }
+
+function loadRoomDetailsInGui(r_id){
+roomDetails.textContent = roomDetails.textContent + `RoomID: ${r_id}`;
+}
+
+function initGrainsFromServer(audioFilePaths){
+  for (let i = 0; i < audioFilePaths.length; i++){
+    initGrain(i, audioFilePaths[i]);
+  }
+  unblock_app(); //unblock so u can move sliders
+};
+
+
+
+function initGrain(id, path) {
+  //let source = context.createBufferSource();
+  let request = new XMLHttpRequest();
+  request.open('GET', path, true);
+  request.responseType = 'arraybuffer';
+  request.onload = function() {
+    let audioData = request.response;
+    //need to send this response to the channel buffer
+    context.decodeAudioData(audioData, function(buffer) {
+      grains[id].full_buffer = buffer;
+      grain_uis[id].handle_spawn_grain();
+      grain_uis[id].disable_record_and_delete(); // make disable recording and delete
+      grains[id].stop();
+      },
+      function(e){"Error with decoding audio data" + e.error});
+  }
+  request.send();
+};
 
 //creates a new room and initializes it
 //TO DO: clear old room -- calling this again creates an old room on top of other ones
@@ -142,7 +188,14 @@ function createSaveButton() {
 function saveButtonClick() {
   console.log('save clicked');
   //PAUSE ALL AUDIO
-  //show form
+  //show form only if you've uploaded audio to all 4 channels !
+  for (let i = 0; i < grains.length; i++){
+    if(!grains[i].full_buffer){
+      alert('please record 4 audio files');
+      return;
+    }
+  }
+  
   formElement.style.display = 'block';
   let saveButton = document.getElementById("saveRoomId");
   saveButton.style.display = "none";
@@ -213,6 +266,7 @@ function init_grains() {
   grains = new Array();
   for (var i = 0; i < NUM_GRAINS; i++) {
     grains.push(new Grain(i));
+
   }
 }
 
@@ -223,7 +277,7 @@ function init_app_div() {
   app = document.createElement("div");
   app.id = APP_ID;
   document.getElementById("all").appendChild(app);
-  var divTest = document.getElementById('app_div');
+  // var divTest = document.getElementById('app_div');
 }
 
 /* Function: get_css_val
@@ -316,6 +370,7 @@ function init_interface() {
 function draw_init_grain_uis() {
   for (var i = 0; i < NUM_GRAINS; i++) {
     grain_uis[i].draw_init();
+    grain_uis[i].enable_record_and_delete();
   }
 }
 

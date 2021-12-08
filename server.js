@@ -38,7 +38,6 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
       if (!roomID) {
         res.json({});
       }
-
       if (roomID) { //query database
         rooms.findOne({
           room: roomID
@@ -50,6 +49,10 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
         });
       }
     });
+
+
+
+
     // FILE UPLOAD
     //( SHOUld BE OUR SAVE STATE )
     //app.post() (.post() method of the express app object)
@@ -69,6 +72,7 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
           Buffer.from(new Uint8Array(file.buffer))); // write the blob to the server as a file
       }
       res.sendStatus(200); //send back that everything went ok
+
       //rooms.insertOne
       //inserts a single document into the rooms collection in MongoDB
       //MongoDB document, give field value pairs -> room and path are both fields
@@ -83,6 +87,7 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
         .catch((error) => console.error(error));
     });
 
+    app.use("/media", express.static("media")); //can query server for file in media
     app.use("/", express.static("app"));
     app.use("/:roomID", express.static("app")); //making room ids possible now :)
 

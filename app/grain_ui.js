@@ -70,6 +70,17 @@ GrainUI.prototype.make_record_div = function () {
   this.box.appendChild(this.record_div);
 }
 
+GrainUI.prototype.disable_record_and_delete = function () {
+this.record_div.style.display = 'none';
+this.remove_div.style.display = 'none';
+}
+
+GrainUI.prototype.enable_record_and_delete = function () {
+this.record_div.style.display = 'flex';
+this.remove_div.style.display = 'flex';
+}
+
+
 //new function //MG
 GrainUI.prototype.update_playstate = function (playing=false) { //defaults to false
   //playing boolean only exists in this fucntion
@@ -323,6 +334,7 @@ GrainUI.prototype.handle_remove_grain = function () {
   this.grain_rect_dims_to_def();
   this.set_grain_rect_sides(this.g_left_px, this.g_right_px);
   this.grain.buffer = null;
+  this.grain.full_buffer = null;
   console.log('grain-deleted');
 }
 
