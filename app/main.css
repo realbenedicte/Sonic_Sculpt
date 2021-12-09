@@ -38,6 +38,7 @@ q {
   quotes: none;
 }
 
+
 blockquote:before,
 blockquote:after,
 q:before,
@@ -258,7 +259,7 @@ footer p {
 
 .main-nav>li>a:hover {
   color: black;
-  text-shadow: #ffc0cb 2px 0 10px;
+  text-shadow: blue 2px 0 10px;
 }
 
 #about-button:hover {
@@ -370,7 +371,6 @@ main {
   font-size: 27px;
   color: black;
   width: 50%;
-  color: white;
   /* 100% width */
   display: inline-block;
   align-self: center;
@@ -390,18 +390,6 @@ main {
   font-size: 60px;
 }
 
-/* When the height of the screen is less than 450 pixels, change the font-size of the links and position the close button again, so they don't overlap */
-@media screen and (max-height: 450px) {
-  .overlay a {
-    font-size: 20px
-  }
-
-  .overlay .closebtn {
-    font-size: 40px;
-    top: 15px;
-    right: 35px;
-  }
-}
 
 #saveRoomId {
   display: inline-block;
@@ -613,4 +601,8 @@ main {
   font-size: 22px;
   text-decoration: none;
   color: blue;
+}
+
+@media only screen and (max-width: 600px) {
+
 }
