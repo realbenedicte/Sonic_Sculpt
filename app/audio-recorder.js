@@ -159,6 +159,7 @@ let AudioRecorder = class {
       formdata.append(`blobs`, blob, `${sound_id}-${i}.wav`);
     }
 
+    //POST ENDPOINT ~!~
     // Now we can send the blob to a server...
     var serverUrl = "/upload"; //we've made a POST endpoint on the server at /upload
     //build a HTTP POST request

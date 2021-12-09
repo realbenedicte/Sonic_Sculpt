@@ -8,7 +8,7 @@ let roomID = null;
 //defining various buttons
 let createRoomButton = document.getElementById("createRoomID"); //define create room button
 // let aboutButton = document.getElementById("about-button");
-let overlayElement = document.getElementById("myNav");
+// let overlayElement = document.getElementById("myNav");
 let homePageButton = document.getElementById("homeButton");
 let formElement = document.getElementById('saveForm');
 let submitButton = document.getElementById('submit');
@@ -27,19 +27,17 @@ window.addEventListener("load", (event) => {
 function init() {
   initRoom();
   init_doc_listeners();
-
 };
 
 function init_doc_listeners() {
   document.addEventListener("mousemove", handle_mouse_move, false);
   document.addEventListener("mousedown", handle_mouse_down, false);
   document.addEventListener("mouseup", handle_mouse_up, false);
-  // homePageButton.addEventListener("click", homePageCreateRoom);
-  //everytime you click the createRoomButton it creates a new room...
   createRoomButton.addEventListener("click", createRoom);
-  // aboutButton.addEventListener("click", openAbout);
 }
 
+//
+//main simple homepage
 function homePageCreateRoom(r_id = null) {
   if (r_id) {
     audioRecorder.init_audio_stream();
@@ -48,18 +46,13 @@ function homePageCreateRoom(r_id = null) {
     createRoomButton.style.display = "none"; //hide create room button
     createSaveButton();
     console.log('homepage created.');
-    overlayElement.style.display = "none"; // hide the about button text
-    // closeAbout();
     formElement.style.display = "none"; //hide form
     roomDetails.style.display = 'none';
     return;
   }
-
   createRoomButton.style.display = "block"; //show the create room button
   console.log('homepage created.');
-  overlayElement.style.display = "none"; // hide the about button text
   createRoomButton.style.display = "block"; //show the create room button
-  // closeAbout();
   formElement.style.display = "none"; //hide form
   roomDetails.style.display = 'none';
   if (document.getElementById('app_div')) {
@@ -85,6 +78,11 @@ function homePageCreateRoom(r_id = null) {
 // 2:"/media/e8Rp-2.wav"
 // 3:"/media/e8Rp-3.wav"
 
+//initRoom()
+//if the room exists in the server it means a user has saved that room
+//so show the room !!!
+// and call initGrainsFromServer(audioFilePaths);
+//which loads up correct audio files corresponding to the room
 function initRoom() {
   let r_id = window.location.hash.substring(1);
   console.log(r_id);
@@ -114,7 +112,6 @@ function initRoom() {
       clientSocket.on('connect', function() {
         console.log("connected");
         clientSocket.emit("init", r_id);
-
         clientSocket.on('disconnect', () => {
         console.log("disconnected");
       });
@@ -143,8 +140,6 @@ function initGrainsFromServer(audioFilePaths){
   unblock_app(); //unblock so u can move sliders
 };
 
-
-
 function initGrain(id, path) {
   //let source = context.createBufferSource();
   let request = new XMLHttpRequest();
@@ -167,16 +162,13 @@ function initGrain(id, path) {
 //creates a new room and initializes it
 //TO DO: clear old room -- calling this again creates an old room on top of other ones
 function createRoom() {
-
   roomID = makeid(4);
   window.location.hash = `${roomID}`;
-
   audioRecorder.init_audio_stream();
   init_grains();
   init_interface();
   createRoomButton.style.display = "none"; //hide create room button
   createSaveButton();
-
 }
 
 // function openAbout() {
@@ -212,7 +204,6 @@ function saveButtonClick() {
       return;
     }
   }
-
   formElement.style.display = 'block';
   let saveButton = document.getElementById("saveRoomId");
   saveButton.style.display = "none";
@@ -236,12 +227,36 @@ function submitRoomDetails() {
   formElement.style.display = 'none';
   divTest.style.visibility = 'visible';
   roomDetails.style.display = 'inline-block';
-
-  //server test
-  //when you submit room details go through each grain channel and save an audio file
-  //right now not working
+  //Save the audio and the room id to the server!!!!!
   audioRecorder.on_save_room();
+  getUserInput();
 }
+
+function getUserInput(){
+var composer = document.getElementById("composer").value;
+var roomName = document.getElementById("roomName").value;
+console.log(composer);
+console.log(roomName);
+//we have the user input so now to add to server/db
+
+let formdata = new FormData(); //create a from to of data to upload to the server
+formdata.append("composer", `${composer}`);
+//formdata.append("roomName", `${roomName}`);
+//POST ENDPOINT ~!~
+// Now we can send the blob to a server...
+var serverUrl = "/uploadRoomDetails"; //we've made a POST endpoint on the server at /uploadRoomDetails"
+//build a HTTP POST request
+var request = new XMLHttpRequest();
+request.open("POST", serverUrl);
+request.onload = function(evt) {
+  if (request.status == 200) {
+    console.log("successful upload of " + `${composer}` + `${roomName}`);
+  } else {
+    console.log("got error ", evt);
+  }
+};
+request.send(formdata); //send the form data to the post endpoint
+};
 
 function get_grains_playing() {
   var playing = [];

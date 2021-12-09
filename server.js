@@ -39,7 +39,8 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
     const db = client.db("sonic"); //sonic is the name of our mongodb database
     const rooms = db.collection("rooms"); //our collection in mongodb is named rooms
 
-
+    //ROUTE FOR ROOM ID
+    //app.get("/room/:roomID")
     app.get("/room/:roomID", function(req, res) {
       let roomID = req.params.roomID;
       if (!roomID) {
@@ -57,16 +58,20 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
       }
     });
 
+
+
+
+    //app.get("/rooms/")
+    //ROUTE FOR ROOMS
     app.get("/rooms/", function(req, res) {
       var options = {
         "limit": 20,
         "sort": "room"
       }
-
       rooms.find({}, options).toArray(function(err, docs) {
         console.log("retrieved records:");
         console.log(docs);
-        if(err){
+        if (err) {
           res.json([]);
         }
         res.json(docs);
@@ -84,6 +89,14 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
       });
     });
 
+    //FORM SUBMISSION
+    //
+    //composer and room name
+    //WHEN YOU PRESS SAVE ROOM AFTER FILLING OUT FIELDS
+    // 1. get the composer/roomName from html form
+    // 2. append to formdata to be posted to server
+    // 3. (in server) read the fieldNames from the previous step, just like roomID
+    // 4. insert into DB
 
     // FILE UPLOAD
     //( SHOUld BE OUR SAVE STATE )
@@ -118,9 +131,32 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
         })
         .catch((error) => console.error(error));
     });
+
+    app.get("/posts", (req, res)=> {
+  res.send('hi');
+});
+
+    app.post('/uploadRoomDetails', upload.single('composer'), (req, res, next) => {
+      const file = req.file
+      console.log(req.file);
+      if (!file) {
+        const error = new Error('Please upload a file')
+        error.httpStatusCode = 400
+        return next(error)
+      }
+        // res.send(file);
+    });
+
+    //ROUTE FOR EXPLORE
     app.get('/explore', function(req, res) {
       res.sendFile(path.join(__dirname, 'app/explore.html'));
     });
+
+    //ROUTE FOR ABOUT
+    app.get('/about', function(req, res) {
+      res.sendFile(path.join(__dirname, 'app/about.html'));
+    });
+
     app.use("/media", express.static("media")); //can query server for file in media
     app.use("/", express.static("app"));
     app.use("/:roomID", express.static("app")); //making room ids possible now :)
