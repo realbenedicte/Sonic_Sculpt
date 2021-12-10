@@ -7,26 +7,18 @@ let currentRoom = null;
 let roomID = null;
 //defining various buttons
 let createRoomButton = document.getElementById("createRoomID"); //define create room button
-// let aboutButton = document.getElementById("about-button");
-// let overlayElement = document.getElementById("myNav");
 let homePageButton = document.getElementById("homeButton");
 let formElement = document.getElementById('saveForm');
 let submitButton = document.getElementById('submit2');
 let roomDetails = document.getElementById('roomDetailsID');
 let audioFilePaths = null;
 
-// var socket = io();
 //When page loads -> call the init function
 window.addEventListener("load", (event) => {
   console.log("window loaded.");
-  init();
-});
-
-//load homepage
-function init() {
   initRoom();
   init_doc_listeners();
-};
+});
 
 function init_doc_listeners() {
   document.addEventListener("mousemove", handle_mouse_move, false);
@@ -35,6 +27,87 @@ function init_doc_listeners() {
   createRoomButton.addEventListener("click", createRoom);
 }
 
+//query the server/db to see if the url typed into the website matches a room !!!!
+//if it does load up that room, if it doesn't load the homepage with createroom
+//we also need to get values from array db
+//
+//mongo db document example:
+//_id:xxxxxxxx
+//room: "e8Rp"
+// paths:Array
+// 0:"/media/e8Rp-0.wav"
+// 1: "/media/e8Rp-1.wav"
+// 2:"/media/e8Rp-2.wav"
+// 3:"/media/e8Rp-3.wav"
+// composer:"maxime"
+// roomName: "testing"
+
+
+//initRoom()
+//if the room exists in the server it means a user has saved that room
+//so show the room !!!
+// and call initGrainsFromServer(audioFilePaths);
+//which loads up correct audio files corresponding to the room
+function initRoom() {
+  let r_id = window.location.hash.substring(1);
+  console.log(window.location);
+  console.log(r_id);
+  if (r_id === '') {
+    homePageCreateRoom();
+    return;
+  }
+  //getting the room from server
+  var url = `/room/${r_id}`;
+  var req = new XMLHttpRequest();
+  req.responseType = 'json';
+  req.open('GET', url, true);
+  req.onload = function() {
+    var roomFromServer = req.response;
+    if (roomFromServer && roomFromServer.room) {
+      homePageCreateRoom(roomFromServer.room);
+      //need to load this files into the audio buffer somehow
+      let audioFilePaths = roomFromServer.paths;
+      let composer = roomFromServer.composer; //getting composer from server
+      let roomName = roomFromServer.roomName; //getting roomname from server
+      console.log('got audio file paths', audioFilePaths);
+      console.log('got room from server', roomFromServer);
+      console.log('got roomName from server', roomName);
+      console.log('got composer from server', composer);
+      initGrainsFromServer(audioFilePaths);
+      //hide and show elements
+      //add composer and roomname to document
+      let roomNameDiv = document.createElement("div");
+      roomNameDiv.setAttribute("id", "roomNameDisplay");
+      let composerDiv = document.createElement("div");
+      composerDiv.setAttribute("id", "composerDisplay");
+      roomNameDiv.innerText += `Room Name: ${roomName}`;
+      composerDiv.innerText += `Composer: ${composer}`;
+      roomDetails.textContent = roomDetails.textContent + `RoomID: ${r_id}`;
+      roomDetails.appendChild(roomNameDiv);
+      roomDetails.appendChild(composerDiv);
+      // loadRoomDetailsInGui(r_id);
+      //connect to socket only in saved room
+      let clientSocket = io.connect('http://localhost:4000');
+      //let theIds = [];
+      clientSocket.on('connect', function() {
+        console.log("connected");
+        clientSocket.emit("init", r_id);
+        clientSocket.on('disconnect', () => {
+          console.log("disconnected");
+        });
+      });
+      if (document.getElementById('saveRoomId')) {
+        var saveTest2 = document.getElementById('saveRoomId');
+        saveTest2.style.display = "none";
+      }
+      roomDetails.style.display = 'flex';
+
+    } else {
+      homePageCreateRoom();
+    }
+  };
+  req.send(null);
+}
 //
 //main simple homepage
 function homePageCreateRoom(r_id = null) {
@@ -64,84 +137,6 @@ function homePageCreateRoom(r_id = null) {
   }
 }
 
-//query the server/db to see if the url typed into the website matches a room !!!!
-//if it does load up that room, if it doesn't load the homepage with createroom
-//we also need to get values from array db
-//
-//mongo db document example:
-//_id:xxxxxxxx
-//room: "e8Rp"
-// paths:Array
-// 0:"/media/e8Rp-0.wav"
-// 1: "/media/e8Rp-1.wav"
-// 2:"/media/e8Rp-2.wav"
-// 3:"/media/e8Rp-3.wav"
-
-//initRoom()
-//if the room exists in the server it means a user has saved that room
-//so show the room !!!
-// and call initGrainsFromServer(audioFilePaths);
-//which loads up correct audio files corresponding to the room
-function initRoom() {
-  let r_id = window.location.hash.substring(1);
-  console.log(window.location);
-  console.log(r_id);
-  if (r_id === '') {
-    homePageCreateRoom();
-    return;
-  }
-  //getting the room !
-  var url = `/room/${r_id}`;
-  var req = new XMLHttpRequest();
-  req.responseType = 'json';
-  req.open('GET', url, true);
-  req.onload = function() {
-    var roomFromServer = req.response;
-    if (roomFromServer && roomFromServer.room) {
-      homePageCreateRoom(roomFromServer.room);
-      //need to load this files into the audio buffer somehow
-      let audioFilePaths = roomFromServer.paths;
-      let composer = roomFromServer.composer; //getting composer from server
-      let roomName = roomFromServer.roomName; //getting roomname from server
-      console.log('got audio file paths', audioFilePaths);
-      console.log('got room from server', roomFromServer);
-      console.log('got roomName from server', roomName);
-      console.log('got composer from server', composer);
-      initGrainsFromServer(audioFilePaths);
-      //hide and show elements
-      //add composer and roomname to document
-      let roomNameDiv = document.createElement("div");
-     roomNameDiv.setAttribute("id", "roomNameDisplay");
-     let composerDiv = document.createElement("div");
-     composerDiv.setAttribute("id", "composerDisplay");
-      roomNameDiv.innerText +=`Room Name: ${roomName}`;
-      composerDiv.innerText += `Composer: ${composer}`;
-      roomDetails.textContent = roomDetails.textContent + `RoomID: ${r_id}`;
-      roomDetails.appendChild(roomNameDiv);
-      roomDetails.appendChild(composerDiv);
-      // loadRoomDetailsInGui(r_id);
-      //connect to socket only in saved room
-      let clientSocket = io.connect('http://localhost:4000');
-      //let theIds = [];
-      clientSocket.on('connect', function() {
-        console.log("connected");
-        clientSocket.emit("init", r_id);
-        clientSocket.on('disconnect', () => {
-          console.log("disconnected");
-        });
-      });
-      if (document.getElementById('saveRoomId')) {
-        var saveTest2 = document.getElementById('saveRoomId');
-        saveTest2.style.display = "none";
-      }
-      roomDetails.style.display = 'flex';
-
-    } else {
-      homePageCreateRoom();
-    }
-  };
-  req.send(null);
-}
 
 function initGrainsFromServer(audioFilePaths) {
   for (let i = 0; i < audioFilePaths.length; i++) {
@@ -181,20 +176,7 @@ function createRoom() {
   init_interface();
   createRoomButton.style.display = "none"; //hide create room button
   createSaveButton();
-}
-
-// function openAbout() {
-//   document.getElementById("myNav").style.display = "block";
-//   console.log('open');
-//   createRoomButton.style.display = "none"; //hide create room button
-//   aboutButton.style.color = "blue";
-// }
-//
-// function closeAbout() {
-//   overlayElement.style.display = "none";
-//   console.log('close');
-//   aboutButton.style.color = "black";
-// }
+};
 
 function createSaveButton() {
   let saveButton = document.getElementById("saveRoomId");
@@ -225,7 +207,6 @@ function saveButtonClick() {
   //turn off all grains!!
   for (let i = 0; i < grains.length; i++) {
     grains[i].stop();
-    // audioRecorder.on_save_room();
   }
   console.log('stopped all grains');
 }
@@ -241,29 +222,7 @@ function submitRoomDetails() {
   roomDetails.style.display = 'flex';
   //Save the audio and the room id to the server!!!!!
   audioRecorder.on_save_room();
-  getUserInput();
 }
-
-function getUserInput() {
-  // //get the id of the room you are in!
-  // let r_id = window.location.hash.substring(1);
-  // let formdata = new FormData(); //create a from to of data to upload to the server
-  // //to the field of room, put the correct roomID
-  // formdata.append("room", `${r_id}`);
-  // //to the field of room, put the correct roomID
-  // var serverUrl = "/uploadRoomDetails";
-  // //build a HTTP POST request
-  // var request = new XMLHttpRequest();
-  // request.open("POST", serverUrl);
-  // request.onload = function(evt) {
-  //   if (request.status == 200) {
-  //     console.log("successful upload of rrooom id  " + `${r_id}`);
-  //   } else {
-  //     console.log("got error ", evt);
-  //   }
-  // };
-  // request.send(formdata);
-};
 
 function get_grains_playing() {
   var playing = [];
@@ -279,13 +238,10 @@ function get_grains_playing() {
   }
 }
 
-/* Function: kill_grains
- * ---------------------
- */
+
 function kill_grains(playing) {
   for (var i = 0; i < playing.length; i++) {
     grains[playing[i]].stop(); //stop playing any grain while recording
-    // grain_uis[playing[i]].handle_remove_grain();
   }
 }
 
@@ -498,14 +454,12 @@ function handle_mouse_down(event) {
   }
 }
 
-
 function handle_mouse_move(event) {
   if (g_changing > -1) {
     event.preventDefault();
     grain_uis[g_changing].handle_new_mouse_coords(event.clientX);
   }
 }
-
 
 /* Function: handle_mouse_up
  * -------------------------

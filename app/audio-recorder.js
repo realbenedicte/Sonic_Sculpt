@@ -46,9 +46,7 @@ let AudioRecorder = class {
 
   delete_rec_blob() {
     window.URL.revokeObjectURL(rec_url);
-
   }
-
 
   init_audio_stream() {
     var self = this;
@@ -116,28 +114,12 @@ let AudioRecorder = class {
     //
   }
 
-  // //save multiple files at once
-  // save_rec_blobs(){
-  //   for (let i = 0; i < grains.length; i++) {
-  //     rec_blob = new Blob(rec_chunks, { type: "audio/ogg; codecs=opus" });
-  //     rec_chunks = []; //in contstants it is null, here we change to array
-  //     rec_url = window.URL.createObjectURL(rec_blob);
-  //     this.upload_blob(rec_blob); // uncomment if you want to stop the uploading process :)
-  //   }
-  //     console.log('many rec blobs called')
-  // }
-  /* Function: get_audio_buffer_source
-   * -----------------------------------
-   * This function creates and returns an AudioBufferSource object that
-   * can play the current full buffer.
-   */
   get_audio_buffer_source(out_node) {
     var buf_src = context.createBufferSource(); //audio is audio context constant
     buf_src.buffer = full_buffer;
     buf_src.connect(out_node);
     return buf_src;
   }
-
 
   //server communication!
   //
@@ -200,6 +182,7 @@ let AudioRecorder = class {
     };
     request.send(formdata);
   }
+  
   //AUDIO BUFFER STUFF
   //
   //https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer

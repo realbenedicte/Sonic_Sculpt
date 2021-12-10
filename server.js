@@ -131,14 +131,10 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
         .catch((error) => console.error(error));
     });
 
-
-
-
     //ROUTE FOR EXPLORE
     app.get('/explore', function(req, res) {
       res.sendFile(path.join(__dirname, 'app/explore.html'));
     });
-
     //ROUTE FOR ABOUT
     app.get('/about', function(req, res) {
       res.sendFile(path.join(__dirname, 'app/about.html'));
@@ -151,8 +147,8 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
     app.use("/r/:roomID", express.static("app")); //making room ids possible now :)
     app.use("/media", express.static("media")); //can query server for file in media
     app.use("/", express.static("app"));
-
     app.use("/:roomID", express.static("app")); //making room ids possible now :)
+
     // START SERVER
     app.listen(port, () => {
       console.log(`SonicSculpt app listening at http://localhost:${port}`);

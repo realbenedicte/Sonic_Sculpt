@@ -590,7 +590,8 @@ main {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
-  justify-content: space-between;
+      justify-content: flex-start;
+
   margin: auto;
   padding: 0;
   width: 100%;
