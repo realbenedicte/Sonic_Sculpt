@@ -191,7 +191,7 @@ let AudioRecorder = class {
     };
     reader.onloadend = function() {
       let arr_buf = reader.result;
-      context
+      context //context is our audio context created in contstants :)
         .decodeAudioData(arr_buf)
         .then(function(data) {
           full_buffer = data;

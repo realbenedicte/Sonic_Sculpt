@@ -1,5 +1,11 @@
 //server.js
-//currently handles uploading wav files to a mongodb database
+//
+// handles uploading wav files to node.js server
+// handles uploading wav filepaths, roomName, roomID, composerName to a mongodb database
+// mongodb database is named 'sonic'
+// mongodb collection is named 'rooms'
+// handles all requests from client
+// serves room information (roomName, roomID, composerName, audio in a room) to client :D
 //
 //Resources:
 //https://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html
@@ -8,13 +14,14 @@
 //https://docs.mongodb.com/drivers/node/current/fundamentals/connection/
 //
 //https://medium.com/gist-for-js/use-of-res-json-vs-res-send-vs-res-end-in-express-b50688c0cddf
+//
 //Node Modules Needed:
 //(require is a Node function for importing a module)
 const express = require("express");
 const app = express(); // Init an Express App
 const path = require("path");
 //https://heynode.com/tutorial/process-user-login-form-expressjs/
-const bodyParser = require('body-parser'); // middleware
+
 const multer = require("multer"); //use multer to upload blob data
 const upload = multer(); // set multer to be the upload variable
 //(just like express, see above ( include it, then use it/set it up))
@@ -155,10 +162,6 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
     app.get('/about', function(req, res) {
       res.sendFile(path.join(__dirname, 'app/about.html'));
     });
-
-    app.use(bodyParser.urlencoded({
-      extended: false
-    }));
 
 
     //https://expressjs.com/en/guide/using-middleware.html
