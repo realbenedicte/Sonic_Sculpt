@@ -1,45 +1,24 @@
+
 /* File: grain.js
- * -----------------------
- * This is a Grain object. It handles the back-end operations of the grain, including
- * storing the correct slice of the recorded sample as the grain's audio data
- * (grain.buffer), applying a volume envelope to the grain (apply_vol_env), and
- * scheduling the grain to play at precisely the correct times (fire, fire_schedule,
- * and init_fire_schedule). It also contains function that refresh the grain buffer
- * based on user interaction, and handles playing and stopping the grain. All function
- * are commented below.
  */
-
-/* Constructor: Grain
- * --------------------
- * This is the constructor for the Grain object. The argument passed into the
- * constructor is the g_ind (which of the 5 grains of the app this one
- * is). All member variables and functions are described internally.
- */
-
- //TO DO: make Grain Class
+ //NOTE I MODIFIED THIS FILE FROM:
+ //https://cm-gitlab.stanford.edu/mherrero/grains4u
 
 function Grain(g_ind) {
-
   console.log("got grain id ", g_ind)
   // Reflects the index of the Grain object in the app
   this.g_ind = g_ind;
-
   // Links to the GrainUI object that controls this Grain object
   this.ui = null;
-
   // Buffer that contains the actual grain audio data. Updated by
   // refresh_grain(), and played by fire()
   this.buffer = null;
-
   this.full_buffer = null;
-
   // Boolean that tracks if the grain is being played or not.
   this.grain_on = false;
-
   // Tracks the ID number of an interval-repeating fire_schedule
   // function, so that it can be cleared when the grain is stopped
   this.intID = null;
-
   // Stores the time (Audio Context clock) of most recent call to fire()
   this.last_fire_time = null;
 }

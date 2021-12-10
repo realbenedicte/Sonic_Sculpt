@@ -1,13 +1,12 @@
+//NOTE THESE CONSTANTS ARE MOSTLY UNMODIFIED AND COME FROM:
+//https://cm-gitlab.stanford.edu/mherrero/grains4u
+
 /* File: constants.js
  * -------------------
  * This file contains all of the constants and global variables used in the
  * Grains4U app. A short description of each can be found above the variable's
  * declaration.
  */
-
-//CONSTANTS////CONSTANTS////CONSTANTS////CONSTANTS///
-//CONSTANTS////CONSTANTS////CONSTANTS////CONSTANTS///
-//CONSTANTS////CONSTANTS////CONSTANTS////CONSTANTS///
 
 // Creates the AudioContext object that the entire app
 // will use to operate.

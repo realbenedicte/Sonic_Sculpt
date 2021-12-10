@@ -1,5 +1,5 @@
 //AudioRecorder Class
-//
+//CLASS CREATED BY MAXIME :)
 
 let AudioRecorder = class {
   constructor() {

@@ -1,12 +1,15 @@
+//NOTE THIS CLASS IS UNMODIFIED FROM:
+//https://cm-gitlab.stanford.edu/mherrero/grains4u
+
 /* File: audio_buffer_slice.js
- * --------------------------- 
+ * ---------------------------
  * This file contains the AudioBufferSlice function. This function recieves
  * a AudioBuffer object, a start and end time (in seconds), a reference to
- * a Grain object, and a callback function. Using the start and end times, 
+ * a Grain object, and a callback function. Using the start and end times,
  * it safely slices a chunk out of the buffer passed into it. It passes this
  * chunk and the Grain that should keep this chunk into the callback function,
  * so that the chunk can be saved.
- * 
+ *
  * NOTE: This function was written by Miguel Mota, and comes from his website at
  *       https://miguelmota.com/bytes/slice-audiobuffer/. I made only slight edits
  *       in implementing it for Grains4U, so credits for this function certainly
@@ -14,7 +17,7 @@
  */
 
 function AudioBufferSlice(buffer, begin, end, grain, callback) {
-  
+
   var error = null;
 
   var duration = buffer.duration;

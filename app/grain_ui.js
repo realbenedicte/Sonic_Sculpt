@@ -1,3 +1,5 @@
+//NOTE I'VE MODIFIED THIS FROM:
+//https://cm-gitlab.stanford.edu/mherrero/grains4u
 
 function GrainUI(g_ind, box_x, box_y, box_width, box_height, color) {
 
