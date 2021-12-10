@@ -36,30 +36,29 @@
         <!-- form styling resource: -->
         <!-- https://codepen.io/ainalem/pen/GRqPwoz -->
         <div id="saveForm">
+        <!-- <form action="/uploadRoomDetails" method="post"> -->
         <div class="title">Save Room</div>
         <div class="input-container ic1">
-          <input id="roomName" class="input" type="text" placeholder=" " />
+        <INPUT type="text" name="roomName" id="roomName" placeholder=" " class="input"/>
           <div class="cut"></div>
           <label for 'roomName' class="placeholder">Room Name</label>
         </div>
         <div class="input-container ic2">
-          <input id="composer" class="input" type="text" placeholder=" " />
+          <INPUT type="text" name="composer" id="composer" class="input" placeholder=" " />
           <div class="cut"></div>
           <label for 'composer' class="placeholder">Composer</label>
         </div>
-        <div class="input-container ic2">
-          <input id="tags" class="input" type="text" placeholder=" " />
-          <div class="cut cut-short"></div>
-          <label for 'tags' class="placeholder">Tags</>
-        </div>
-        <button type="text" id="submit">Save!</button>
-      </div>
+        <input id ="submit2"type="submit" value="Submit">
+     <!-- </form> -->
+          </div>
+
       <div id="roomDetailsID">
-      <p>
-        Room Name: Composer: Users:
-      </p></div>
-      <button id="saveRoomId" style="display: none;">Save Room</button>
+        <!-- <div id = "roomNameDisplay">
+        </div>
+        <div id = "composerDisplay">
+        </div> -->
       </div>
+      <button id="saveRoomId" style="display: none;">Save Room</button>
       <div id="all">
       </div>
   <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>

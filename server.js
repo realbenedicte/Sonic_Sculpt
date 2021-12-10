@@ -15,14 +15,14 @@
 const express = require("express");
 const app = express(); // Init an Express App
 const path = require("path");
+//https://heynode.com/tutorial/process-user-login-form-expressjs/
+const bodyParser = require('body-parser'); // middleware
 const multer = require("multer"); //use multer to upload blob data
 const upload = multer(); // set multer to be the upload variable
 //(just like express, see above ( include it, then use it/set it up))
 const fs = require("fs"); //use the file system module so we can save files
 const mongodb = require("mongodb"); //our database
 const MongoClient = require("mongodb").MongoClient; //The **MongoClient** class is a class that allows for making Connections to MongoDB
-
-// let httpServer = require("http").createServer(app);
 
 //constants:
 const port = 3000; //local host port
@@ -32,6 +32,7 @@ let io = require("socket.io")(4000, {
     methods: ["GET", "POST"]
   }
 });
+
 //Connect Node.js application to MongoDB
 //work with data using the Node.js driver
 MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use this string to connect to 'Compass'
@@ -58,9 +59,6 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
       }
     });
 
-
-
-
     //app.get("/rooms/")
     //ROUTE FOR ROOMS
     app.get("/rooms/", function(req, res) {
@@ -69,7 +67,7 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
         "sort": "room"
       }
       rooms.find({}, options).toArray(function(err, docs) {
-        console.log("retrieved records:");
+        console.log("retrieved rooms");
         console.log(docs);
         if (err) {
           res.json([]);
@@ -99,7 +97,6 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
     // 4. insert into DB
 
     // FILE UPLOAD
-    //( SHOUld BE OUR SAVE STATE )
     //app.post() (.post() method of the express app object)
     //
     //app.post(path, callback [, callback ...])
@@ -117,13 +114,15 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
           Buffer.from(new Uint8Array(file.buffer))); // write the blob to the server as a file
       }
       res.sendStatus(200); //send back that everything went ok
-
+      console.log(req.body.roomName);
       //rooms.insertOne
       //inserts a single document into the rooms collection in MongoDB
       //MongoDB document, give field value pairs -> room and path are both fields
       rooms.insertOne({
           "room": req.body.room,
-          "paths": filePaths
+          "paths": filePaths,
+          "composer": req.body.composer,
+          "roomName": req.body.roomName,
         })
         .then((result) => {
           console.log(result); //console log the result
@@ -132,20 +131,8 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
         .catch((error) => console.error(error));
     });
 
-    app.get("/posts", (req, res)=> {
-  res.send('hi');
-});
 
-    app.post('/uploadRoomDetails', upload.single('composer'), (req, res, next) => {
-      const file = req.file
-      console.log(req.file);
-      if (!file) {
-        const error = new Error('Please upload a file')
-        error.httpStatusCode = 400
-        return next(error)
-      }
-        // res.send(file);
-    });
+
 
     //ROUTE FOR EXPLORE
     app.get('/explore', function(req, res) {
@@ -157,10 +144,15 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
       res.sendFile(path.join(__dirname, 'app/about.html'));
     });
 
+    app.use(bodyParser.urlencoded({
+      extended: false
+    }));
+
+    app.use("/r/:roomID", express.static("app")); //making room ids possible now :)
     app.use("/media", express.static("media")); //can query server for file in media
     app.use("/", express.static("app"));
-    app.use("/:roomID", express.static("app")); //making room ids possible now :)
 
+    app.use("/:roomID", express.static("app")); //making room ids possible now :)
     // START SERVER
     app.listen(port, () => {
       console.log(`SonicSculpt app listening at http://localhost:${port}`);

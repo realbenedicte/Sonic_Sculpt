@@ -143,8 +143,11 @@ let AudioRecorder = class {
   //
   upload_blobs() { //to server
     //SERVER STUFF
-
     console.log('upload_blob')
+
+    let roomNameValue = document.getElementById("roomName").value;
+    let composerValue = document.getElementById("composer").value;
+
     let formdata = new FormData(); //create a from to of data to upload to the server
     let sound_id = roomID;
 
@@ -152,10 +155,14 @@ let AudioRecorder = class {
       sound_id = makeid(4);
       roomID = sound_id;
     }
-
+    //to the field of room, put the correct roomID
     formdata.append("room", `${roomID}`);
+    formdata.append("composer", `${composerValue}`);
+    formdata.append("roomName", `${roomNameValue}`);
+
     for (let i = 0; i < this.blobs.length; i++) {
       let blob = this.blobs[i];
+      //name, value, filename
       formdata.append(`blobs`, blob, `${sound_id}-${i}.wav`);
     }
 
@@ -168,6 +175,25 @@ let AudioRecorder = class {
     request.onload = function(evt) {
       if (request.status == 200) {
         console.log("successful upload of " + `${sound_id}.wav`);
+        // window.location.pathname = `/r/${roomID}`;
+        // call function to display gui info + put grains into save mode
+        //if you get 200 it means these values were saved so we can display them
+        let roomDetails = document.getElementById('roomDetailsID');
+      //  let composerDiv = document.getElementById("composerDisplay");
+        let roomNameDiv = document.createElement("div");
+       roomNameDiv.setAttribute("id", "roomNameDisplay");
+       let composerDiv = document.createElement("div");
+       composerDiv.setAttribute("id", "composerDisplay");
+        roomNameDiv.innerText = `Room Name: ${roomNameValue}`;
+        composerDiv.innerText = `Composer: ${composerValue}`;
+        roomDetails.textContent = roomDetails.textContent + `RoomID: ${roomID}`;
+        roomDetails.appendChild(roomNameDiv);
+        roomDetails.appendChild(composerDiv);
+        for (let i = 0; i < grains.length; i++){
+          grain_uis[i].disable_record_and_delete();
+            grains[i].stop(); // make disable recording and delete
+        }
+
       } else {
         console.log("got error ", evt);
       }

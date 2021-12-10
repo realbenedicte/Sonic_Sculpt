@@ -542,12 +542,31 @@ main {
   width: 100%;
 }
 
+
+#submit2 {
+  background-color: blue;
+  border-radius: 12px;
+  border: 0;
+  box-sizing: border-box;
+  color: #eee;
+  cursor: pointer;
+  font-size: 18px;
+  height: 50px;
+  margin-top: 38px;
+  outline: 0;
+  text-align: center;
+  width: 100%;
+}
+
 .submit:active {
   background-color: #06b;
 }
 
+
 #roomDetailsID {
-  display: inline-block;
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
   align-self: center;
   border: none;
   padding: 0.7rem 2rem;
@@ -566,7 +585,6 @@ main {
   color: white;
 }
 
-.roomWrapper {}
 
 #rooms {
   display: flex;
@@ -591,6 +609,7 @@ main {
   border-style: solid;
   background-color: white;
   margin: 10px;
+  flex-direction: column;
 }
 
 #rooms>div>a {
@@ -598,9 +617,18 @@ main {
   text-align: center;
   display: inline-block;
   border-color: black;
-  font-size: 22px;
+  font-size: 18px;
   text-decoration: none;
   color: blue;
+}
+
+#rooms>div>p {
+  text-align: center;
+  text-align: center;
+  display: inline-block;
+  font-size: 15px;
+  text-decoration: none;
+  color: black;
 }
 
 @media only screen and (max-width: 600px) {

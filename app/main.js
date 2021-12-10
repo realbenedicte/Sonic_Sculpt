@@ -11,15 +11,14 @@ let createRoomButton = document.getElementById("createRoomID"); //define create 
 // let overlayElement = document.getElementById("myNav");
 let homePageButton = document.getElementById("homeButton");
 let formElement = document.getElementById('saveForm');
-let submitButton = document.getElementById('submit');
+let submitButton = document.getElementById('submit2');
 let roomDetails = document.getElementById('roomDetailsID');
 let audioFilePaths = null;
 
- // var socket = io();
+// var socket = io();
 //When page loads -> call the init function
 window.addEventListener("load", (event) => {
   console.log("window loaded.");
-
   init();
 });
 
@@ -85,10 +84,13 @@ function homePageCreateRoom(r_id = null) {
 //which loads up correct audio files corresponding to the room
 function initRoom() {
   let r_id = window.location.hash.substring(1);
+  console.log(window.location);
   console.log(r_id);
-  if (!r_id) {
+  if (r_id === '') {
     homePageCreateRoom();
+    return;
   }
+  //getting the room !
   var url = `/room/${r_id}`;
   var req = new XMLHttpRequest();
   req.responseType = 'json';
@@ -99,13 +101,25 @@ function initRoom() {
       homePageCreateRoom(roomFromServer.room);
       //need to load this files into the audio buffer somehow
       let audioFilePaths = roomFromServer.paths;
+      let composer = roomFromServer.composer; //getting composer from server
+      let roomName = roomFromServer.roomName; //getting roomname from server
       console.log('got audio file paths', audioFilePaths);
       console.log('got room from server', roomFromServer);
-    //  getData(audioFilePaths);
+      console.log('got roomName from server', roomName);
+      console.log('got composer from server', composer);
       initGrainsFromServer(audioFilePaths);
       //hide and show elements
-      loadRoomDetailsInGui(r_id);
-
+      //add composer and roomname to document
+      let roomNameDiv = document.createElement("div");
+     roomNameDiv.setAttribute("id", "roomNameDisplay");
+     let composerDiv = document.createElement("div");
+     composerDiv.setAttribute("id", "composerDisplay");
+      roomNameDiv.innerText +=`Room Name: ${roomName}`;
+      composerDiv.innerText += `Composer: ${composer}`;
+      roomDetails.textContent = roomDetails.textContent + `RoomID: ${r_id}`;
+      roomDetails.appendChild(roomNameDiv);
+      roomDetails.appendChild(composerDiv);
+      // loadRoomDetailsInGui(r_id);
       //connect to socket only in saved room
       let clientSocket = io.connect('http://localhost:4000');
       //let theIds = [];
@@ -113,14 +127,14 @@ function initRoom() {
         console.log("connected");
         clientSocket.emit("init", r_id);
         clientSocket.on('disconnect', () => {
-        console.log("disconnected");
-      });
+          console.log("disconnected");
+        });
       });
       if (document.getElementById('saveRoomId')) {
         var saveTest2 = document.getElementById('saveRoomId');
         saveTest2.style.display = "none";
       }
-      roomDetails.style.display = 'block';
+      roomDetails.style.display = 'flex';
 
     } else {
       homePageCreateRoom();
@@ -129,12 +143,8 @@ function initRoom() {
   req.send(null);
 }
 
-function loadRoomDetailsInGui(r_id){
-roomDetails.textContent = roomDetails.textContent + `RoomID: ${r_id}`;
-}
-
-function initGrainsFromServer(audioFilePaths){
-  for (let i = 0; i < audioFilePaths.length; i++){
+function initGrainsFromServer(audioFilePaths) {
+  for (let i = 0; i < audioFilePaths.length; i++) {
     initGrain(i, audioFilePaths[i]);
   }
   unblock_app(); //unblock so u can move sliders
@@ -149,12 +159,14 @@ function initGrain(id, path) {
     let audioData = request.response;
     //need to send this response to the channel buffer
     context.decodeAudioData(audioData, function(buffer) {
-      grains[id].full_buffer = buffer;
-      grain_uis[id].handle_spawn_grain();
-      grain_uis[id].disable_record_and_delete(); // make disable recording and delete
-      grains[id].stop();
+        grains[id].full_buffer = buffer;
+        grain_uis[id].handle_spawn_grain();
+        grain_uis[id].disable_record_and_delete(); // make disable recording and delete
+        grains[id].stop();
       },
-      function(e){"Error with decoding audio data" + e.error});
+      function(e) {
+        "Error with decoding audio data" + e.error
+      });
   }
   request.send();
 };
@@ -198,8 +210,8 @@ function saveButtonClick() {
   console.log('save clicked');
   //PAUSE ALL AUDIO
   //show form only if you've uploaded audio to all 4 channels !
-  for (let i = 0; i < grains.length; i++){
-    if(!grains[i].full_buffer){
+  for (let i = 0; i < grains.length; i++) {
+    if (!grains[i].full_buffer) {
       alert('please record 4 audio files');
       return;
     }
@@ -226,36 +238,31 @@ function submitRoomDetails() {
   var divTest = document.getElementById('app_div');
   formElement.style.display = 'none';
   divTest.style.visibility = 'visible';
-  roomDetails.style.display = 'inline-block';
+  roomDetails.style.display = 'flex';
   //Save the audio and the room id to the server!!!!!
   audioRecorder.on_save_room();
   getUserInput();
 }
 
-function getUserInput(){
-var composer = document.getElementById("composer").value;
-var roomName = document.getElementById("roomName").value;
-console.log(composer);
-console.log(roomName);
-//we have the user input so now to add to server/db
-
-let formdata = new FormData(); //create a from to of data to upload to the server
-formdata.append("composer", `${composer}`);
-//formdata.append("roomName", `${roomName}`);
-//POST ENDPOINT ~!~
-// Now we can send the blob to a server...
-var serverUrl = "/uploadRoomDetails"; //we've made a POST endpoint on the server at /uploadRoomDetails"
-//build a HTTP POST request
-var request = new XMLHttpRequest();
-request.open("POST", serverUrl);
-request.onload = function(evt) {
-  if (request.status == 200) {
-    console.log("successful upload of " + `${composer}` + `${roomName}`);
-  } else {
-    console.log("got error ", evt);
-  }
-};
-request.send(formdata); //send the form data to the post endpoint
+function getUserInput() {
+  // //get the id of the room you are in!
+  // let r_id = window.location.hash.substring(1);
+  // let formdata = new FormData(); //create a from to of data to upload to the server
+  // //to the field of room, put the correct roomID
+  // formdata.append("room", `${r_id}`);
+  // //to the field of room, put the correct roomID
+  // var serverUrl = "/uploadRoomDetails";
+  // //build a HTTP POST request
+  // var request = new XMLHttpRequest();
+  // request.open("POST", serverUrl);
+  // request.onload = function(evt) {
+  //   if (request.status == 200) {
+  //     console.log("successful upload of rrooom id  " + `${r_id}`);
+  //   } else {
+  //     console.log("got error ", evt);
+  //   }
+  // };
+  // request.send(formdata);
 };
 
 function get_grains_playing() {
@@ -498,6 +505,7 @@ function handle_mouse_move(event) {
     grain_uis[g_changing].handle_new_mouse_coords(event.clientX);
   }
 }
+
 
 /* Function: handle_mouse_up
  * -------------------------

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Sonic_Sculpt</title>
-  <link rel="stylesheet" type="text/css" href="main.css">
+  <link rel="stylesheet" type="text/css" href="/main.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
@@ -21,12 +21,17 @@
         console.log(rooms);
         for (let i =0; i < rooms.length; i++) {
           console.log(rooms[i].room);
-
+          let roomNameDiv= document.createElement('p');
+          let composerNameDiv= document.createElement('p');
           let roomEl= document.createElement('div');
           let roomLink = document.createElement('a');
+          roomNameDiv.innerHTML = `Room Name: ${rooms[i].roomName}`
+          composerNameDiv.innerHTML = `Composer: ${rooms[i].composer}`
           roomLink.setAttribute("href", `/#${rooms[i].room}`) //put url
           roomLink.innerText = `RoomID: ${rooms[i].room}`;
           roomEl.appendChild(roomLink);
+          roomEl.appendChild(roomNameDiv);
+          roomEl.appendChild(composerNameDiv);
           roomsContainer.appendChild(roomEl);
         }
       }
