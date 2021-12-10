@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name = "viewport" content = "width = device-width">
+  <meta name="viewport" content="width = device-width">
   <title>Sonic_Sculpt</title>
   <link rel="stylesheet" type="text/css" href="main.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,7 +16,9 @@
         <ul id="menu" class="main-nav">
           <li>
             <div id="homeButton">
-              <a href = '/'> <p> ~Sonic Sculpt~</p></a>
+              <a href='/'>
+                <p> ~Sonic Sculpt~</p>
+              </a>
             </div>
           </li>
           <li>
@@ -32,48 +33,42 @@
       <div class="home-page-create">
         <button type="button" id="createRoomID">Create A Room</button>
       </div>
-      <div id = saveTest>
+      <div id=saveTest>
         <!-- form styling resource: -->
         <!-- https://codepen.io/ainalem/pen/GRqPwoz -->
+        <!-- <form> -->
         <div id="saveForm">
-        <!-- <form action="/uploadRoomDetails" method="post"> -->
-        <div class="title">Save Room</div>
-        <div class="input-container ic1">
-        <INPUT type="text" name="roomName" id="roomName" placeholder=" " class="input"/>
-          <div class="cut"></div>
-          <label for 'roomName' class="placeholder">Room Name</label>
-        </div>
-        <div class="input-container ic2">
-          <INPUT type="text" name="composer" id="composer" class="input" placeholder=" " />
-          <div class="cut"></div>
-          <label for 'composer' class="placeholder">Composer</label>
-        </div>
-        <input id ="submit2"type="submit" value="Submit">
-     <!-- </form> -->
+          <div class="title">Save Room</div>
+          <div class="input-container ic1">
+            <INPUT type="text" name="roomName" id="roomName" placeholder=" " class="input" required/>
+            <div class="cut"></div>
+            <label for 'roomName' class="placeholder">Room Name</label>
           </div>
-
-      <div id="roomDetailsID">
-        <!-- <div id = "roomNameDisplay">
+          <div class="input-container ic2">
+            <INPUT type="text" name="composer" id="composer" class="input" placeholder=" " required/>
+            <div class="cut"></div>
+            <label for 'composer' class="placeholder">Composer</label>
+          </div>
+          <input id="submit2" type="submit" value="Submit" >
         </div>
-        <div id = "composerDisplay">
-        </div> -->
+          <!-- </form> -->
+        <div id="roomDetailsID">
+        </div>
+        <button id="saveRoomId" style="display: none;">Save Room</button>
+        <div id="all">
+        </div>
+        <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="audio_buffer_slice.js"></script>
+        <script type="text/javascript" src="constants.js"></script>
+        <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="grain_ui.js"></script>
+        <script type="text/javascript" src="grain.js"></script>
+        <script type="text/javascript" src="audio-recorder.js"></script>
+        <script type="text/javascript" src="main.js"></script>
       </div>
-      <button id="saveRoomId" style="display: none;">Save Room</button>
-      <div id="all">
-      </div>
-  <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
-      <script type="text/javascript" src="audio_buffer_slice.js"></script>
-      <script type="text/javascript" src="constants.js"></script>
-      <script type="text/javascript" src="utils.js"></script>
-      <script type="text/javascript" src="grain_ui.js"></script>
-      <script type="text/javascript" src="grain.js"></script>
-      <script type="text/javascript" src="audio-recorder.js"></script>
-      <script type="text/javascript" src="main.js"></script>
+      <footer id="footer">
+      </footer>
     </div>
-    <footer id="footer">
-    </footer>
   </div>
-</div>
 </body>
-
 </html>

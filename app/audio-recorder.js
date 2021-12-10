@@ -111,7 +111,6 @@ let AudioRecorder = class {
     //find id of the blob
     this.blobs[current_grain_id] = blob;
     console.log('curretn g id', current_grain_id);
-    //
   }
 
   get_audio_buffer_source(out_node) {
@@ -157,32 +156,29 @@ let AudioRecorder = class {
     request.onload = function(evt) {
       if (request.status == 200) {
         console.log("successful upload of " + `${sound_id}.wav`);
-        // window.location.pathname = `/r/${roomID}`;
         // call function to display gui info + put grains into save mode
         //if you get 200 it means these values were saved so we can display them
         let roomDetails = document.getElementById('roomDetailsID');
-      //  let composerDiv = document.getElementById("composerDisplay");
         let roomNameDiv = document.createElement("div");
-       roomNameDiv.setAttribute("id", "roomNameDisplay");
-       let composerDiv = document.createElement("div");
-       composerDiv.setAttribute("id", "composerDisplay");
+        roomNameDiv.setAttribute("id", "roomNameDisplay");
+        let composerDiv = document.createElement("div");
+        composerDiv.setAttribute("id", "composerDisplay");
         roomNameDiv.innerText = `Room Name: ${roomNameValue}`;
         composerDiv.innerText = `Composer: ${composerValue}`;
         roomDetails.textContent = roomDetails.textContent + `RoomID: ${roomID}`;
         roomDetails.appendChild(roomNameDiv);
         roomDetails.appendChild(composerDiv);
-        for (let i = 0; i < grains.length; i++){
+        for (let i = 0; i < grains.length; i++) {
           grain_uis[i].disable_record_and_delete();
-            grains[i].stop(); // make disable recording and delete
+          grains[i].stop(); // make disable recording and delete
         }
-
       } else {
         console.log("got error ", evt);
       }
     };
     request.send(formdata);
   }
-  
+
   //AUDIO BUFFER STUFF
   //
   //https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer
@@ -195,7 +191,6 @@ let AudioRecorder = class {
     };
     reader.onloadend = function() {
       let arr_buf = reader.result;
-
       context
         .decodeAudioData(arr_buf)
         .then(function(data) {

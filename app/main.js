@@ -13,7 +13,7 @@ let submitButton = document.getElementById('submit2');
 let roomDetails = document.getElementById('roomDetailsID');
 let audioFilePaths = null;
 
-//When page loads -> call the init function
+//When page loads -> call the init functions
 window.addEventListener("load", (event) => {
   console.log("window loaded.");
   initRoom();
@@ -69,13 +69,17 @@ function initRoom() {
       let audioFilePaths = roomFromServer.paths;
       let composer = roomFromServer.composer; //getting composer from server
       let roomName = roomFromServer.roomName; //getting roomname from server
+      //
+      //consolelogs
       console.log('got audio file paths', audioFilePaths);
       console.log('got room from server', roomFromServer);
       console.log('got roomName from server', roomName);
       console.log('got composer from server', composer);
+      //populate grain channels with correct audio file paths
+      //
       initGrainsFromServer(audioFilePaths);
-      //hide and show elements
-      //add composer and roomname to document
+      //Show composer, room name and room id in the gui
+      //we got these elements from the server because they are in the rooms object
       let roomNameDiv = document.createElement("div");
       roomNameDiv.setAttribute("id", "roomNameDisplay");
       let composerDiv = document.createElement("div");
@@ -85,17 +89,16 @@ function initRoom() {
       roomDetails.textContent = roomDetails.textContent + `RoomID: ${r_id}`;
       roomDetails.appendChild(roomNameDiv);
       roomDetails.appendChild(composerDiv);
-      // loadRoomDetailsInGui(r_id);
       //connect to socket only in saved room
-      let clientSocket = io.connect('http://localhost:4000');
-      //let theIds = [];
-      clientSocket.on('connect', function() {
-        console.log("connected");
-        clientSocket.emit("init", r_id);
-        clientSocket.on('disconnect', () => {
-          console.log("disconnected");
-        });
-      });
+      //disabled sockets for this version
+      // let clientSocket = io.connect('http://localhost:4000');
+      // clientSocket.on('connect', function() {
+      //   console.log("connected");
+      //   clientSocket.emit("init", r_id);
+      //   clientSocket.on('disconnect', () => {
+      //     console.log("disconnected");
+      //   });
+      // });
       if (document.getElementById('saveRoomId')) {
         var saveTest2 = document.getElementById('saveRoomId');
         saveTest2.style.display = "none";

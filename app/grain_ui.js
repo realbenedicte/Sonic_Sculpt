@@ -180,7 +180,6 @@ GrainUI.prototype.make_grain_rect = function () {
   this.box.appendChild(this.grain_rect);
 }
 
-
 GrainUI.prototype.toggle_live = function (live = true) {
  if(live){
    this.box.classList.add('live');
