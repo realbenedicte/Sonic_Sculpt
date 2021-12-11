@@ -12,13 +12,53 @@ let formElement = document.getElementById("saveForm");
 let submitButton = document.getElementById("submit2");
 let roomDetails = document.getElementById("roomDetailsID");
 let audioFilePaths = null;
+let socket = io();
+let socketInitialized = true
 
+let grainState = []
 //When page loads -> call the init functions
 window.addEventListener("load", (event) => {
   console.log("window loaded.");
   initRoom();
   createRoomButton.addEventListener("click", createRoom);
 });
+
+socket.on("initialized", (state, newMember = true) => {
+  console.log("socket initiallized got state !", state)
+  if (!newMember) {
+    updateGrainStateFromSocket(state)
+  }
+  socketInitialized = true
+})
+
+socket.on("updateGrain", (state) => {
+  console.log("got updateState from server ", state)
+  if(socketInitialized) {
+    updateGrainStateFromSocket(state)
+  }
+})
+
+function updateGrainStateFromSocket(state) {
+  for (let i = 0; i < grains.length; i++) {
+    let grain = grains[i]
+    const [start, end, paused] = state[i]
+
+    console.log("updating state ", start, end, paused)
+    grain.ui.set([start, end])
+    // if (paused) {
+    //   grain.stop()
+    // } else {
+    //   grain.play()
+    // }
+    // if (socketInitialized) {
+    //   grain.refresh_play()
+    // }
+  }
+}
+
+socket.on("disconnect", () => {
+  socketInitialized = false
+})
 
 //query the server/db to see if the url typed into the website matches a room !!!!
 //if it does load up that room, if it doesn't load the homepage with createroom
@@ -56,7 +96,7 @@ function initRoom() {
   req.onload = function () {
     var roomFromServer = req.response;
     if (roomFromServer && roomFromServer.room) {
-      homePageCreateRoom(roomFromServer.room);
+      homePageCreateRoom(roomFromServer.room, roomFromServer.grains);
       //need to load this files into the audio buffer somehow
       let audioFilePaths = roomFromServer.paths;
       let composer = roomFromServer.composer; //getting composer from server
@@ -69,7 +109,7 @@ function initRoom() {
       console.log("got composer from server", composer);
       //populate grain channels with correct audio file paths
       //
-      initGrainsFromServer(audioFilePaths);
+      initGrainsFromServer(roomFromServer.grains);
 
       //Show composer, room name and room id in the gui
       //we got these elements from the server because they are in the rooms object
@@ -104,19 +144,34 @@ function initRoom() {
   };
   req.send(null);
 }
+
+function getGrainsState() {
+  return grains.map((grain)=> {
+    let grainPos = grain.ui.get()
+    return [...grainPos, grain.grain_on]
+  })
+}
 //
 //main simple homepage
-function homePageCreateRoom(r_id = null) {
+function homePageCreateRoom(r_id = null, grainsData = null) {
   if (r_id) {
+    roomID = r_id;
     audioRecorder.init_audio_stream();
-    init_grains();
-    init_interface();
+    init_grains(grainsData);
+    init_interface(grainsData);
     initGrainUiWithRoom();
     createRoomButton.style.display = "none"; //hide create room button
     createSaveButton();
     console.log("homepage created.");
     formElement.style.display = "none"; //hide form
     roomDetails.style.display = "none";
+
+    grainState = grainsData.map((grain)=> (
+      [grain.start, grain.end, false]
+    ))
+
+    socket.emit('init', r_id, grainState);
+
     return;
   }
   createRoomButton.style.display = "block"; //show the create room button
@@ -134,9 +189,9 @@ function homePageCreateRoom(r_id = null) {
   }
 }
 
-function initGrainsFromServer(audioFilePaths) {
-  for (let i = 0; i < audioFilePaths.length; i++) {
-    initGrain(i, audioFilePaths[i]);
+function initGrainsFromServer(grainsData) {
+  for (let i = 0; i < grainsData.length; i++) {
+    initGrain(i, grainsData[i].audio);
   }
 }
 
@@ -278,12 +333,14 @@ function init_app_div() {
  * to their Grain objects, draws the grain interfaces, and then blocks
  * app interaction (until a recording occurs).
  */
-function init_interface() {
+function init_interface(grainsData = null) {
   // init app div
   init_app_div();
   grain_uis = new Array();
   for (var i = 0; i < NUM_GRAINS; i++) {
-    grain_uis.push(createSlider(i));
+
+    let grainData = grainsData ? grainsData[i] : null
+    grain_uis.push(createSlider(i, grainData));
   }
   link_grains_to_uis();
 }
@@ -292,13 +349,16 @@ function init_interface() {
 const sliderColors = ["red", "green", "orange", "purple"];
 
 //function that creates sliders and creates callbacks for if a slider box is being dragged
-function createSlider(id) {
+function createSlider(id, grainData) {
+
+  console.log("creating slider with grain data ", grainData)
   let sliderEl = document.createElement("div");
   sliderEl.id = `slider-${id}`;
   sliderEl.className = `slider off ${sliderColors[id]}`;
   app.appendChild(sliderEl);
+  let grainStart = grainData ? [grainData.start, grainData.end] : [40, 60]
   let slider = noUiSlider.create(sliderEl, {
-    start: [40, 60],
+    start: grainStart,
     connect: true,
     margin: 10,
     behaviour: "drag",
@@ -375,7 +435,14 @@ function onRemove(e) {
 //refresh play (to do with granular synthesis and audio playback)
 function onDragEnd(e) {
   console.log("drag end ! ", e, this);
-  this.grain.refresh_play();
+  if (socketInitialized) {
+    grainState = getGrainsState()
+
+    console.log("sending state to server ", roomID, grainState)
+    socket.emit("updateState", roomID, grainState)
+  } else {
+    this.grain.refresh_play();
+  }
 }
 
 //on pause stop playing the grains for that particular channel

@@ -19,6 +19,10 @@
 //(require is a Node function for importing a module)
 const express = require("express");
 const app = express(); // Init an Express App
+const http = require('http');
+const server = http.createServer(app);
+
+
 const path = require("path");
 //https://heynode.com/tutorial/process-user-login-form-expressjs/
 
@@ -31,12 +35,13 @@ const MongoClient = require("mongodb").MongoClient; //The **MongoClient** class 
 const port = 3000; //local host port
 
 //didn't use sockets in this version
-let io = require("socket.io")(4000, {
-  cors: {
-    origin: 'http://localhost:3000',
-    methods: ["GET", "POST"]
-  }
-});
+
+const { Server } = require("socket.io");
+const io = new Server(server);
+
+let socketRooms = {}
+
+let socketInitialized = false;
 
 //Connect Node.js application to MongoDB
 //work with data using the Node.js driver
@@ -126,6 +131,7 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
     app.post("/upload", upload.array("blobs", 4), function(req, res, next) {
       // console.log("this is the request.file "+`${req.file}`);
       //media folder stores all the wav files
+
       let filePaths = [];
       console.log(req.files);
       for (let i = 0; i < req.files.length; i++) {
@@ -141,9 +147,22 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
       //rooms.insertOne
       //inserts a single document into the rooms collection in MongoDB
       //MongoDB document, give field value pairs -> room and path are both fields
+
+      let grainsJson = JSON.parse(req.body.grains)
+      console.log("got grains", grainsJson)
+
+      let grains = grainsJson.map((grain, index) => (
+        {
+          audio: filePaths[index],
+          start: grain.start,
+          end: grain.end
+        }
+      ))
+
       rooms.insertOne({
           "room": req.body.room,
           "paths": filePaths,
+          "grains": grains,
           "composer": req.body.composer,
           "roomName": req.body.roomName,
         })
@@ -176,11 +195,47 @@ MongoClient.connect("mongodb://localhost/") //MongoDB connection string - use th
     app.use("/", express.static("app"));
     app.use("/:roomID", express.static("app")); //making room ids possible now :)
 
+
+    // socket stuff !
+    io.on('connection', (socket) => {
+      console.log('a user connected');
+
+      socket.on('init', (room, state) => {
+        console.log('user joined room: ' + room);
+        let newMember = true;
+        if (room in socketRooms) {
+          newMember = false;
+        } else {
+          socketRooms[room] = {
+            "state": state,
+          }
+          console.log("socket room created ! ", socketRooms[room])
+        }
+        socket.join(room)
+        socket.emit("initialized", socketRooms[room].state, newMember)
+        
+      });
+
+      socket.on("updateState", (room, state) => {
+        console.log("got update State ", room, state)
+        socket.to(room).emit("updateGrain", state)
+      })
+
+
+      socket.on('disconnect', () => {
+        console.log('user disconnected');
+      });
+    });
+
+
     // START SERVER
     //https://expressjs.com/en/starter/hello-world.html
     //This app starts a server and listens on port 3000 for connections.
-    app.listen(port, () => {
-      console.log(`SonicSculpt app listening at http://localhost:${port}`);
+    // app.listen(port, () => {
+    //   console.log(`SonicSculpt app listening at http://localhost:${port}`);
+    // });
+    server.listen(3000, () => {
+      console.log('listening on *:3000');
     });
   })
   .catch(console.error);

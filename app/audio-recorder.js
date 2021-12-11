@@ -136,12 +136,24 @@ let AudioRecorder = class {
     formdata.append("room", `${roomID}`);
     formdata.append("composer", `${composerValue}`);
     formdata.append("roomName", `${roomNameValue}`);
+    
 
     for (let i = 0; i < this.blobs.length; i++) {
       let blob = this.blobs[i];
-      //name, value, filename
       formdata.append(`blobs`, blob, `${sound_id}-${i}.wav`);
     }
+
+    let grainsData = []
+    for (let i =0; i < grains.length; i++) {
+      let grain = grains[i];
+      let grainData = {
+        "start": grain.oldStart,
+        "end": grain.oldEnd,
+      }
+      grainsData.push(grainData)
+    }
+
+    formdata.append('grains', JSON.stringify(grainsData))
 
     //POST ENDPOINT ~!~
     // Now we can send the blob to a server...
@@ -197,7 +209,6 @@ let AudioRecorder = class {
           console.log(data.duration); // can find duration (how long our recording is in seconds)
           if (current_grain_id !== null) {
             grains[current_grain_id].full_buffer = data;
-            // grain_uis[current_grain_id].handle_spawn_grain();
             grains[current_grain_id].play();
             current_grain_id = null;
           }
