@@ -70,6 +70,7 @@ function initRoom() {
       //populate grain channels with correct audio file paths
       //
       initGrainsFromServer(audioFilePaths);
+
       //Show composer, room name and room id in the gui
       //we got these elements from the server because they are in the rooms object
       let roomNameDiv = document.createElement("div");
@@ -91,6 +92,7 @@ function initRoom() {
       //     console.log("disconnected");
       //   });
       // });
+
       if (document.getElementById("saveRoomId")) {
         var saveTest2 = document.getElementById("saveRoomId");
         saveTest2.style.display = "none";
@@ -386,7 +388,7 @@ function onPause(e) {
     grains[g_ind].play();
   }
 }
-//Make sure grain ui is pretty
+//Make sure grain ui has the necessary buttons
 function initGrainUiWithRoom() {
   for (let i = 0; i < grain_uis.length; i++) {
     const grainUi = grain_uis[i];

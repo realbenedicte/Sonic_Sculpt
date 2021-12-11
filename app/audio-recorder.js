@@ -23,7 +23,7 @@ let AudioRecorder = class {
   //
   //upload the recorded wav file to the data base :)
   on_record_stop(e) {
-    this.save_rec_blob(); 
+    this.save_rec_blob();
     this.handle_store_full_buffer(); //audio buffer stuff
   }
 
@@ -165,7 +165,9 @@ let AudioRecorder = class {
         roomDetails.appendChild(roomNameDiv);
         roomDetails.appendChild(composerDiv);
         for (let i = 0; i < grains.length; i++) {
-          grain_uis[i].disable_record_and_delete();
+          // grain_uis[i].disable_record_and_delete();
+          grains[i].ui.removeButton.classList.add("hidden");
+          grains[i].ui.recordButton.classList.add("hidden");
           grains[i].stop(); // make disable recording and delete
         }
       } else {
