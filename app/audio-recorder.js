@@ -40,7 +40,7 @@ let AudioRecorder = class {
     if (verbose) {
       console.log("recording stopped");
     }
-    unblock_app();
+    // unblock_app();
     // rec_button.is_active = 0;
   }
 
@@ -72,7 +72,7 @@ let AudioRecorder = class {
     if (verbose) {
       console.log("recording started");
     }
-    block_app();
+    // block_app();
   }
 
   handle_rec_press(current_grain_id) {
@@ -199,7 +199,7 @@ let AudioRecorder = class {
           console.log(data.duration); // can find duration (how long our recording is in seconds)
           if (current_grain_id !== null) {
             grains[current_grain_id].full_buffer = data;
-            grain_uis[current_grain_id].handle_spawn_grain();
+            // grain_uis[current_grain_id].handle_spawn_grain();
             grains[current_grain_id].play();
             current_grain_id = null;
           }

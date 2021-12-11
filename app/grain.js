@@ -21,6 +21,9 @@ function Grain(g_ind) {
   this.intID = null;
   // Stores the time (Audio Context clock) of most recent call to fire()
   this.last_fire_time = null;
+
+  this.oldStart = 0;
+  this.oldEnd = 0;
 }
 
 /* Function: apply_vol_env
@@ -58,8 +61,19 @@ Grain.prototype.apply_vol_env = function () { //volume envelope
  */
 Grain.prototype.refresh_buffer = function (buf) {
   if (verbose) console.log("refreshing grain buffer");
-  new_start = this.ui.g_left_perc * buf.duration;
-  new_end = this.ui.g_right_perc * buf.duration;
+
+  const [sliderStart, sliderEnd] = this.ui.get()
+
+  if (sliderStart === this.oldStart && sliderEnd === this.oldEnd) {
+    console.log("already set !")
+    return;
+  }
+  this.oldStart = sliderStart
+  this.oldEnd = sliderEnd
+  
+  new_start = sliderStart/100 * buf.duration;
+  new_end = sliderEnd/100 * buf.duration;
+  
   console.log('new_start', new_start);
   console.log('new_end', new_end);
   AudioBufferSlice(buf, new_start, new_end, this, function (e, new_buffer, grain) {

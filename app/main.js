@@ -8,9 +8,9 @@ let roomID = null;
 //defining various buttons
 let createRoomButton = document.getElementById("createRoomID"); //define create room button
 let homePageButton = document.getElementById("homeButton");
-let formElement = document.getElementById('saveForm');
-let submitButton = document.getElementById('submit2');
-let roomDetails = document.getElementById('roomDetailsID');
+let formElement = document.getElementById("saveForm");
+let submitButton = document.getElementById("submit2");
+let roomDetails = document.getElementById("roomDetailsID");
 let audioFilePaths = null;
 
 //When page loads -> call the init functions
@@ -42,7 +42,6 @@ function init_doc_listeners() {
 // composer:"maxime"
 // roomName: "testing"
 
-
 //initRoom()
 //if the room exists in the server it means a user has saved that room
 //so show the room !!!
@@ -52,16 +51,16 @@ function initRoom() {
   let r_id = window.location.hash.substring(1);
   console.log(window.location);
   console.log(r_id);
-  if (r_id === '') {
+  if (r_id === "") {
     homePageCreateRoom();
     return;
   }
   //getting the room from server
   var url = `/room/${r_id}`;
   var req = new XMLHttpRequest();
-  req.responseType = 'json';
-  req.open('GET', url, true);
-  req.onload = function() {
+  req.responseType = "json";
+  req.open("GET", url, true);
+  req.onload = function () {
     var roomFromServer = req.response;
     if (roomFromServer && roomFromServer.room) {
       homePageCreateRoom(roomFromServer.room);
@@ -71,10 +70,10 @@ function initRoom() {
       let roomName = roomFromServer.roomName; //getting roomname from server
       //
       //consolelogs
-      console.log('got audio file paths', audioFilePaths);
-      console.log('got room from server', roomFromServer);
-      console.log('got roomName from server', roomName);
-      console.log('got composer from server', composer);
+      console.log("got audio file paths", audioFilePaths);
+      console.log("got room from server", roomFromServer);
+      console.log("got roomName from server", roomName);
+      console.log("got composer from server", composer);
       //populate grain channels with correct audio file paths
       //
       initGrainsFromServer(audioFilePaths);
@@ -99,12 +98,11 @@ function initRoom() {
       //     console.log("disconnected");
       //   });
       // });
-      if (document.getElementById('saveRoomId')) {
-        var saveTest2 = document.getElementById('saveRoomId');
+      if (document.getElementById("saveRoomId")) {
+        var saveTest2 = document.getElementById("saveRoomId");
         saveTest2.style.display = "none";
       }
-      roomDetails.style.display = 'flex';
-
+      roomDetails.style.display = "flex";
     } else {
       homePageCreateRoom();
     }
@@ -120,54 +118,56 @@ function homePageCreateRoom(r_id = null) {
     init_interface();
     createRoomButton.style.display = "none"; //hide create room button
     createSaveButton();
-    console.log('homepage created.');
+    console.log("homepage created.");
     formElement.style.display = "none"; //hide form
-    roomDetails.style.display = 'none';
+    roomDetails.style.display = "none";
     return;
   }
   createRoomButton.style.display = "block"; //show the create room button
-  console.log('homepage created.');
+  console.log("homepage created.");
   createRoomButton.style.display = "block"; //show the create room button
   formElement.style.display = "none"; //hide form
-  roomDetails.style.display = 'none';
-  if (document.getElementById('app_div')) {
-    var divTest = document.getElementById('app_div');
+  roomDetails.style.display = "none";
+  if (document.getElementById("app_div")) {
+    var divTest = document.getElementById("app_div");
     divTest.style.visibility = "hidden";
   }
-  if (document.getElementById('saveRoomId')) {
-    var saveTest2 = document.getElementById('saveRoomId');
+  if (document.getElementById("saveRoomId")) {
+    var saveTest2 = document.getElementById("saveRoomId");
     saveTest2.style.display = "none";
   }
 }
-
 
 function initGrainsFromServer(audioFilePaths) {
   for (let i = 0; i < audioFilePaths.length; i++) {
     initGrain(i, audioFilePaths[i]);
   }
   unblock_app(); //unblock so u can move sliders
-};
+}
 
 function initGrain(id, path) {
   //let source = context.createBufferSource();
   let request = new XMLHttpRequest();
-  request.open('GET', path, true);
-  request.responseType = 'arraybuffer';
-  request.onload = function() {
+  request.open("GET", path, true);
+  request.responseType = "arraybuffer";
+  request.onload = function () {
     let audioData = request.response;
     //need to send this response to the channel buffer
-    context.decodeAudioData(audioData, function(buffer) {
+    context.decodeAudioData(
+      audioData,
+      function (buffer) {
         grains[id].full_buffer = buffer;
         grain_uis[id].handle_spawn_grain();
         grain_uis[id].disable_record_and_delete(); // make disable recording and delete
         grains[id].stop();
       },
-      function(e) {
-        "Error with decoding audio data" + e.error
-      });
-  }
+      function (e) {
+        "Error with decoding audio data" + e.error;
+      }
+    );
+  };
   request.send();
-};
+}
 
 //creates a new room and initializes it
 //TO DO: clear old room -- calling this again creates an old room on top of other ones
@@ -179,12 +179,12 @@ function createRoom() {
   init_interface();
   createRoomButton.style.display = "none"; //hide create room button
   createSaveButton();
-};
+}
 
 function createSaveButton() {
   let saveButton = document.getElementById("saveRoomId");
-  saveButton.style.display = 'block';
-  saveButton.addEventListener("click", saveButtonClick)
+  saveButton.style.display = "block";
+  saveButton.addEventListener("click", saveButtonClick);
 }
 
 //when you click save:
@@ -192,26 +192,26 @@ function createSaveButton() {
 //in a form
 //send this form to the server !!!!
 function saveButtonClick() {
-  console.log('save clicked');
+  console.log("save clicked");
   //PAUSE ALL AUDIO
   //show form only if you've uploaded audio to all 4 channels !
   for (let i = 0; i < grains.length; i++) {
     if (!grains[i].full_buffer) {
-      alert('please record 4 audio files');
+      alert("please record 4 audio files");
       return;
     }
   }
-  formElement.style.display = 'block';
+  formElement.style.display = "block";
   let saveButton = document.getElementById("saveRoomId");
   saveButton.style.display = "none";
-  var divTest = document.getElementById('app_div');
+  var divTest = document.getElementById("app_div");
   divTest.style.visibility = "hidden";
   submitButton.addEventListener("click", submitRoomDetails);
   //turn off all grains!!
   for (let i = 0; i < grains.length; i++) {
     grains[i].stop();
   }
-  console.log('stopped all grains');
+  console.log("stopped all grains");
 }
 
 //send form details to the server here!!!
@@ -219,10 +219,10 @@ function saveButtonClick() {
 //make the audio not deleteable/recordable at this point (just pause/play/move)
 function submitRoomDetails() {
   //first show the main app again but needs to now have details from the form!
-  var divTest = document.getElementById('app_div');
-  formElement.style.display = 'none';
-  divTest.style.visibility = 'visible';
-  roomDetails.style.display = 'flex';
+  var divTest = document.getElementById("app_div");
+  formElement.style.display = "none";
+  divTest.style.visibility = "visible";
+  roomDetails.style.display = "flex";
   //Save the audio and the room id to the server!!!!!
   audioRecorder.on_save_room();
 }
@@ -240,7 +240,6 @@ function get_grains_playing() {
     return null;
   }
 }
-
 
 function kill_grains(playing) {
   for (var i = 0; i < playing.length; i++) {
@@ -264,7 +263,6 @@ function init_grains() {
   grains = new Array();
   for (var i = 0; i < NUM_GRAINS; i++) {
     grains.push(new Grain(i));
-
   }
 }
 
@@ -342,22 +340,182 @@ function init_interface() {
   //init_rec_stop_wrapper();
   // init app div
   init_app_div();
-  //init grain_uis
   grain_uis = new Array();
   for (var i = 0; i < NUM_GRAINS; i++) {
-    //calc GrainUI init values (box_x, box_y, box_width, box_height)
-    var gb_height = get_grain_box_height();
-    var gb_width = get_grain_box_width();
-    var gb_posit = get_grain_box_posit(i);
-    grain_uis.push(
-      new GrainUI(i, gb_posit[0], gb_posit[1], gb_width, gb_height, COLORS[i])
-    );
+    grain_uis.push(createSlider(i));
   }
+  link_grains_to_uis();
+
+  //init grain_uis
+  // grain_uis = new Array();
+  // for (var i = 0; i < NUM_GRAINS; i++) {
+  //   //calc GrainUI init values (box_x, box_y, box_width, box_height)
+  //   var gb_height = get_grain_box_height();
+  //   var gb_width = get_grain_box_width();
+  //   var gb_posit = get_grain_box_posit(i);
+  //   grain_uis.push(
+  //     new GrainUI(i, gb_posit[0], gb_posit[1], gb_width, gb_height, COLORS[i])
+  //   );
+  // }
 
   // link grains to ui's
-  link_grains_to_uis();
-  draw_init_grain_uis();
-  block_app();
+  // link_grains_to_uis();
+  // draw_init_grain_uis();
+  // block_app();
+}
+
+const sliderColors = ["red", "green", "orange", "purple"]
+
+function createSlider(id) {
+  let sliderEl = document.createElement("div");
+  sliderEl.id = `slider-${id}`;
+  sliderEl.className = `slider ${sliderColors[id]}`
+
+  app.appendChild(sliderEl);
+  let slider = noUiSlider.create(sliderEl, {
+    start: [40, 60],
+    connect: true,
+    margin: 10,
+    behaviour: 'drag',
+    range: {
+      min: 0,
+      max: 100,
+    },
+  });
+  slider.on("end", onDragEnd)
+  slider.grain = null
+  console.log(`created slider ${id} `, slider)
+
+
+  // record div
+  let recordEl = document.createElement("div");
+  recordEl.className = "record_div"
+  recordEl.id = `record_div_${id}`
+  let inner_msg = document.createElement("h3");
+  inner_msg.className = "record_text";
+  inner_msg.innerText = "record"
+  recordEl.appendChild(inner_msg)
+  sliderEl.appendChild(recordEl)
+
+
+  // play pause div
+  let playEl = document.createElement("div");
+  playEl.className = "pause_div hidden"
+  playEl.id = `pause_div_${id}`
+  inner_msg = document.createElement("h3");
+  inner_msg.className = "pause_text";
+  inner_msg.innerText = "pause"
+  playEl.appendChild(inner_msg)
+  sliderEl.appendChild(playEl) 
+
+
+  // remove grain div
+  let removeEl = document.createElement('div');
+  removeEl.id = `remove_div_${id}`
+  removeEl.className = "remove_div hidden";
+  inner_msg = document.createElement("h3");
+  inner_msg.className = "remove_text";
+  inner_msg.innerText = "delete grain";
+  removeEl.appendChild(inner_msg);
+  sliderEl.appendChild(removeEl);
+
+
+  
+  slider.recordButton = recordEl;
+  slider.pauseButton = playEl;
+  slider.removeButton = removeEl;
+  slider.update_playstate = updatePlaystate;
+  
+  
+  
+  playEl.addEventListener("click", onPause)
+  recordEl.addEventListener("click", onRecord)
+  removeEl.addEventListener("click", onRemove)
+  // playEl.addEventListener("click", onTogglePlay)
+  // this.record_div = document.createElement('div');
+  // this.record_div.className = "record_div"
+  // var inner_msg = document.createElement("h3");
+  // inner_msg.className = "record_text";
+  // inner_msg.id = "g_record_" + this.g_ind;
+  // inner_msg.innerHTML = "record";
+  // this.record_div.style.background = this.color;
+  // this.record_div.style.border = "5px solid " + this.color;
+  // this.record_div.appendChild(inner_msg);
+  // this.box.appendChild(this.record_div);
+  
+  return slider;
+}
+
+function updatePlaystate (playing=false) { //defaults to false
+  //playing boolean only exists in this fucntion
+  let pause_text = this.pauseButton.firstChild;
+  if (playing){
+    pause_text .innerHTML = "pause"
+  }
+  else {
+    pause_text.innerHTML = "play"
+  }
+}
+
+function onRemove(e) {
+  const g_ind = get_g_ind_from_id(e.target.id);
+  const grain = grains[g_ind]
+  grain.stop();
+  grain.buffer = null;
+  grain.full_buffer = null;
+  grain.oldStart = 0;
+  grain.oldEnd = 0;
+
+  grain.ui.removeButton.classList.add("hidden")
+  grain.ui.pauseButton.classList.add("hidden")
+  grain.ui.recordButton.classList.remove("hidden")
+
+  // this.toggle_live(false);
+  // this.grain_rect_dims_to_def();
+  // this.set_grain_rect_sides(this.g_left_px, this.g_right_px);
+  console.log('grain-deleted');
+
+}
+
+function onDragEnd(e) {
+
+  console.log("drag end ! ", e, this)
+  this.grain.refresh_play()
+}
+
+function onPause(e) {
+  var g_ind = get_g_ind_from_id(e.target.id);
+  //toggle for play/pause
+
+  if (grains[g_ind].grain_on) {
+    grains[g_ind].stop();
+  } else {
+    grains[g_ind].play();
+  }
+  //grain_uis[g_ind].handle_remove_grain();
+}
+
+function onRecord(e) {
+
+  console.log(e)
+  const g_ind = get_g_ind_from_id(e.target.id);
+  const grainUi = grain_uis[g_ind];
+  current_grain_id = g_ind;
+  if (audioRecorder.isRecording) {
+    // audioRecorder.isRecording = false;
+    e.target.innerHTML = "record";
+    console.log("ending record ", current_grain_id);
+    audioRecorder.handle_rec_press(current_grain_id);
+    e.target.classList.add("hidden")
+    grainUi.pauseButton.classList.remove("hidden")
+    grainUi.removeButton.classList.remove("hidden")
+    return;
+  }
+  e.target.innerHTML = "stop"; //change text
+  console.log("got record id ", g_ind);
+  console.log("beginning record ", g_ind);
+  audioRecorder.handle_rec_press(current_grain_id);
+
 }
 
 /* Function: draw_init_grain_uis
@@ -422,39 +580,45 @@ function handle_mouse_down(event) {
     var g_ind = get_g_ind_from_id(event.target.id);
     grain_uis[g_ind].handle_grain_rect_click(event.clientX);
     g_changing = g_ind;
-  } else if (event.target.className == "remove_text") {
-    var g_ind = get_g_ind_from_id(event.target.id);
-    grains[g_ind].stop();
-    grain_uis[g_ind].handle_remove_grain();
-  } else if (event.target.className == "pause_text") {
-    var g_ind = get_g_ind_from_id(event.target.id);
-    //toggle for play/pause
-
-    if (grains[g_ind].grain_on) {
-      grains[g_ind].stop();
-    } else {
-      grains[g_ind].play();
-    }
-    //grain_uis[g_ind].handle_remove_grain();
-  } else if (event.target.className == "record_text") {
-    var g_ind = get_g_ind_from_id(event.target.id);
-    current_grain_id = g_ind;
-    if (audioRecorder.isRecording) {
-      // audioRecorder.isRecording = false;
-      event.target.innerHTML = "record";
-      console.log("ending record ", current_grain_id);
-      audioRecorder.handle_rec_press(current_grain_id);
-      return;
-    }
-
-    // audioRecorder.isRecording = true;
-    event.target.innerHTML = "stop"; //change text
-
-    console.log("got record id ", g_ind);
-
-    console.log("beginning record ", g_ind);
-    audioRecorder.handle_rec_press(current_grain_id);
   }
+  
+  // if (event.target.className == "remove_text") {
+  //   var g_ind = get_g_ind_from_id(event.target.id);
+  //   grains[g_ind].stop();
+  //   grain_uis[g_ind].handle_remove_grain();
+  // }
+  
+  // if (event.target.className == "pause_text") {
+  //   var g_ind = get_g_ind_from_id(event.target.id);
+  //   //toggle for play/pause
+
+  //   if (grains[g_ind].grain_on) {
+  //     grains[g_ind].stop();
+  //   } else {
+  //     grains[g_ind].play();
+  //   }
+  //   //grain_uis[g_ind].handle_remove_grain();
+  // }
+  
+  // if (event.target.className == "record_text") {
+  //   var g_ind = get_g_ind_from_id(event.target.id);
+  //   current_grain_id = g_ind;
+  //   if (audioRecorder.isRecording) {
+  //     // audioRecorder.isRecording = false;
+  //     event.target.innerHTML = "record";
+  //     console.log("ending record ", current_grain_id);
+  //     audioRecorder.handle_rec_press(current_grain_id);
+  //     return;
+  //   }
+
+  //   // audioRecorder.isRecording = true;
+  //   event.target.innerHTML = "stop"; //change text
+
+  //   console.log("got record id ", g_ind);
+
+  //   console.log("beginning record ", g_ind);
+  //   audioRecorder.handle_rec_press(current_grain_id);
+  // }
 }
 
 function handle_mouse_move(event) {

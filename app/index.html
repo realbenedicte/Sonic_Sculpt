@@ -4,10 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width = device-width">
   <title>Sonic_Sculpt</title>
-  <link rel="stylesheet" type="text/css" href="main.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+  <link href="nouislider.css" rel="stylesheet">
+
+  <link rel="stylesheet" type="text/css" href="main.css">
 </head>
 <body>
   <div id="page-container">
@@ -37,27 +39,28 @@
         <!-- form styling resource: -->
         <!-- https://codepen.io/ainalem/pen/GRqPwoz -->
         <!-- <form> -->
-        <div id="saveForm">
+        <div id="saveForm" style="display:none;">
           <div class="title">Save Room</div>
           <div class="input-container ic1">
             <INPUT type="text" name="roomName" id="roomName" placeholder=" " class="input" required/>
             <div class="cut"></div>
-            <label for 'roomName' class="placeholder">Room Name</label>
+            <label for='roomName' class="placeholder">Room Name</label>
           </div>
           <div class="input-container ic2">
             <INPUT type="text" name="composer" id="composer" class="input" placeholder=" " required/>
             <div class="cut"></div>
-            <label for 'composer' class="placeholder">Composer</label>
+            <label for='composer' class="placeholder">Composer</label>
           </div>
           <input id="submit2" type="submit" value="Submit" >
         </div>
-          <!-- </form> -->
+          </form>
         <div id="roomDetailsID">
         </div>
         <button id="saveRoomId" style="display: none;">Save Room</button>
         <div id="all">
         </div>
-        <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
+        <!-- <script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script> -->
+        <script type="text/javascript" src="nouislider.js"></script>
         <script type="text/javascript" src="audio_buffer_slice.js"></script>
         <script type="text/javascript" src="constants.js"></script>
         <script type="text/javascript" src="utils.js"></script>
