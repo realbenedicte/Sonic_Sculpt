@@ -23,7 +23,7 @@ let AudioRecorder = class {
   //
   //upload the recorded wav file to the data base :)
   on_record_stop(e) {
-    this.save_rec_blob(); //upload the recorded wav file to the data base :)
+    this.save_rec_blob(); 
     this.handle_store_full_buffer(); //audio buffer stuff
   }
 

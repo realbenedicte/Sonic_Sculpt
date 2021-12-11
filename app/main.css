@@ -301,9 +301,6 @@ footer p {
   font-size: 2em;
 }
 
-
-
-
 .main-nav > li > a:hover {
   color: black;
   text-shadow: blue 2px 0 10px;
@@ -771,6 +768,6 @@ main {
 
 
 @media only screen and (max-width: 800px) {
-  
+
 
 }

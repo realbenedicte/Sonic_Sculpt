@@ -208,6 +208,7 @@ function saveButtonClick() {
 //send form details to the server here!!!
 //post the room to the explore page
 //make the audio not deleteable/recordable at this point (just pause/play/move)
+//audioRecorder.on_save_room(); makes a post request to the server to upload json data and wav files to the server
 function submitRoomDetails() {
   //first show the main app again but needs to now have details from the form!
   var divTest = document.getElementById("app_div");
@@ -276,7 +277,6 @@ function init_app_div() {
  * app interaction (until a recording occurs).
  */
 function init_interface() {
-  //init_rec_stop_wrapper();
   // init app div
   init_app_div();
   grain_uis = new Array();
@@ -286,13 +286,14 @@ function init_interface() {
   link_grains_to_uis();
 }
 
+//array to hold the colors we want for each grain channel
 const sliderColors = ["red", "green", "orange", "purple"];
 
+//function that creates sliders and creates callbacks for if a slider box is being dragged
 function createSlider(id) {
   let sliderEl = document.createElement("div");
   sliderEl.id = `slider-${id}`;
   sliderEl.className = `slider off ${sliderColors[id]}`;
-
   app.appendChild(sliderEl);
   let slider = noUiSlider.create(sliderEl, {
     start: [40, 60],
@@ -368,26 +369,26 @@ function onRemove(e) {
   console.log("grain-deleted");
 }
 
+//callback for if a slider box is dragged when it stops dragging
+//refresh play (to do with granular synthesis and audio playback)
 function onDragEnd(e) {
   console.log("drag end ! ", e, this);
   this.grain.refresh_play();
 }
 
+//on pause stop playing the grains for that particular channel
 function onPause(e) {
   var g_ind = get_g_ind_from_id(e.target.id);
   //toggle for play/pause
-
   if (grains[g_ind].grain_on) {
     grains[g_ind].stop();
   } else {
     grains[g_ind].play();
   }
-  //grain_uis[g_ind].handle_remove_grain();
 }
-
+//Make sure grain ui is pretty
 function initGrainUiWithRoom() {
   for (let i = 0; i < grain_uis.length; i++) {
-
     const grainUi = grain_uis[i];
     console.log(" got grain ui", grainUi)
     grainUi.target.classList.remove("recording");
@@ -399,7 +400,10 @@ function initGrainUiWithRoom() {
     grainUi.target.classList.remove("off");
   }
 }
-
+//Record function
+//get the grain id of channel
+//update gui
+//call audioRecorder function handle_rec_press()!
 function onRecord(e) {
   console.log(e);
   const g_ind = get_g_ind_from_id(e.target.id);
