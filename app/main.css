@@ -38,7 +38,6 @@ q {
   quotes: none;
 }
 
-
 blockquote:before,
 blockquote:after,
 q:before,
@@ -70,7 +69,7 @@ body {
 #app_div {
   position: absolute;
   width: 80vw;
-  height: 75%;
+  height: calc(100vh - 155px);
   left: 0;
   right: 0;
   display: flex;
@@ -78,7 +77,13 @@ body {
   align-items: center;
   margin: auto;
   justify-content: space-evenly;
+  /* top: 100px; */
 }
+.nav-container {
+  width: 80vw;
+  margin: auto;
+}
+
 
 .spawn_div {
   position: absolute;
@@ -100,32 +105,51 @@ body {
   align-items: center;
   justify-content: center;
   position: absolute;
-  width: 100px;
+  width: 40px;
   height: 100%;
   box-sizing: border-box;
   z-index: 5;
   top: 0;
   color: white;
   cursor: pointer;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
 }
 
-.record_text, .pause_text, .remove_text {
+.record_text,
+.pause_text,
+.remove_text {
   pointer-events: none;
+  display: none;
 }
 
 .record_div {
-  right: 0;
+  right: -40px;
+  background-image: url("/icons/mic_on.svg");
+}
+
+.record_div.recording {
+  background-image: url("/icons/mic_off.svg");
 }
 
 .pause_div {
-  right: 0;
+  right: -40px;
+  background-image: url("/icons/pause.svg");
+}
+
+.pause_div.playing {
+  right: -40px;
+  background-image: url("/icons/play.svg");
 }
 
 .remove_div {
-  left: 0;
+  left: -40px;
+  background-image: url("/icons/del.svg");
 }
 
-.dormant .pause_div, .dormant .remove_div {
+.dormant .pause_div,
+.dormant .remove_div {
   display: none;
 }
 
@@ -201,7 +225,6 @@ body {
 }
 
 #content-wrap {
-  
   /* Footer height */
 }
 
@@ -234,20 +257,20 @@ footer p {
   justify-content: space-between;
   margin: auto;
   flex-direction: row;
-  width: 80vw;
-  margin-top: 20px;
-
+  width: 100%;
+  margin: 20px 0;
+  position: relative;
+  z-index: 999;
 }
 
 .main-nav li {
   list-style-type: none;
+  margin-left: 20px;
+  margin-right: 0;
 }
 
 .main-nav a {
   text-decoration: none;
-  /* padding-left: 0px; */
-  /* padding-right: 0px; */
-  /* padding-top: 40px; */
   display: block;
   margin: 0;
   padding: 0;
@@ -262,13 +285,26 @@ footer p {
   padding-top: 40px;
   display: block;
 }
-
-.main-nav>li>a {
+.main-nav > li > a {
   color: black;
-  font-size: 30px;
+  font-size: 1.5em;
+  margin-left: 20px;
+  text-align: right;
 }
 
-.main-nav>li>a:hover {
+.main-nav > li:first-child {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.main-nav > li:first-child p {
+  font-size: 2em;
+}
+
+
+
+
+.main-nav > li > a:hover {
   color: black;
   text-shadow: blue 2px 0 10px;
 }
@@ -292,13 +328,10 @@ main {
 }
 
 #homeButton p {
-  font-size: 350%;
-  margin-left: 0px;
-  margin-right: 10px;
-  padding-top: 0px;
-  padding-left: 0px;
   text-align: left;
-  color: black;
+  color: #080808;
+  margin: 0;
+  padding: 0;
 }
 
 #homeButton p {
@@ -344,7 +377,7 @@ main {
   border-style: solid;
   touch-action: manipulation;
   transition: all 235ms ease-in-out;
-  box-shadow: rgba(0, 0, 255, .3) 2px 20px 20px -3px;
+  box-shadow: rgba(0, 0, 255, 0.3) 2px 20px 20px -3px;
 }
 
 #createRoomID:hover {
@@ -402,30 +435,26 @@ main {
   font-size: 60px;
 }
 
-
-
-
 #saveRoomId {
-  display: inline-block;
+  display: flex;
   align-self: center;
   border: none;
-  padding: 0.7rem 2rem;
   text-decoration: none;
   background: blue;
   font-family: sans-serif;
   font-size: 1.2rem;
-  color: blue;
   cursor: pointer;
-  text-align: center;
-  border-color: blue;
-  border-style: solid;
   touch-action: manipulation;
   transition: all 235ms ease-in-out;
   z-index: 10;
-  margin-top: 20px;
-  margin-bottom: 10px;
   width: 100%;
   color: white;
+  margin: 0;
+  text-align: center;
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
 }
 
 #saveRoomId:hover {
@@ -444,7 +473,7 @@ main {
   flex-direction: column;
   align-items: center;
   margin: auto;
-  justify-content: space-evenly;
+  margin-top: 40px;
 }
 
 #saveForm {
@@ -462,7 +491,7 @@ main {
 
 .title {
   color: black;
-  font-size: 36px;
+  font-size: 1.2em;
   font-weight: 600;
   margin-top: 30px;
   text-align: center;
@@ -511,8 +540,8 @@ main {
   width: 50px;
 }
 
-.input:focus~.cut,
-.input:not(:placeholder-shown)~.cut {
+.input:focus ~ .cut,
+.input:not(:placeholder-shown) ~ .cut {
   transform: translateY(8px);
 }
 
@@ -528,16 +557,16 @@ main {
   top: 20px;
 }
 
-.input:focus~.placeholder,
-.input:not(:placeholder-shown)~.placeholder {
+.input:focus ~ .placeholder,
+.input:not(:placeholder-shown) ~ .placeholder {
   transform: translateY(-30px) translateX(10px) scale(0.75);
 }
 
-.input:not(:placeholder-shown)~.placeholder {
+.input:not(:placeholder-shown) ~ .placeholder {
   color: #808097;
 }
 
-.input:focus~.placeholder {
+.input:focus ~ .placeholder {
   color: #dc2f55;
 }
 
@@ -555,7 +584,6 @@ main {
   text-align: center;
   width: 100%;
 }
-
 
 #submit2 {
   background-color: blue;
@@ -576,29 +604,25 @@ main {
   background-color: #06b;
 }
 
-
 #roomDetailsID {
-  display:flex;
+  display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-self: center;
-  border: none;
-  padding: 0.7rem 2rem;
   text-decoration: none;
   background: blue;
   font-family: sans-serif;
-  font-size: 1.2rem;
+  font-size: 1.2em;
   color: blue;
   text-align: center;
-  border-color: blue;
-  border-style: solid;
   z-index: 10;
-  margin-top: 20px;
-  margin-bottom: 10px;
   width: 100%;
   color: white;
+  margin: 0;
+  padding: 20px 10px;
+  border: none;
+  box-sizing: border-box;
 }
-
 
 #rooms {
   display: flex;
@@ -615,7 +639,7 @@ main {
   padding-top: 100px;
 }
 
-#rooms>div {
+#rooms > div {
   width: 200px;
   height: 200px;
   display: flex;
@@ -627,7 +651,7 @@ main {
   flex-direction: column;
 }
 
-#rooms>div>a {
+#rooms > div > a {
   text-align: center;
   text-align: center;
   display: inline-block;
@@ -637,7 +661,7 @@ main {
   color: blue;
 }
 
-#rooms>div>p {
+#rooms > div > p {
   text-align: center;
   text-align: center;
   display: inline-block;
@@ -646,75 +670,106 @@ main {
   color: black;
 }
 
-
 /* Slider custom styles */
 .slider {
   width: 100%;
-  height: 15vh;
+  height: 10vh;
   max-height: 110px;
   border: 5px solid;
   box-sizing: border-box;
+  border-right: 40px solid;
+  border-left: 40px solid;
+}
+
+.slider.off .noUi-base {
+  display: none;
 }
 
 .slider.red {
-
   border-color: rgb(255, 74, 74);
 }
 .slider.green {
   border-color: rgb(94, 203, 95);
-  
 }
 .slider.orange {
   border-color: rgb(255, 153, 69);
-  
 }
 .slider.purple {
   border-color: rgb(215, 101, 255);
-
 }
 
+.slider .no_audio {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  margin: auto;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.slider.red .no_audio {
+ color: rgb(255, 74, 74);
+}
+.slider.green .no_audio{
+ color: rgb(94, 203, 95);
+}
+.slider.orange .no_audio{
+ color: rgb(255, 153, 69);
+}
+.slider.purple .no_audio{
+ color: rgb(215, 101, 255);
+}
 
 .noUi-handle {
   border: none;
   background: none;
-  
 }
 
 .noUi-horizontal .noUi-handle {
-  height: 15vh;
+  height: 10vh;
   max-height: calc(110px + 12px);
-  top: -11px;
+  top: -6px;
 }
 
 /* Handle stripes;
  */
- .noUi-handle:before,
- .noUi-handle:after {
-   display: none;
- }
+.noUi-handle:before,
+.noUi-handle:after {
+  display: none;
+}
 
-
- .red .noUi-connect, .red .record_div, .red .pause_div, .red .remove_div {
-   background: rgb(255, 74, 74);
- }
- .green .noUi-connect, .green .record_div, .green .pause_div, .green .remove_div {
-   background: rgb(94, 203, 95);
- }
- .orange .noUi-connect, .orange .record_div, .orange .pause_div, .orange .remove_div {
-   background: rgb(255, 153, 69);
- }
- .purple .noUi-connect, .purple .record_div, .purple .pause_div, .purple .remove_div {
-   background: rgb(215, 101, 255);
- }
- .blue .noUi-connect, .blue .record_div {
-   background: rgb(60, 91, 255);
- }
-
-
-
+.red .noUi-connect,
+.red .record_div,
+.red .pause_div,
+.red .remove_div {
+  background-color: rgb(255, 74, 74);
+}
+.green .noUi-connect,
+.green .record_div,
+.green .pause_div,
+.green .remove_div {
+  background-color: rgb(94, 203, 95);
+}
+.orange .noUi-connect,
+.orange .record_div,
+.orange .pause_div,
+.orange .remove_div {
+  background-color: rgb(255, 153, 69);
+}
+.purple .noUi-connect,
+.purple .record_div,
+.purple .pause_div,
+.purple .remove_div {
+  background-color: rgb(215, 101, 255);
+}
+.blue .noUi-connect,
+.blue .record_div {
+  background-color: rgb(60, 91, 255);
+}
 
 
 
 @media only screen and (max-width: 600px) {
-
 }

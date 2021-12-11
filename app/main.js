@@ -116,6 +116,7 @@ function homePageCreateRoom(r_id = null) {
     audioRecorder.init_audio_stream();
     init_grains();
     init_interface();
+    initGrainUiWithRoom();
     createRoomButton.style.display = "none"; //hide create room button
     createSaveButton();
     console.log("homepage created.");
@@ -142,7 +143,7 @@ function initGrainsFromServer(audioFilePaths) {
   for (let i = 0; i < audioFilePaths.length; i++) {
     initGrain(i, audioFilePaths[i]);
   }
-  unblock_app(); //unblock so u can move sliders
+  // unblock_app(); //unblock so u can move sliders
 }
 
 function initGrain(id, path) {
@@ -157,8 +158,6 @@ function initGrain(id, path) {
       audioData,
       function (buffer) {
         grains[id].full_buffer = buffer;
-        grain_uis[id].handle_spawn_grain();
-        grain_uis[id].disable_record_and_delete(); // make disable recording and delete
         grains[id].stop();
       },
       function (e) {
@@ -364,73 +363,62 @@ function init_interface() {
   // block_app();
 }
 
-const sliderColors = ["red", "green", "orange", "purple"]
+const sliderColors = ["red", "green", "orange", "purple"];
 
 function createSlider(id) {
   let sliderEl = document.createElement("div");
   sliderEl.id = `slider-${id}`;
-  sliderEl.className = `slider ${sliderColors[id]}`
+  sliderEl.className = `slider off ${sliderColors[id]}`;
 
   app.appendChild(sliderEl);
   let slider = noUiSlider.create(sliderEl, {
     start: [40, 60],
     connect: true,
     margin: 10,
-    behaviour: 'drag',
+    behaviour: "drag",
     range: {
       min: 0,
       max: 100,
     },
   });
-  slider.on("end", onDragEnd)
-  slider.grain = null
-  console.log(`created slider ${id} `, slider)
+  slider.on("end", onDragEnd);
+  slider.grain = null;
+  console.log(`created slider ${id} `, slider);
 
+  let noAudioEl = document.createElement("div");
+  let inner_msg = document.createElement("h3");
+  inner_msg.className = "no_audio";
+  inner_msg.innerText = "No Audio";
+  noAudioEl.appendChild(inner_msg);
+  sliderEl.appendChild(noAudioEl);
 
   // record div
   let recordEl = document.createElement("div");
-  recordEl.className = "record_div"
-  recordEl.id = `record_div_${id}`
-  let inner_msg = document.createElement("h3");
-  inner_msg.className = "record_text";
-  inner_msg.innerText = "record"
-  recordEl.appendChild(inner_msg)
-  sliderEl.appendChild(recordEl)
-
+  recordEl.className = "record_div";
+  recordEl.id = `record_div_${id}`;
+  sliderEl.appendChild(recordEl);
 
   // play pause div
   let playEl = document.createElement("div");
-  playEl.className = "pause_div hidden"
-  playEl.id = `pause_div_${id}`
-  inner_msg = document.createElement("h3");
-  inner_msg.className = "pause_text";
-  inner_msg.innerText = "pause"
-  playEl.appendChild(inner_msg)
-  sliderEl.appendChild(playEl) 
-
+  playEl.className = "pause_div hidden";
+  playEl.id = `pause_div_${id}`;
+  sliderEl.appendChild(playEl);
 
   // remove grain div
-  let removeEl = document.createElement('div');
-  removeEl.id = `remove_div_${id}`
+  let removeEl = document.createElement("div");
+  removeEl.id = `remove_div_${id}`;
   removeEl.className = "remove_div hidden";
-  inner_msg = document.createElement("h3");
-  inner_msg.className = "remove_text";
-  inner_msg.innerText = "delete grain";
-  removeEl.appendChild(inner_msg);
   sliderEl.appendChild(removeEl);
 
-
-  
   slider.recordButton = recordEl;
   slider.pauseButton = playEl;
   slider.removeButton = removeEl;
+  slider.noAudio = noAudioEl;
   slider.update_playstate = updatePlaystate;
-  
-  
-  
-  playEl.addEventListener("click", onPause)
-  recordEl.addEventListener("click", onRecord)
-  removeEl.addEventListener("click", onRemove)
+
+  playEl.addEventListener("click", onPause);
+  recordEl.addEventListener("click", onRecord);
+  removeEl.addEventListener("click", onRemove);
   // playEl.addEventListener("click", onTogglePlay)
   // this.record_div = document.createElement('div');
   // this.record_div.className = "record_div"
@@ -442,45 +430,42 @@ function createSlider(id) {
   // this.record_div.style.border = "5px solid " + this.color;
   // this.record_div.appendChild(inner_msg);
   // this.box.appendChild(this.record_div);
-  
+
   return slider;
 }
 
-function updatePlaystate (playing=false) { //defaults to false
-  //playing boolean only exists in this fucntion
-  let pause_text = this.pauseButton.firstChild;
-  if (playing){
-    pause_text .innerHTML = "pause"
-  }
-  else {
-    pause_text.innerHTML = "play"
+function updatePlaystate(playing = false) {
+  //defaults to false
+  if (playing) {
+    this.pauseButton.classList.remove("playing");
+  } else {
+    this.pauseButton.classList.add("playing");
   }
 }
 
 function onRemove(e) {
   const g_ind = get_g_ind_from_id(e.target.id);
-  const grain = grains[g_ind]
+  const grain = grains[g_ind];
   grain.stop();
   grain.buffer = null;
   grain.full_buffer = null;
   grain.oldStart = 0;
   grain.oldEnd = 0;
 
-  grain.ui.removeButton.classList.add("hidden")
-  grain.ui.pauseButton.classList.add("hidden")
-  grain.ui.recordButton.classList.remove("hidden")
-
+  grain.ui.noAudio.classList.remove("hidden");
+  grain.ui.removeButton.classList.add("hidden");
+  grain.ui.pauseButton.classList.add("hidden");
+  grain.ui.recordButton.classList.remove("hidden");
+  grain.ui.target.classList.add("off");
   // this.toggle_live(false);
   // this.grain_rect_dims_to_def();
   // this.set_grain_rect_sides(this.g_left_px, this.g_right_px);
-  console.log('grain-deleted');
-
+  console.log("grain-deleted");
 }
 
 function onDragEnd(e) {
-
-  console.log("drag end ! ", e, this)
-  this.grain.refresh_play()
+  console.log("drag end ! ", e, this);
+  this.grain.refresh_play();
 }
 
 function onPause(e) {
@@ -495,27 +480,43 @@ function onPause(e) {
   //grain_uis[g_ind].handle_remove_grain();
 }
 
-function onRecord(e) {
+function initGrainUiWithRoom() {
+  for (let i = 0; i < grain_uis.length; i++) {
 
-  console.log(e)
+    const grainUi = grain_uis[i];
+    console.log(" got grain ui", grainUi)
+    grainUi.target.classList.remove("recording");
+    grainUi.target.classList.remove("hidden");
+    grainUi.pauseButton.classList.remove("hidden");
+    grainUi.removeButton.classList.add("hidden");
+    grainUi.recordButton.classList.add("hidden");
+    grainUi.noAudio.classList.add("hidden");
+    grainUi.target.classList.remove("off");
+  }
+}
+
+function onRecord(e) {
+  console.log(e);
   const g_ind = get_g_ind_from_id(e.target.id);
   const grainUi = grain_uis[g_ind];
   current_grain_id = g_ind;
   if (audioRecorder.isRecording) {
     // audioRecorder.isRecording = false;
-    e.target.innerHTML = "record";
+
+    e.target.classList.remove("recording");
     console.log("ending record ", current_grain_id);
     audioRecorder.handle_rec_press(current_grain_id);
-    e.target.classList.add("hidden")
-    grainUi.pauseButton.classList.remove("hidden")
-    grainUi.removeButton.classList.remove("hidden")
+    e.target.classList.add("hidden");
+    grainUi.pauseButton.classList.remove("hidden");
+    grainUi.removeButton.classList.remove("hidden");
+    grainUi.noAudio.classList.add("hidden");
+    grainUi.target.classList.remove("off");
     return;
   }
-  e.target.innerHTML = "stop"; //change text
+  e.target.classList.add("recording");
   console.log("got record id ", g_ind);
   console.log("beginning record ", g_ind);
   audioRecorder.handle_rec_press(current_grain_id);
-
 }
 
 /* Function: draw_init_grain_uis
@@ -581,13 +582,13 @@ function handle_mouse_down(event) {
     grain_uis[g_ind].handle_grain_rect_click(event.clientX);
     g_changing = g_ind;
   }
-  
+
   // if (event.target.className == "remove_text") {
   //   var g_ind = get_g_ind_from_id(event.target.id);
   //   grains[g_ind].stop();
   //   grain_uis[g_ind].handle_remove_grain();
   // }
-  
+
   // if (event.target.className == "pause_text") {
   //   var g_ind = get_g_ind_from_id(event.target.id);
   //   //toggle for play/pause
@@ -599,7 +600,7 @@ function handle_mouse_down(event) {
   //   }
   //   //grain_uis[g_ind].handle_remove_grain();
   // }
-  
+
   // if (event.target.className == "record_text") {
   //   var g_ind = get_g_ind_from_id(event.target.id);
   //   current_grain_id = g_ind;
