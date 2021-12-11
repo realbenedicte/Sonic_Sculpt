@@ -1,13 +1,12 @@
 //AudioRecorder Class
 //CLASS CREATED BY MAXIME :)
-
+//
 let AudioRecorder = class {
   constructor() {
     this.isRecording = false;
     this.on_record_stop = this.on_record_stop.bind(this);
     this.blobs = [null, null, null, null];
   }
-
   //methods for this class
   //
   init_mic_recorder(stream) {
@@ -40,8 +39,6 @@ let AudioRecorder = class {
     if (verbose) {
       console.log("recording stopped");
     }
-    // unblock_app();
-    // rec_button.is_active = 0;
   }
 
   delete_rec_blob() {
@@ -72,7 +69,6 @@ let AudioRecorder = class {
     if (verbose) {
       console.log("recording started");
     }
-    // block_app();
   }
 
   handle_rec_press(current_grain_id) {

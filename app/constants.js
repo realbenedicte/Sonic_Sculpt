@@ -1,13 +1,6 @@
 //NOTE THESE CONSTANTS ARE MOSTLY UNMODIFIED AND COME FROM:
 //https://cm-gitlab.stanford.edu/mherrero/grains4u
 
-/* File: constants.js
- * -------------------
- * This file contains all of the constants and global variables used in the
- * Grains4U app. A short description of each can be found above the variable's
- * declaration.
- */
-
 // Creates the AudioContext object that the entire app
 // will use to operate.
 var context = new (window.AudioContext || window.webkitAudioContext)();
@@ -51,32 +44,8 @@ var verbose = 0;
 // Number of grains in the app
 const NUM_GRAINS = 4;
 
-// The different GrainUI colors
-const COLORS = ["rgb(255, 74, 74)", "rgb(94, 203, 95)", "rgb(255, 153, 69)", "rgb(215, 101, 255)", "rgb(60, 91, 255)"];
-
 // the HTML id label of the app div
 const APP_ID = "app_div";
-
-// the HTML id label of the div containing the Rec/Stop button
-const REC_STOP_ID = "rec_stop_wrapper";
-
-// The percentage of the browser window which the app takes up
-const APP_WIDTH_RATIO = 0.6;
-const APP_HEIGHT_RATIO = 0.8;
-
-// The spacing margin (in pixels) above and below each GrainUI box.
-const GRAIN_BOX_MARGIN = 10;
-
-/* G_RECT_SIDE_PERC: Defines the grain_rect's section boundaries
- * as a percentage of the grain_rect's current length. The grain_rect,
- * a component of the GrainUI object that controls grain position and
- * length, has three sections of interaction, one on each side, and one
- * large one in the middle. Different grain manipulations occur depending
- * on which of these sections is clicked. This percentage of the grain_rect's
- * length is reserved on either side of the grain_rect for right or left
- * grain stretching.
- */
-const G_RECT_SIDE_PERC = 0.1;
 
 /* FIRE_SCHED_TIMEOUT: For use in the Grain object's grain
  * scheduling solution. The timeout constant defines how often
@@ -93,9 +62,3 @@ const FIRE_SCHED_TIMEOUT = 25;
  * are scheduled on the Web Audio API's clock.
  */
 const FIRE_SCHED_LOOKAHEAD = 100;
-
-/* G_RECT_DEF: defines the initial state of the inner grain box, including
- * the starting point (index 0 val), ending point (index 0 val), and
- * total width of the inner grain box (index 0 val).
- */
-const G_RECT_DEF = [0.6, 0.8, 0.2];

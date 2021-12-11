@@ -17,15 +17,8 @@ let audioFilePaths = null;
 window.addEventListener("load", (event) => {
   console.log("window loaded.");
   initRoom();
-  init_doc_listeners();
-});
-
-function init_doc_listeners() {
-  document.addEventListener("mousemove", handle_mouse_move, false);
-  document.addEventListener("mousedown", handle_mouse_down, false);
-  document.addEventListener("mouseup", handle_mouse_up, false);
   createRoomButton.addEventListener("click", createRoom);
-}
+});
 
 //query the server/db to see if the url typed into the website matches a room !!!!
 //if it does load up that room, if it doesn't load the homepage with createroom
@@ -143,7 +136,6 @@ function initGrainsFromServer(audioFilePaths) {
   for (let i = 0; i < audioFilePaths.length; i++) {
     initGrain(i, audioFilePaths[i]);
   }
-  // unblock_app(); //unblock so u can move sliders
 }
 
 function initGrain(id, path) {
@@ -275,58 +267,6 @@ function init_app_div() {
   // var divTest = document.getElementById('app_div');
 }
 
-/* Function: get_css_val
- * ---------------------
- * This is a general purpose function for retrieving the final, calculated value
- * of an object's css property on the page. The function takes in the id string
- * of the object (elem_id), the name of the property that will be queried (val_name)
- * and a boolean indicating whether the return value should be processed into a float
- * or not (return_as_num).
- */
-function get_css_val(elem_id, val_name, return_as_num) {
-  var elem = document.getElementById(elem_id);
-  var style_val = window.getComputedStyle(elem).getPropertyValue(val_name);
-  if (return_as_num) return parseFloat(style_val);
-  return style_val;
-}
-
-/* Function: get_grain_box_height
- * ------------------------------
- * This function returns the height that each grain box should be
- * in the application. The quantity is returned as a number variable
- * with pixels as the unit.
- */
-function get_grain_box_height() {
-  var app_height = get_css_val(APP_ID, "height", true);
-  return app_height / (NUM_GRAINS * 1.0) - 2 * GRAIN_BOX_MARGIN;
-}
-
-/* Function: get_grain_box_width
- * -----------------------------
- * This function returns the width that each grain box should be
- * in the application. The quantity is returned as a number variable
- * with pixels as the unit.
- */
-function get_grain_box_width() {
-  return get_css_val(APP_ID, "width", true);
-}
-
-/* Function: get_grain_box_posit
- * -----------------------------
- * This calculates the x and y coordinates of the top-left corner of
- * each grain box on the page. The coordinate pair depends on the
- * index of the grain box, and the height of the window. The coordinate pair
- * is returned in the posit array.
- */
-function get_grain_box_posit(g_ind) {
-  var posit = [];
-  //get x val
-  posit[0] = 0;
-  //get y val
-  var g_box_height = get_grain_box_height();
-  posit[1] = g_ind * (g_box_height + 2 * GRAIN_BOX_MARGIN);
-  return posit;
-}
 
 /* Function: init_interface
  * ------------------------
@@ -344,23 +284,6 @@ function init_interface() {
     grain_uis.push(createSlider(i));
   }
   link_grains_to_uis();
-
-  //init grain_uis
-  // grain_uis = new Array();
-  // for (var i = 0; i < NUM_GRAINS; i++) {
-  //   //calc GrainUI init values (box_x, box_y, box_width, box_height)
-  //   var gb_height = get_grain_box_height();
-  //   var gb_width = get_grain_box_width();
-  //   var gb_posit = get_grain_box_posit(i);
-  //   grain_uis.push(
-  //     new GrainUI(i, gb_posit[0], gb_posit[1], gb_width, gb_height, COLORS[i])
-  //   );
-  // }
-
-  // link grains to ui's
-  // link_grains_to_uis();
-  // draw_init_grain_uis();
-  // block_app();
 }
 
 const sliderColors = ["red", "green", "orange", "purple"];
@@ -409,28 +332,14 @@ function createSlider(id) {
   removeEl.id = `remove_div_${id}`;
   removeEl.className = "remove_div hidden";
   sliderEl.appendChild(removeEl);
-
   slider.recordButton = recordEl;
   slider.pauseButton = playEl;
   slider.removeButton = removeEl;
   slider.noAudio = noAudioEl;
   slider.update_playstate = updatePlaystate;
-
   playEl.addEventListener("click", onPause);
   recordEl.addEventListener("click", onRecord);
   removeEl.addEventListener("click", onRemove);
-  // playEl.addEventListener("click", onTogglePlay)
-  // this.record_div = document.createElement('div');
-  // this.record_div.className = "record_div"
-  // var inner_msg = document.createElement("h3");
-  // inner_msg.className = "record_text";
-  // inner_msg.id = "g_record_" + this.g_ind;
-  // inner_msg.innerHTML = "record";
-  // this.record_div.style.background = this.color;
-  // this.record_div.style.border = "5px solid " + this.color;
-  // this.record_div.appendChild(inner_msg);
-  // this.box.appendChild(this.record_div);
-
   return slider;
 }
 
@@ -451,15 +360,11 @@ function onRemove(e) {
   grain.full_buffer = null;
   grain.oldStart = 0;
   grain.oldEnd = 0;
-
   grain.ui.noAudio.classList.remove("hidden");
   grain.ui.removeButton.classList.add("hidden");
   grain.ui.pauseButton.classList.add("hidden");
   grain.ui.recordButton.classList.remove("hidden");
   grain.ui.target.classList.add("off");
-  // this.toggle_live(false);
-  // this.grain_rect_dims_to_def();
-  // this.set_grain_rect_sides(this.g_left_px, this.g_right_px);
   console.log("grain-deleted");
 }
 
@@ -501,8 +406,6 @@ function onRecord(e) {
   const grainUi = grain_uis[g_ind];
   current_grain_id = g_ind;
   if (audioRecorder.isRecording) {
-    // audioRecorder.isRecording = false;
-
     e.target.classList.remove("recording");
     console.log("ending record ", current_grain_id);
     audioRecorder.handle_rec_press(current_grain_id);
@@ -519,17 +422,6 @@ function onRecord(e) {
   audioRecorder.handle_rec_press(current_grain_id);
 }
 
-/* Function: draw_init_grain_uis
- * -----------------------------
- * This function initializes the display elements of the GrainUI
- * objects.
- */
-function draw_init_grain_uis() {
-  for (var i = 0; i < NUM_GRAINS; i++) {
-    grain_uis[i].draw_init();
-    grain_uis[i].enable_record_and_delete();
-  }
-}
 
 /* Function: get_g_ind_from_id
  * ---------------------------
@@ -540,104 +432,4 @@ function draw_init_grain_uis() {
 function get_g_ind_from_id(str) {
   var ind_str = str.charAt(str.length - 1);
   return parseInt(ind_str);
-}
-
-/* Function: unblock_app
- * ---------------------
- * This function unblocks the entire app, allowing interactions
- * with the grains. This is used once a recording is made by the
- * user and the grains can be played.
- */
-function unblock_app() {
-  for (var i = 0; i < NUM_GRAINS; i++) {
-    grain_uis[i].unblock_me();
-  }
-}
-
-/* Function: block_app
- * -------------------
- * This function makes the entire app blocked, and prevents interactions
- * with the grains. This is used for when the page is initially loaded and
- * no recording is in the buffer, or when a recording is happening.
- */
-function block_app() {
-  for (var i = 0; i < NUM_GRAINS; i++) {
-    grain_uis[i].block_me();
-  }
-}
-
-/* Function: handle_mouse_move
- * ---------------------------
- * This function handles any mouse down event on the page. There are
- * four cases that require handling: If the text "add a grain" is clicked
- * on an inactive grain, then the grain is initiated. If a grain rectangle
- * is clicked, the correct grain number is retrieved, and transformation
- * on that grain is initiated. If the Record button is pressed, recording begins.
- * If the remove button is pressed, the grain is killed.
- */
-function handle_mouse_down(event) {
-  if (event.target.className == "g_rect") {
-    event.preventDefault();
-    var g_ind = get_g_ind_from_id(event.target.id);
-    grain_uis[g_ind].handle_grain_rect_click(event.clientX);
-    g_changing = g_ind;
-  }
-
-  // if (event.target.className == "remove_text") {
-  //   var g_ind = get_g_ind_from_id(event.target.id);
-  //   grains[g_ind].stop();
-  //   grain_uis[g_ind].handle_remove_grain();
-  // }
-
-  // if (event.target.className == "pause_text") {
-  //   var g_ind = get_g_ind_from_id(event.target.id);
-  //   //toggle for play/pause
-
-  //   if (grains[g_ind].grain_on) {
-  //     grains[g_ind].stop();
-  //   } else {
-  //     grains[g_ind].play();
-  //   }
-  //   //grain_uis[g_ind].handle_remove_grain();
-  // }
-
-  // if (event.target.className == "record_text") {
-  //   var g_ind = get_g_ind_from_id(event.target.id);
-  //   current_grain_id = g_ind;
-  //   if (audioRecorder.isRecording) {
-  //     // audioRecorder.isRecording = false;
-  //     event.target.innerHTML = "record";
-  //     console.log("ending record ", current_grain_id);
-  //     audioRecorder.handle_rec_press(current_grain_id);
-  //     return;
-  //   }
-
-  //   // audioRecorder.isRecording = true;
-  //   event.target.innerHTML = "stop"; //change text
-
-  //   console.log("got record id ", g_ind);
-
-  //   console.log("beginning record ", g_ind);
-  //   audioRecorder.handle_rec_press(current_grain_id);
-  // }
-}
-
-function handle_mouse_move(event) {
-  if (g_changing > -1) {
-    event.preventDefault();
-    grain_uis[g_changing].handle_new_mouse_coords(event.clientX);
-  }
-}
-
-/* Function: handle_mouse_up
- * -------------------------
- * This function handles a mouse up event. If one of the grain rectangles
- * is being transformed, this is stopped, and the g_changing boolean is
- * switched to reflect this.
- */
-function handle_mouse_up(event) {
-  if (g_changing > -1) {
-    grain_uis[g_changing].handle_grain_rect_release();
-    g_changing = -1;
-  }
 }
